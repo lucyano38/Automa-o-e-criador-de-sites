@@ -51,14 +51,22 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ onOpenWhatsA
           </div>
 
           <form onSubmit={handleSendQuick} className="space-y-2">
-            <input
-              type="text"
-              placeholder="Digite sua dúvida ou ideia..."
+            <textarea
+              id="floating-whatsapp-textarea"
+              rows={3}
+              placeholder="Digite sua dúvida, ideia ou detalhes do projeto..."
               value={quickText}
               onChange={(e) => setQuickText(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:border-emerald-500"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendQuick(e);
+                }
+              }}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:border-emerald-500 resize-none leading-relaxed transition-colors"
             />
             <button
+              id="floating-whatsapp-submit-btn"
               type="submit"
               className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition-all cursor-pointer shadow-md shadow-emerald-500/20"
             >

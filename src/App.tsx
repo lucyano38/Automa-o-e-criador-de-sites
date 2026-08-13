@@ -17,6 +17,7 @@ import { FaqSection } from './components/FaqSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
+import { BackToTop } from './components/BackToTop';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('solucoes');
@@ -133,6 +134,9 @@ export default function App() {
 
       {/* Floating WhatsApp Action Button & Drawer */}
       <FloatingWhatsApp onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+
+      {/* Floating Back to Top Button */}
+      <BackToTop />
 
     </div>
   );
