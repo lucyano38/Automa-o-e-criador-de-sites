@@ -1,0 +1,37 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "System user",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role", "createdAt"]
+    },
+    "Subscription": {
+      "title": "Subscription",
+      "description": "User subscription status",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "status": { "type": "string" },
+        "stripeSubscriptionId": { "type": "string" }
+      },
+      "required": ["userId", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "User" },
+      "description": "User profiles"
+    },
+    "/users/{userId}/subscriptions/{subscriptionId}": {
+      "schema": { "$ref": "Subscription" },
+      "description": "User subscriptions"
+    }
+  }
+}

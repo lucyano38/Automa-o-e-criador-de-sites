@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { SERVICES_DATA } from '../data/services';
-import { Globe, MessageSquare, Workflow, Instagram, BarChart3, Check, ArrowRight, Sparkles, Code2, Search, Smartphone } from 'lucide-react';
+import { Globe, MessageSquare, Workflow, Instagram, BarChart3, Check, ArrowRight, Sparkles, Code2, Search, Smartphone, Video } from 'lucide-react';
 
 interface ServicesSectionProps {
   onOpenWhatsApp: () => void;
@@ -18,6 +18,8 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onOpenWhatsApp
         return <Workflow className="w-8 h-8 text-amber-300" />;
       case 'Instagram':
         return <Instagram className="w-8 h-8 text-pink-300" />;
+      case 'Video':
+        return <Video className="w-8 h-8 text-cyan-400" />;
       case 'BarChart3':
         return <BarChart3 className="w-8 h-8 text-purple-300" />;
       default:

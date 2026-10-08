@@ -105,3 +105,41 @@ export interface InsightItem {
   linkUrl?: string;
 }
 
+export interface VideoCaptionSegment {
+  id: string;
+  startTime: number;
+  endTime: number;
+  text: string;
+  highlightWord?: string;
+  emoji?: string;
+  effect?: 'zoom' | 'bounce' | 'shake' | 'flash' | 'none';
+}
+
+export interface VideoPresetSample {
+  id: string;
+  title: string;
+  category: string;
+  format: '9:16' | '16:9' | '1:1';
+  duration: number;
+  videoUrl: string;
+  thumbnailUrl: string;
+  description: string;
+  hook: string;
+  captions: VideoCaptionSegment[];
+  soundtrack: string;
+}
+
+export interface AutoVideoSettings {
+  autoJumpCuts: boolean;
+  autoCaptions: boolean;
+  captionStyle: 'hormozi' | 'neon' | 'minimal' | 'pop' | 'cyber';
+  captionFontSize: number;
+  autoZoomIn: boolean;
+  autoEmojis: boolean;
+  backgroundMusicVolume: number;
+  selectedBgm: string;
+  aspectRatio: '9:16' | '16:9' | '1:1';
+  viralityScore: number;
+}
+
+

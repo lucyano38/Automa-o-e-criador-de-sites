@@ -19,7 +19,7 @@ export const Footer: React.FC = () => {
             </div>
             <div>
               <div className="text-white font-extrabold text-sm">Luciano Tavares Silva</div>
-              <div className="text-[11px] text-amber-400/90 font-mono">Titular & Desenvolvedor · Foco Completo</div>
+              <div className="text-[11px] text-amber-400/90 font-mono">Titular & Desenvolvedor · Foco em Dados</div>
             </div>
           </div>
 
@@ -50,7 +50,7 @@ export const Footer: React.FC = () => {
         {/* Bottom copyright & portals */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-400 text-[11px]">
           <div>
-            © {new Date().getFullYear()} Luciano Tavares Silva · Foco Completo. Desenvolvimento Web, Automações WhatsApp & Mídias Sociais.
+            © {new Date().getFullYear()} Luciano Tavares Silva · Foco em Dados. Desenvolvimento Web, Automações WhatsApp & Mídias Sociais.
           </div>
           <div className="flex items-center gap-3 font-mono text-amber-400">
             <a href="https://soscuidadores.com" target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-1">

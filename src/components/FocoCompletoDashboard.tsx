@@ -155,7 +155,7 @@ export const FocoCompletoDashboard: React.FC<FocoCompletoDashboardProps> = ({
               </div>
               <div>
                 <span className="text-lg font-extrabold text-white tracking-tight font-sans">
-                  Foco Completo
+                  Foco em Dados
                 </span>
                 <span className="block text-[10px] text-amber-400/80 font-mono">
                   focoemdados.com.br
@@ -173,7 +173,7 @@ export const FocoCompletoDashboard: React.FC<FocoCompletoDashboardProps> = ({
 
             {/* CTA Button */}
             <button 
-              onClick={() => onOpenWhatsAppWithMessage('Olá Luciano! Gostaria de implementar um Painel Central Foco Completo para o meu negócio.')}
+              onClick={() => onOpenWhatsAppWithMessage('Olá Luciano! Gostaria de implementar um Painel Central Foco em Dados para o meu negócio.')}
               className="px-5 py-2.5 rounded-xl font-extrabold text-xs bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 text-slate-950 shadow-lg shadow-amber-500/30 hover:scale-105 transition-all cursor-pointer"
             >
               Começar Agora
@@ -183,7 +183,7 @@ export const FocoCompletoDashboard: React.FC<FocoCompletoDashboardProps> = ({
           {/* 2. Headline Title in Glowing Gold */}
           <div className="text-center py-2 relative z-10">
             <h1 className="text-2xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-300 tracking-tight drop-shadow-[0_0_25px_rgba(250,189,0,0.4)]">
-              Painel Central Foco Completo
+              Painel Central Foco em Dados
             </h1>
           </div>
 
@@ -402,7 +402,7 @@ export const FocoCompletoDashboard: React.FC<FocoCompletoDashboardProps> = ({
               </p>
             </div>
             <button
-              onClick={() => onOpenWhatsAppWithMessage('Olá Luciano! Vi o Painel Central Foco Completo e quero um orçamento para integrar meu negócio.')}
+              onClick={() => onOpenWhatsAppWithMessage('Olá Luciano! Vi o Painel Central Foco em Dados e quero um orçamento para integrar meu negócio.')}
               className="px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-500/20 shrink-0"
             >
               <MessageSquare className="w-4 h-4 fill-slate-950" />

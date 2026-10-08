@@ -105,6 +105,122 @@ async function startServer() {
     res.json({ insights: insightsData, total: insightsData.length });
   });
 
+  // API Route: AI Auto Video Editor & Script / Hook Generator
+  app.post('/api/auto-video/generate-script', async (req, res) => {
+    try {
+      const { topic, format, targetAudience, style } = req.body;
+
+      if (!topic) {
+        return res.status(400).json({ error: 'Informe o tema ou ideia do vídeo.' });
+      }
+
+      const apiKey = process.env.GEMINI_API_KEY;
+
+      if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
+        // Fallback intelligent script and auto-edit structure
+        return res.json({
+          source: 'fallback',
+          title: `Vídeo Estratégico: ${topic}`,
+          viralityScore: 92,
+          estimatedDuration: '45 segundos',
+          aspectRatio: format || '9:16',
+          hooks: [
+            `Pare de perder clientes por não ter ${topic}! Veja isso agora:`,
+            `O maior segredo para dominar ${topic} em menos de 1 minuto.`,
+            `Se você ainda faz isso com ${topic}, está perdendo dinheiro.`
+          ],
+          segments: [
+            {
+              timestamp: '00:00 - 00:05',
+              scene: 'Gancho Visual + Zoom Rápido (1.2x)',
+              dialogue: `Você sabia que a maioria das pessoas erra feio quando o assunto é ${topic}?`,
+              brollSuggestion: 'Corte rápido com texto piscando em amarelo/verde e efeito sonoro swoosh.',
+              captionText: 'VOCÊ SABIA DISSO?! 😱',
+              captionHighlight: 'VOCÊ SABIA'
+            },
+            {
+              timestamp: '00:05 - 00:18',
+              scene: 'Problema & Identificação (Câmera Normal)',
+              dialogue: `O grande erro é tentar resolver tudo no manual sem uma estrutura automática e profissional.`,
+              brollSuggestion: 'Tela mostrando processos lentos e notificação de alerta.',
+              captionText: 'O erro clássico de fazer tudo no manual...',
+              captionHighlight: 'ERRO CLÁSSICO'
+            },
+            {
+              timestamp: '00:18 - 00:35',
+              scene: 'Solução Prática & Demonstração (Corte Dinâmico)',
+              dialogue: `Com a automação certa, você economiza horas por dia e atrai clientes 24 horas por dia no piloto automático.`,
+              brollSuggestion: 'Gráfico de crescimento acelerado e notificações de novos leads no WhatsApp.',
+              captionText: 'Atendimento e vendas no piloto automático 24h! 🚀',
+              captionHighlight: 'PILOTO AUTOMÁTICO'
+            },
+            {
+              timestamp: '00:35 - 00:45',
+              scene: 'Chamada para Ação / CTA (Zoom In + Botão WhatsApp)',
+              dialogue: `Quer aplicar isso no seu negócio hoje mesmo? Clica no link da bio ou me chama no WhatsApp!`,
+              brollSuggestion: 'Seta animada apontando para a bio ou botão de contato.',
+              captionText: 'Fale com o Luciano no WhatsApp agora mesmo! 👉',
+              captionHighlight: 'CLIQUE NO LINK'
+            }
+          ],
+          suggestedCaptionsStyle: 'Hormozi Pop (Amarelo / Verde)',
+          recommendedBgm: 'Upbeat Tech Modern Lofi',
+          hashtags: ['#marketingdigital', '#automacao', '#conversao', '#negociosdigitais', '#reelsbrasil']
+        });
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
+
+      const prompt = `Você é um editor de vídeo profissional e estrategista de vídeos curtos virais (Reels, TikTok, Shorts e VSLs).
+Gere uma estrutura completa de edição automática e roteiro de alta retenção para o seguinte vídeo:
+- Tema/Assunto: ${topic}
+- Formato desejado: ${format || '9:16 (Vertical Reels/TikTok)'}
+- Público Alvo: ${targetAudience || 'Empreendedores e Clientes em Potencial'}
+- Estilo: ${style || 'Dinâmico, com cortes rápidos, legendas magnéticas e alto impacto'}
+
+Retorne APENAS um JSON válido no seguinte formato:
+{
+  "title": "string",
+  "viralityScore": 94,
+  "estimatedDuration": "45-60s",
+  "aspectRatio": "9:16",
+  "hooks": ["gancho 1", "gancho 2", "gancho 3"],
+  "segments": [
+    {
+      "timestamp": "00:00 - 00:05",
+      "scene": "descrição do corte / transição visual",
+      "dialogue": "fala exata do apresentador",
+      "brollSuggestion": "sugestão de B-Roll / imagem de apoio",
+      "captionText": "texto da legenda dinâmica",
+      "captionHighlight": "palavra a destacar"
+    }
+  ],
+  "suggestedCaptionsStyle": "Hormozi Pop",
+  "recommendedBgm": "Nome do estilo musical de fundo",
+  "hashtags": ["#tag1", "#tag2", "#tag3"]
+}`;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json'
+        }
+      });
+
+      const text = response.text || '';
+      try {
+        const parsed = JSON.parse(text);
+        return res.json({ source: 'gemini_ai', ...parsed });
+      } catch (e) {
+        return res.status(500).json({ error: 'Erro ao formatar roteiro de vídeo.' });
+      }
+    } catch (err: any) {
+      console.error('Auto Video API error:', err);
+      res.status(500).json({ error: 'Erro ao gerar edição automática de vídeo.' });
+    }
+  });
+
   // API Route: AI E-Commerce & Automation Diagnostic
   app.post('/api/diagnostic', async (req, res) => {
     try {

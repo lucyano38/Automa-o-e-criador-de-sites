@@ -12,7 +12,9 @@ import {
   Tag, 
   Zap,
   TrendingDown,
-  ShieldCheck
+  ShieldCheck,
+  Video,
+  Film
 } from 'lucide-react';
 
 interface ServicePricingBlocksProps {
@@ -96,6 +98,25 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
       lucianoPrice: 'R$ 690,00',
       customTag: 'A partir de ou Sob Medida',
       popular: false
+    },
+    {
+      id: 'edicao-video-ia',
+      title: 'EDIÇÃO AUTOMÁTICA DE VÍDEO & REELS',
+      badge: 'Cortes Dinâmicos, Legendas & Retenção',
+      icon: Video,
+      accentColor: 'border-amber-500/30 hover:border-amber-400',
+      badgeBg: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
+      description: 'Transforme gravações brutas em vídeos virais e magnéticos com legendas Alex Hormozi, cortes de silêncio e zooms de retenção.',
+      deliverables: [
+        'Corte automático de pausas e silêncios (jump-cuts de alta retenção)',
+        'Legendas dinâmicas palavra por palavra no estilo Hormozi / TikTok',
+        'Auto Zoom dinâmico e inserção de emojis/B-rolls contextuais',
+        'Pacotes avulsos ou mensais para Reels, Shorts e TikTok prontos para postar'
+      ],
+      marketPrice: 'R$ 1.200 a R$ 3.000 / mês',
+      lucianoPrice: 'R$ 390,00',
+      customTag: 'Pacote a partir de ou Por Vídeo',
+      popular: false
     }
   ];
 
@@ -123,8 +144,8 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
           </p>
         </motion.div>
 
-        {/* 4 Clean Visual Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+        {/* Offerings Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {offerings.map((item, index) => {
             const IconComponent = item.icon;
             return (

@@ -7,6 +7,7 @@ import { FocoCompletoDashboard } from './components/FocoCompletoDashboard';
 import { ServicesSection } from './components/ServicesSection';
 import { ServicePricingBlocks } from './components/ServicePricingBlocks';
 import { AutomationBuilder } from './components/AutomationBuilder';
+import { AutoVideoEditor } from './components/AutoVideoEditor';
 import { PortfolioSection } from './components/PortfolioSection';
 import { InsightsSection } from './components/InsightsSection';
 import { RoiCalculator } from './components/RoiCalculator';
@@ -34,7 +35,7 @@ export default function App() {
 
   const navTabs = [
     { id: 'solucoes', label: '⚡ Soluções & Serviços', sub: 'Websites, Automação & Instagram' },
-    { id: 'painel', label: '📊 Painel Foco Completo', sub: 'Dashboard de Indicadores & Funil' },
+    { id: 'painel', label: '📊 Painel Foco em Dados', sub: 'Dashboard de Indicadores & Funil' },
     { id: 'sobre', label: '♿ Sobre Luciano (Titular)', sub: 'História, Superação & Portais' },
     { id: 'insights', label: '💡 Insights & IA', sub: 'Artigos Práticos & Diagnóstico' },
   ];
@@ -68,6 +69,7 @@ export default function App() {
                 onOpenWhatsApp={() => handleOpenWhatsAppWithMessage()} 
                 setActiveTab={setActiveTab}
               />
+              <AutoVideoEditor onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
               <ServicePricingBlocks onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
               <ServicesSection onOpenWhatsApp={() => handleOpenWhatsAppWithMessage()} />
               <AutomationBuilder onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
@@ -80,7 +82,7 @@ export default function App() {
             </motion.div>
           )}
 
-          {/* Tab 2: Painel Foco Completo (Full Flagship Dashboard) */}
+          {/* Tab 2: Painel Foco em Dados (Full Flagship Dashboard) */}
           {activeTab === 'painel' && (
             <motion.div
               key="painel"

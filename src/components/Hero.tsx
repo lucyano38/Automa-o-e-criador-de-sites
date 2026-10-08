@@ -68,22 +68,30 @@ export const Hero: React.FC<HeroProps> = ({ onOpenWhatsApp, setActiveTab }) => {
             </div>
 
             {/* Clean White Pill CTA Button (Like MK3Digital Screenshot) */}
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
               <button
                 onClick={onOpenWhatsApp}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-extrabold text-sm bg-white text-slate-950 hover:bg-cyan-300 transition-all shadow-xl hover:scale-105 cursor-pointer uppercase tracking-wider"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full font-extrabold text-xs bg-white text-slate-950 hover:bg-cyan-300 transition-all shadow-xl hover:scale-105 cursor-pointer uppercase tracking-wider"
               >
                 <MessageSquare className="w-4 h-4 fill-slate-950" />
-                <span>Fale Conosco no WhatsApp</span>
+                <span>Fale no WhatsApp</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
               <a
-                href="#servicos-precos"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full font-bold text-xs bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 transition-all cursor-pointer uppercase tracking-wider"
+                href="#editor-video-ia"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full font-bold text-xs bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-400/40 transition-all cursor-pointer uppercase tracking-wider shadow-lg shadow-cyan-500/10"
               >
-                <Zap className="w-4 h-4 text-amber-400" />
-                <span>Ver Soluções & Valores</span>
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Edição de Vídeo IA</span>
+              </a>
+
+              <a
+                href="#servicos-precos"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full font-bold text-xs bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 transition-all cursor-pointer uppercase tracking-wider"
+              >
+                <Zap className="w-3.5 h-3.5 text-amber-400" />
+                <span>Soluções & Preços</span>
               </a>
             </div>
 

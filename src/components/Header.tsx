@@ -21,6 +21,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenW
 
   const navTabs = [
     { id: 'solucoes', label: 'INÍCIO' },
+    { id: 'video-ia', label: 'VÍDEO COM IA' },
     { id: 'websites', label: 'WEBSITES & PAGES' },
     { id: 'automacao', label: 'AUTOMAÇÃO 24H' },
     { id: 'cases', label: 'CASES / PORTFÓLIO' },
@@ -55,7 +56,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenW
             </div>
             <div>
               <div className="font-extrabold text-white text-lg tracking-tight group-hover:text-cyan-400 transition-colors uppercase font-sans">
-                Foco Completo
+                Foco em Dados
               </div>
               <p className="text-[10px] text-cyan-400/90 font-mono tracking-widest uppercase font-semibold">
                 AGÊNCIA DIGITAL & AUTOMAÇÕES
@@ -78,6 +79,14 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenW
                         contactEl.scrollIntoView({ behavior: 'smooth' });
                         return;
                       }
+                    }
+                    if (tab.id === 'video-ia') {
+                      setActiveTab('solucoes');
+                      setTimeout(() => {
+                        const targetEl = document.getElementById('editor-video-ia');
+                        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+                      }, 100);
+                      return;
                     }
                     if (tab.id === 'websites' || tab.id === 'automacao') {
                       setActiveTab('solucoes');
@@ -164,6 +173,14 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenW
                   if (tab.id === 'contato') {
                     const contactEl = document.getElementById('contato-section');
                     if (contactEl) contactEl.scrollIntoView({ behavior: 'smooth' });
+                    return;
+                  }
+                  if (tab.id === 'video-ia') {
+                    setActiveTab('solucoes');
+                    setTimeout(() => {
+                      const targetEl = document.getElementById('editor-video-ia');
+                      if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
                     return;
                   }
                   if (tab.id === 'websites' || tab.id === 'automacao') {
