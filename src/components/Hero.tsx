@@ -7,8 +7,10 @@ import {
   Zap, 
   Instagram,
   CheckCircle2,
-  Laptop
+  Laptop,
+  Radar
 } from 'lucide-react';
+import { TechGlobeCanvas } from './TechGlobeCanvas';
 
 interface HeroProps {
   onOpenWhatsApp: () => void;
@@ -19,6 +21,9 @@ export const Hero: React.FC<HeroProps> = ({ onOpenWhatsApp, setActiveTab }) => {
   return (
     <section className="relative pt-12 pb-16 lg:pt-20 lg:pb-24 overflow-hidden bg-[#0d0f10]">
       
+      {/* 3D Animated Dissolving Globe Particle Canvas */}
+      <TechGlobeCanvas variant="hero" intensity={0.75} className="opacity-45 pointer-events-none" />
+
       {/* Background Subtle Gradient & Light Grid */}
       <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-20 pointer-events-none"></div>
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -84,6 +89,14 @@ export const Hero: React.FC<HeroProps> = ({ onOpenWhatsApp, setActiveTab }) => {
               >
                 <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
                 <span>Edição de Vídeo IA</span>
+              </a>
+
+              <a
+                href="#prospeccao-ativa"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full font-bold text-xs bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 hover:from-emerald-500/30 hover:to-cyan-500/30 text-emerald-300 border border-emerald-400/50 transition-all cursor-pointer uppercase tracking-wider shadow-lg shadow-emerald-500/10"
+              >
+                <Radar className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Radar de Prospecção B2B</span>
               </a>
 
               <a

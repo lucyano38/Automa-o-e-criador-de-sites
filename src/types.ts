@@ -142,4 +142,62 @@ export interface AutoVideoSettings {
   viralityScore: number;
 }
 
+export interface ProspectAuditDetails {
+  mobileFriendly: boolean;
+  sslActive: boolean;
+  loadSpeedSeconds: number;
+  hasWhatsAppButton: boolean;
+  googleLighthouseScore: number;
+  modernityIssues: string[];
+  keyWeakness: string;
+  conversionOpportunity: string;
+}
+
+export interface ProspectLead {
+  id: string;
+  companyName: string;
+  tradeName: string;
+  cnpj: string;
+  cnae: string;
+  cnaeDescription: string;
+  niche: string;
+  distanceKm: number;
+  address: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  phone: string;
+  whatsappDirect: string;
+  hasWebsite: boolean;
+  websiteUrl?: string;
+  urgencyLevel: 'alta' | 'media' | 'baixa';
+  leadStatus: 'novo' | 'contatado' | 'proposta' | 'fechado';
+  opportunityType: 'criar_site' | 'modernizar_site' | 'automacao_expansao';
+  auditDetails: ProspectAuditDetails;
+  estimatedMonthlyLoss: number;
+  customPitch: string;
+  googleRating?: number;
+  reviewCount?: number;
+}
+
+export interface CnaeNicheOption {
+  id: string;
+  name: string;
+  cnaeCode: string;
+  cnaeDescription: string;
+  icon: string;
+  category: string;
+  serviceToOffer: string;
+  recommendedPitchHint: string;
+}
+
+export interface ProspectingFilters {
+  nicheId: string;
+  radiusKm: number;
+  websiteFilter: 'todos' | 'sem_site' | 'com_site';
+  urgencyFilter: 'todos' | 'alta' | 'media';
+  searchQuery: string;
+  locationCity: string;
+}
+
 

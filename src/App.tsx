@@ -19,6 +19,7 @@ import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { BackToTop } from './components/BackToTop';
+import { ActiveProspectingRadar } from './components/ActiveProspectingRadar';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('solucoes');
@@ -69,6 +70,7 @@ export default function App() {
                 onOpenWhatsApp={() => handleOpenWhatsAppWithMessage()} 
                 setActiveTab={setActiveTab}
               />
+              <ActiveProspectingRadar onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
               <AutoVideoEditor onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
               <ServicePricingBlocks onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
               <ServicesSection onOpenWhatsApp={() => handleOpenWhatsAppWithMessage()} />
@@ -78,6 +80,21 @@ export default function App() {
               <TestimonialsSection />
               <TechStack />
               <FaqSection />
+              <ContactSection onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+            </motion.div>
+          )}
+
+          {/* Tab: Prospecção Ativa B2B por CNAE & Raio */}
+          {activeTab === 'prospeccao' && (
+            <motion.div
+              key="prospeccao"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.35, ease: 'easeInOut' }}
+              className="pt-4 space-y-8"
+            >
+              <ActiveProspectingRadar onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
               <ContactSection onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
             </motion.div>
           )}

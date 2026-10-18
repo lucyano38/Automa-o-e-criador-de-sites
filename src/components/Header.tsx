@@ -21,6 +21,7 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenW
 
   const navTabs = [
     { id: 'solucoes', label: 'INÍCIO' },
+    { id: 'prospeccao', label: 'PROSPECÇÃO B2B' },
     { id: 'video-ia', label: 'VÍDEO COM IA' },
     { id: 'websites', label: 'WEBSITES & PAGES' },
     { id: 'automacao', label: 'AUTOMAÇÃO 24H' },
@@ -79,6 +80,14 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenW
                         contactEl.scrollIntoView({ behavior: 'smooth' });
                         return;
                       }
+                    }
+                    if (tab.id === 'prospeccao') {
+                      setActiveTab('solucoes');
+                      setTimeout(() => {
+                        const targetEl = document.getElementById('prospeccao-ativa');
+                        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+                      }, 100);
+                      return;
                     }
                     if (tab.id === 'video-ia') {
                       setActiveTab('solucoes');
@@ -173,6 +182,14 @@ export const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onOpenW
                   if (tab.id === 'contato') {
                     const contactEl = document.getElementById('contato-section');
                     if (contactEl) contactEl.scrollIntoView({ behavior: 'smooth' });
+                    return;
+                  }
+                  if (tab.id === 'prospeccao') {
+                    setActiveTab('solucoes');
+                    setTimeout(() => {
+                      const targetEl = document.getElementById('prospeccao-ativa');
+                      if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
                     return;
                   }
                   if (tab.id === 'video-ia') {

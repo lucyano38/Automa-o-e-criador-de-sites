@@ -2,36 +2,65 @@
   "entities": {
     "User": {
       "title": "User",
-      "description": "System user",
+      "description": "Represents a system user.",
       "type": "object",
       "properties": {
-        "uid": { "type": "string" },
-        "email": { "type": "string" },
-        "role": { "type": "string", "enum": ["user", "admin"] },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin"] }
       },
-      "required": ["uid", "email", "role", "createdAt"]
+      "required": ["email", "role"]
     },
-    "Subscription": {
-      "title": "Subscription",
-      "description": "User subscription status",
+    "VideoJob": {
+      "title": "VideoJob",
+      "description": "Represents an automated video editing job.",
       "type": "object",
       "properties": {
         "userId": { "type": "string" },
-        "status": { "type": "string" },
-        "stripeSubscriptionId": { "type": "string" }
+        "videoUrl": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "processing", "completed", "failed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["userId", "status"]
+      "required": ["userId", "videoUrl", "status", "createdAt"]
+    },
+    "Subscription": {
+      "title": "Subscription",
+      "description": "Represents a user's subscription to paid features.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "stripeCustomerId": { "type": "string" },
+        "status": { "type": "string" },
+        "plan": { "type": "string" }
+      },
+      "required": ["userId", "stripeCustomerId", "status", "plan"]
+    },
+    "ServiceConfig": {
+      "title": "ServiceConfig",
+      "description": "Represents service settings like address and social handles.",
+      "type": "object",
+      "properties": {
+        "address": { "type": "string" },
+        "instagramHandle": { "type": "string" }
+      }
     }
   },
   "firestore": {
     "/users/{userId}": {
-      "schema": { "$ref": "User" },
-      "description": "User profiles"
+      "schema": "User",
+      "description": "User profiles."
     },
-    "/users/{userId}/subscriptions/{subscriptionId}": {
-      "schema": { "$ref": "Subscription" },
-      "description": "User subscriptions"
+    "/videoJobs/{jobId}": {
+      "schema": "VideoJob",
+      "description": "Video editing tasks."
+    },
+    "/subscriptions/{subId}": {
+      "schema": "Subscription",
+      "description": "Subscription records."
+    },
+    "/config/service": {
+      "schema": "ServiceConfig",
+      "description": "Global service settings."
     }
   }
 }

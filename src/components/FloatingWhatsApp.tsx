@@ -5,18 +5,73 @@ interface FloatingWhatsAppProps {
   onOpenWhatsAppWithMessage: (msg: string) => void;
 }
 
+const SUGGESTIONS = [
+  'Quero um orçamento',
+  'Preciso de uma automação',
+  'Como funciona o painel?',
+  'Quero editar vídeos com IA'
+];
+
 export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ onOpenWhatsAppWithMessage }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [quickText, setQuickText] = useState('');
+  const [placeholder, setPlaceholder] = useState('');
+  const [isError, setIsError] = useState(false);
 
-  const handleSendQuick = (e: React.FormEvent) => {
-    e.preventDefault();
-    const msg = quickText.trim()
-      ? `Olá Luciano! ${quickText}`
+  // Typewriter effect for placeholder
+  React.useEffect(() => {
+    let currentIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let timeout: NodeJS.Timeout;
+
+    const type = () => {
+      const currentString = SUGGESTIONS[currentIndex % SUGGESTIONS.length];
+      
+      if (isDeleting) {
+        setPlaceholder(currentString.substring(0, charIndex - 1));
+        charIndex--;
+      } else {
+        setPlaceholder(currentString.substring(0, charIndex + 1));
+        charIndex++;
+      }
+
+      let typeSpeed = isDeleting ? 30 : 100;
+
+      if (!isDeleting && charIndex === currentString.length) {
+        typeSpeed = 2000; // Pause at end
+        isDeleting = true;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        currentIndex++;
+        typeSpeed = 500;
+      }
+
+      timeout = setTimeout(type, typeSpeed);
+    };
+
+    type();
+    return () => clearTimeout(timeout);
+  }, []);
+
+  const handleSendQuick = (text: string) => {
+    if (text.trim().length < 5) {
+      setIsError(true);
+      setTimeout(() => setIsError(false), 300);
+      return;
+    }
+
+    const msg = text.trim()
+      ? `Olá Luciano! ${text}`
       : 'Olá Luciano! Vi seu site e gostaria de conversar sobre um projeto de website, automação ou Instagram.';
     onOpenWhatsAppWithMessage(msg);
     setOpenDrawer(false);
     setQuickText('');
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSendQuick(quickText);
   };
 
   return (
@@ -50,20 +105,38 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ onOpenWhatsA
             👋 Olá! Precisa de um website, automação no WhatsApp/Telegram ou artes para Instagram? Como posso te ajudar hoje?
           </div>
 
-          <form onSubmit={handleSendQuick} className="space-y-2">
+          {/* Sugestões Rápidas */}
+          <div className="flex flex-wrap gap-2">
+            {SUGGESTIONS.map((suggestion) => (
+              <button
+                key={suggestion}
+                onClick={() => handleSendQuick(suggestion)}
+                className="px-3 py-1.5 rounded-full bg-slate-800 text-[10px] text-slate-300 hover:bg-emerald-900/50 hover:text-emerald-300 transition-colors border border-slate-700 hover:border-emerald-500/50"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+
+          <form onSubmit={handleFormSubmit} className="space-y-2">
             <textarea
               id="floating-whatsapp-textarea"
               rows={3}
-              placeholder="Digite sua dúvida, ideia ou detalhes do projeto..."
+              placeholder={placeholder}
               value={quickText}
-              onChange={(e) => setQuickText(e.target.value)}
+              onChange={(e) => {
+                setQuickText(e.target.value);
+                if (isError) setIsError(false);
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
-                  handleSendQuick(e);
+                  handleSendQuick(quickText);
                 }
               }}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:border-emerald-500 resize-none leading-relaxed transition-colors"
+              className={`w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border text-slate-100 placeholder-slate-500 text-xs focus:outline-none resize-none leading-relaxed transition-colors ${
+                isError ? 'border-red-500 animate-shake' : 'border-slate-800 focus:border-emerald-500'
+              }`}
             />
             <button
               id="floating-whatsapp-submit-btn"
@@ -71,7 +144,7 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ onOpenWhatsA
               className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition-all cursor-pointer shadow-md shadow-emerald-500/20"
             >
               <MessageSquare className="w-3.5 h-3.5 fill-slate-950" />
-              <span>Abrir WhatsApp com Luciano</span>
+              <span>Enviar no WhatsApp</span>
             </button>
           </form>
         </div>
