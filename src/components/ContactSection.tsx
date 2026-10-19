@@ -103,22 +103,50 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenWhatsAppWi
                   <ArrowRight className="w-4 h-4 text-blue-400 group-hover:translate-x-1 transition-transform" />
                 </a>
 
-                {/* Email Direct */}
+                {/* Email Profissional */}
+                <a
+                  href="mailto:atendimento@focoemdados.com.br"
+                  className="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-cyan-500/30 transition-all text-left group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+                      <Mail className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-white group-hover:text-cyan-300">E-mail Profissional</div>
+                      <div className="text-xs text-cyan-400 font-mono font-bold">atendimento@focoemdados.com.br</div>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-1 transition-transform" />
+                </a>
+
+                {/* Email Titular */}
                 <a
                   href="mailto:lucyano.pci@gmail.com"
                   className="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-all text-left group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-slate-800 text-teal-400 border border-slate-700">
+                    <div className="p-2.5 rounded-xl bg-slate-800 text-amber-400 border border-slate-700">
                       <Mail className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-white">E-mail Direto</div>
-                      <div className="text-xs text-slate-400 font-mono">lucyano.pci@gmail.com</div>
+                      <div className="text-xs font-bold text-white">E-mail do Titular</div>
+                      <div className="text-xs text-amber-300 font-mono">lucyano.pci@gmail.com</div>
                     </div>
                   </div>
                   <ArrowRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
                 </a>
+
+                {/* Telefone Adicional */}
+                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-900 border border-slate-800 text-left">
+                  <div className="p-2.5 rounded-xl bg-slate-800 text-cyan-400 border border-slate-700">
+                    <Phone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-white">Telefone de Contato</div>
+                    <div className="text-xs text-cyan-400 font-mono">(11) 97061-0078</div>
+                  </div>
+                </div>
 
                 {/* Portais Sob Comando */}
                 <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
@@ -127,12 +155,16 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenWhatsAppWi
                   </div>
                   <div className="space-y-1 text-xs text-slate-300 font-mono">
                     <div className="flex items-center justify-between">
-                      <span>• soscuidadores.com</span>
-                      <a href="https://soscuidadores.com" target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline">Visitar</a>
+                      <span>• fococompleto.com.br</span>
+                      <a href="https://fococompleto.com.br" target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">Principal</a>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>• focoemdados.com.br</span>
                       <a href="https://focoemdados.com.br" target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline">Visitar</a>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>• soscuidadores.com</span>
+                      <a href="https://soscuidadores.com" target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline">Visitar</a>
                     </div>
                   </div>
                 </div>
@@ -223,10 +255,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenWhatsAppWi
                       className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 text-xs focus:outline-none focus:border-emerald-500 transition-colors"
                     >
                       <option value="Website / Landing Page">Website / Landing Page</option>
+                      <option value="Postagens & Gestão Instagram e Facebook">Postagens & Gestão Instagram e Facebook</option>
+                      <option value="Edição Profissional de Vídeo & Reels">Edição Profissional de Vídeo & Reels</option>
                       <option value="Automação WhatsApp / Telegram">Automação WhatsApp / Telegram</option>
-                      <option value="Posts & Artes para Instagram">Posts & Artes para Instagram</option>
                       <option value="Análise de Dados & BI">Análise de Dados & BI</option>
-                      <option value="Projeto Completo (Web + Automação)">Projeto Completo (Web + Automação)</option>
+                      <option value="Projeto Completo (Web + Redes + Automação)">Projeto Completo (Web + Redes + Automação)</option>
                     </select>
                   </div>
 

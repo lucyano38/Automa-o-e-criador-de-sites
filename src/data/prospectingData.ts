@@ -1,4 +1,5 @@
-import { CnaeNicheOption, ProspectLead } from '../types';
+import { CnaeNicheOption, ProspectLead, GeoLocationPoint } from '../types';
+import { calculateHaversineDistanceKm, createOffsetCoordinates } from '../lib/geoService';
 
 export const CNAE_NICHES: CnaeNicheOption[] = [
   {
@@ -123,18 +124,448 @@ export const CNAE_NICHES: CnaeNicheOption[] = [
   },
 ];
 
-// Rich initial base with multiple niches and close distances (0.6 km to 4.8 km)
-export const INITIAL_PROSPECT_LEADS: ProspectLead[] = [
-  // 1. SEM SITE - Clínica Odontológica (1.2 km)
+// Verified Itupeva center coordinates: -23.1531, -47.0578
+// Pre-built leads strictly located in Itupeva, SP and nearby municipalities within 15 km (Eloy Chaves/Jundiaí, Cabreúva Jacaré)
+export const ITUPEVA_PROSPECT_LEADS: ProspectLead[] = [
+  // 1. SEM SITE - Clínica Odontológica (Centro Itupeva - 0.7 km)
   {
-    id: 'lead-001',
+    id: 'itupeva-001',
+    companyName: 'Consultório OdontoPrime Itupeva Ltda',
+    tradeName: 'OdontoPrime Itupeva',
+    cnpj: '45.182.903/0001-14',
+    cnae: '8630-5/04',
+    cnaeDescription: 'Atividade odontológica com consultas e próteses',
+    niche: 'saude',
+    distanceKm: 0.7,
+    lat: -23.1542,
+    lng: -47.0545,
+    address: 'Av. Brasil, 480',
+    neighborhood: 'Centro',
+    city: 'Itupeva',
+    state: 'SP',
+    phone: '(11) 4591-2040',
+    whatsappDirect: '551145912040',
+    hasWebsite: false,
+    urgencyLevel: 'alta',
+    leadStatus: 'novo',
+    opportunityType: 'criar_site',
+    googleRating: 4.8,
+    reviewCount: 36,
+    estimatedMonthlyLoss: 7800,
+    auditDetails: {
+      mobileFriendly: false,
+      sslActive: false,
+      loadSpeedSeconds: 0,
+      hasWhatsAppButton: false,
+      googleLighthouseScore: 0,
+      modernityIssues: [
+        'Sem página institucional indexada no Google para pacientes em Itupeva',
+        'Falta de agendamento online rápido ou botão de WhatsApp direto',
+        'Depende de indicação e perde pacientes de implantes para Jundiaí',
+      ],
+      keyWeakness: 'Sem presença web em Itupeva; pacientes acabam agendando com clínicas que aparecem no topo do Google.',
+      conversionOpportunity: 'Landing Page de Alta Conversão + Google Meu Negócio estruturado + Botão WhatsApp 24h.',
+    },
+    customPitch: `Olá, equipe da OdontoPrime Itupeva! Vi que vocês são muito elogiados no Centro de Itupeva com nota 4.8, mas notei que vocês ainda não possuem um site profissional com botão direto para agendamento no WhatsApp. Quem pesquisa por dentista em Itupeva hoje busca pelo celular e clica na primeira opção rápida. Criamos páginas modernas que colocam sua clínica no topo das buscas da região. Posso enviar um modelo demonstrativo sem compromisso?`,
+  },
+
+  // 2. COM SITE DESATUALIZADO - Pizzaria & Forneria (Jd. Brasil, Itupeva - 1.4 km)
+  {
+    id: 'itupeva-002',
+    companyName: 'Pizzaria & Forneria Bella Itupeva Eireli',
+    tradeName: 'Bella Forneria Itupeva',
+    cnpj: '38.291.404/0001-92',
+    cnae: '5611-2/01',
+    cnaeDescription: 'Restaurantes e pizzarias com serviço completo e delivery',
+    niche: 'gastronomia',
+    distanceKm: 1.4,
+    lat: -23.1598,
+    lng: -47.0512,
+    address: 'Rua Vicente Tartalha, 120',
+    neighborhood: 'Jardim Brasil',
+    city: 'Itupeva',
+    state: 'SP',
+    phone: '(11) 4591-8890',
+    whatsappDirect: '551145918890',
+    hasWebsite: true,
+    websiteUrl: 'http://bellaforneriaitupeva.com.br',
+    urgencyLevel: 'alta',
+    leadStatus: 'novo',
+    opportunityType: 'modernizar_site',
+    googleRating: 4.7,
+    reviewCount: 140,
+    estimatedMonthlyLoss: 11500,
+    auditDetails: {
+      mobileFriendly: false,
+      sslActive: false,
+      loadSpeedSeconds: 5.4,
+      hasWhatsAppButton: false,
+      googleLighthouseScore: 32,
+      modernityIssues: [
+        'Site antigo que não abre o cardápio no celular sem zoom manual',
+        'Sem certificado SSL (aparece como "Não Seguro" no Chrome)',
+        'Falta de botão direto de pedidos no WhatsApp para fugir das taxas do iFood',
+      ],
+      keyWeakness: 'Cardápio em formato imagem pesada que não converte clientes que querem pedir no WhatsApp.',
+      conversionOpportunity: 'Cardápio Digital Interativo Mobile + Pedidos Diretos no WhatsApp sem Taxa + Redesign Moderno.',
+    },
+    customPitch: `Olá, pessoal da Bella Forneria Itupeva! As pizzas de vocês têm ótima fama na cidade, mas dei uma olhada no site atual e percebi que no celular ele demora mais de 5 segundos para abrir e o cardápio não tem botão fácil de pedir no WhatsApp. Desenvolvemos cardápios digitais modernos para pizzarias que aumentam os pedidos diretos e reduzem as comissões pagas para apps. Posso enviar uma prévia rápida de como ficaria o cardápio de vocês?`,
+  },
+
+  // 3. SEM SITE - Mecânica e Auto Center (Pq. das Hortênsias, Itupeva - 2.3 km)
+  {
+    id: 'itupeva-003',
+    companyName: 'Auto Center Tonoli & Mecânica Especializada Ltda',
+    tradeName: 'Auto Center Tonoli Itupeva',
+    cnpj: '29.401.782/0001-08',
+    cnae: '4520-0/01',
+    cnaeDescription: 'Serviços de manutenção e reparação mecânica',
+    niche: 'automotivo',
+    distanceKm: 2.3,
+    lat: -23.1672,
+    lng: -47.0498,
+    address: 'Rodovia Vice-Prefeito Hermenegildo Tonoli, 1450',
+    neighborhood: 'Parque das Hortênsias',
+    city: 'Itupeva',
+    state: 'SP',
+    phone: '(11) 4593-1120',
+    whatsappDirect: '551145931120',
+    hasWebsite: false,
+    urgencyLevel: 'alta',
+    leadStatus: 'novo',
+    opportunityType: 'criar_site',
+    googleRating: 4.6,
+    reviewCount: 48,
+    estimatedMonthlyLoss: 14000,
+    auditDetails: {
+      mobileFriendly: false,
+      sslActive: false,
+      loadSpeedSeconds: 0,
+      hasWhatsAppButton: false,
+      googleLighthouseScore: 0,
+      modernityIssues: [
+        'Motoristas que quebram o carro na Rodovia Tonoli não encontram site para socorro',
+        'Sem agendamento online de alinhamento, balanceamento e troca de óleo',
+        'Falta de autoridade digital frente aos autocenters de rede de Jundiaí',
+      ],
+      keyWeakness: 'Inexistência de site com botão de emergência / guincho no WhatsApp.',
+      conversionOpportunity: 'Landing Page de Alta Conversão + Botão de Socorro/Guincho Rápido + Agendamento de Revisão.',
+    },
+    customPitch: `Olá, equipe do Auto Center Tonoli! Vocês estão muito bem posicionados na Rodovia Tonoli em Itupeva, mas hoje quando um motorista tem um problema no carro ou busca revisão na cidade, ele não encontra um site oficial de vocês com botão de WhatsApp. Criamos páginas rápidas para oficinas mecânicas que geram orçamentos diários no seu WhatsApp. Quer dar uma olhada em como ficaria uma página para a sua oficina?`,
+  },
+
+  // 4. COM SITE DESATUALIZADO - Escritório de Advocacia (Centro Itupeva - 0.9 km)
+  {
+    id: 'itupeva-004',
+    companyName: 'Advocacia Prado & Associados Itupeva',
+    tradeName: 'Prado & Associados Advocacia',
+    cnpj: '21.902.331/0001-44',
+    cnae: '6911-7/01',
+    cnaeDescription: 'Serviços advocatícios nas áreas trabalhista e cível',
+    niche: 'advocacia',
+    distanceKm: 0.9,
+    lat: -23.1518,
+    lng: -47.0560,
+    address: 'Rua Emídio Agostinho, 95 - Sala 3',
+    neighborhood: 'Centro',
+    city: 'Itupeva',
+    state: 'SP',
+    phone: '(11) 4591-3310',
+    whatsappDirect: '551145913310',
+    hasWebsite: true,
+    websiteUrl: 'http://pradoadvocacia-itupeva.com',
+    urgencyLevel: 'alta',
+    leadStatus: 'novo',
+    opportunityType: 'modernizar_site',
+    googleRating: 4.5,
+    reviewCount: 18,
+    estimatedMonthlyLoss: 9800,
+    auditDetails: {
+      mobileFriendly: false,
+      sslActive: false,
+      loadSpeedSeconds: 6.0,
+      hasWhatsAppButton: false,
+      googleLighthouseScore: 28,
+      modernityIssues: [
+        'Site institucional de 2014 com layout congelado em desktop',
+        'Falta de segurança HTTPS (aviso de site inseguro afasta clientes empresariais)',
+        'Sem formulário conectado ao WhatsApp para triagem jurídica',
+      ],
+      keyWeakness: 'Site desatualizado que transmite sensação de escritório estagnado.',
+      conversionOpportunity: 'Portal Jurídico Moderno e Seguro + Certificado SSL + Triagem Rápida no WhatsApp.',
+    },
+    customPitch: `Olá, Dr. Prado e equipe! Estive analisando a presença de escritórios de advocacia em Itupeva e notei que o site pradoadvocacia-itupeva.com está com layout antigo e sem certificado de segurança SSL, além de não ter botão rápido de WhatsApp para clientes. Modernizamos portais jurídicos com design sóbrio, carregamento rápido e total segurança para captar novos clientes corporativos na região. Posso apresentar uma proposta de modernização?`,
+  },
+
+  // 5. SEM SITE - Imobiliária e Chácaras (Itupeva - 1.8 km)
+  {
+    id: 'itupeva-005',
+    companyName: 'Itupeva Chácaras & Imóveis Consultoria',
+    tradeName: 'Itupeva Chácaras & Imóveis',
+    cnpj: '33.102.890/0001-77',
+    cnae: '6821-8/01',
+    cnaeDescription: 'Corretagem na compra, venda e locação de imóveis e chácaras',
+    niche: 'imoveis',
+    distanceKm: 1.8,
+    lat: -23.1490,
+    lng: -47.0620,
+    address: 'Av. Emílio Checchinato, 650',
+    neighborhood: 'Jardim São Vicente',
+    city: 'Itupeva',
+    state: 'SP',
+    phone: '(11) 4591-5500',
+    whatsappDirect: '551145915500',
+    hasWebsite: false,
+    urgencyLevel: 'alta',
+    leadStatus: 'novo',
+    opportunityType: 'criar_site',
+    googleRating: 4.9,
+    reviewCount: 54,
+    estimatedMonthlyLoss: 22000,
+    auditDetails: {
+      mobileFriendly: false,
+      sslActive: false,
+      loadSpeedSeconds: 0,
+      hasWhatsAppButton: false,
+      googleLighthouseScore: 0,
+      modernityIssues: [
+        'Não possui portal próprio com catálogo de chácaras e condomínios de Itupeva',
+        'Gasta muito em portais terceirizados sem fortalecer a marca própria da imobiliária',
+        'Compradores de São Paulo e Campinas que buscam lazer em Itupeva não acham o site',
+      ],
+      keyWeakness: 'Refém de portais de anúncios caros por não ter catálogo online próprio.',
+      conversionOpportunity: 'Portal Imobiliário com Vitrine de Chácaras e Terrenos + Integração com WhatsApp dos Corretores.',
+    },
+    customPitch: `Olá, corretores da Itupeva Chácaras & Imóveis! Muitas famílias de São Paulo e Campinas buscam chácaras e casas em condomínio em Itupeva todos os fins de semana, mas hoje vocês não têm um portal próprio com catálogo fácil no WhatsApp. Criamos sites imobiliários modernos, leves e integrados com WhatsApp, com vitrine de imóveis e captação de novos proprietários. Gostariam de ver uma demonstração de como ficaria a vitrine de imóveis de vocês?`,
+  },
+
+  // 6. COM SITE DESATUALIZADO - Clínica Veterinária & Pet (Eloy Chaves / Jundiaí - 7.6 km de Itupeva)
+  {
+    id: 'itupeva-006',
+    companyName: 'Hospital Veterinário VetLife Eloy Chaves Ltda',
+    tradeName: 'VetLife Eloy Chaves',
+    cnpj: '31.402.891/0001-35',
+    cnae: '7500-1/00',
+    cnaeDescription: 'Atividades veterinárias, consultas e cirurgias',
+    niche: 'pets',
+    distanceKm: 7.6,
+    lat: -23.1812,
+    lng: -46.9620,
+    address: 'Av. Benedicto Castilho de Andrade, 1020',
+    neighborhood: 'Eloy Chaves',
+    city: 'Jundiaí',
+    state: 'SP',
+    phone: '(11) 4582-4410',
+    whatsappDirect: '551145824410',
+    hasWebsite: true,
+    websiteUrl: 'http://vetlife-eloychaves.com.br',
+    urgencyLevel: 'media',
+    leadStatus: 'novo',
+    opportunityType: 'modernizar_site',
+    googleRating: 4.8,
+    reviewCount: 92,
+    estimatedMonthlyLoss: 8900,
+    auditDetails: {
+      mobileFriendly: true,
+      sslActive: true,
+      loadSpeedSeconds: 4.7,
+      hasWhatsAppButton: false,
+      googleLighthouseScore: 44,
+      modernityIssues: [
+        'Falta de botão direto de plantão de emergência 24h no WhatsApp',
+        'Página de serviços veterinários lenta no 4G mobile',
+        'Tutores de Itupeva e Jundiaí com pet doente precisam ligar sem botão fácil',
+      ],
+      keyWeakness: 'Falta de CTA clara de emergência 24h com atendimento imediato via WhatsApp.',
+      conversionOpportunity: 'Site de Atendimento Emergencial 24h + Botão WhatsApp de Plantão Rápido + Agendamento de Vacinas.',
+    },
+    customPitch: `Olá, equipe da VetLife Eloy Chaves! Vocês atendem uma região estratégica entre Jundiaí e Itupeva, mas notei que no site de vocês falta um botão flutuante bem visível para emergências e agendamento rápido de consultas pelo WhatsApp. Em situações urgentes com animais, os tutores preferem clínicas com contato rápido de 1 clique. Posso mandar uma sugestão de modernização?`,
+  },
+
+  // 7. SEM SITE - Salão de Beleza & Estética (Jd. São Vicente, Itupeva - 1.2 km)
+  {
+    id: 'itupeva-007',
+    companyName: 'Studio Beleza & Estética Avançada Itupeva',
+    tradeName: 'Studio Beleza Itupeva',
+    cnpj: '39.812.001/0001-63',
+    cnae: '9602-5/01',
+    cnaeDescription: 'Cabeleireiros, manicure, estética e cuidados de beleza',
+    niche: 'estetica',
+    distanceKm: 1.2,
+    lat: -23.1565,
+    lng: -47.0592,
+    address: 'Rua Emílio Agostinho, 310',
+    neighborhood: 'Jardim São Vicente',
+    city: 'Itupeva',
+    state: 'SP',
+    phone: '(11) 97411-9020',
+    whatsappDirect: '5511974119020',
+    hasWebsite: false,
+    urgencyLevel: 'alta',
+    leadStatus: 'novo',
+    opportunityType: 'criar_site',
+    googleRating: 4.9,
+    reviewCount: 62,
+    estimatedMonthlyLoss: 6500,
+    auditDetails: {
+      mobileFriendly: false,
+      sslActive: false,
+      loadSpeedSeconds: 0,
+      hasWhatsAppButton: false,
+      googleLighthouseScore: 0,
+      modernityIssues: [
+        'Depende exclusivamente do Direct do Instagram para agendar serviços',
+        'Sem catálogo visual online de procedimentos (mechas, botox, unhas)',
+        'Clientes perdem tempo perguntando valores de serviços básicos',
+      ],
+      keyWeakness: 'Sem vitrine digital com agendamento direto de horários no WhatsApp.',
+      conversionOpportunity: 'Vitrine Visual Imersiva de Procedimentos + Agendamento VIP no WhatsApp + Link de Bio Otimizado.',
+    },
+    customPitch: `Olá, equipe do Studio Beleza Itupeva! Acompanho os trabalhos impecáveis de vocês na cidade, mas notei que vocês ainda não possuem um catálogo digital online com botão direto para agendamento no WhatsApp. Ficar respondendo mensagens manuais no Instagram toma muito tempo. Criamos vitrines digitais leves onde as clientes veem os procedimentos e já agendam o horário direto no WhatsApp. Posso te enviar um modelo?`,
+  },
+
+  // 8. COM SITE DESATUALIZADO - Construtora e Reformas (Itupeva - 3.2 km)
+  {
+    id: 'itupeva-008',
+    companyName: 'Monte Serrat Engenharia & Obras Civis Eireli',
+    tradeName: 'Monte Serrat Engenharia',
+    cnpj: '28.112.554/0001-20',
+    cnae: '4120-4/00',
+    cnaeDescription: 'Construção de edifícios e reformas residenciais',
+    niche: 'construcao',
+    distanceKm: 3.2,
+    lat: -23.1690,
+    lng: -47.0720,
+    address: 'Estrada do Monte Serrat, 400',
+    neighborhood: 'Monte Serrat',
+    city: 'Itupeva',
+    state: 'SP',
+    phone: '(11) 4591-9980',
+    whatsappDirect: '551145919980',
+    hasWebsite: true,
+    websiteUrl: 'http://monteserrat-obras.com.br',
+    urgencyLevel: 'alta',
+    leadStatus: 'novo',
+    opportunityType: 'modernizar_site',
+    googleRating: 4.6,
+    reviewCount: 22,
+    estimatedMonthlyLoss: 28000,
+    auditDetails: {
+      mobileFriendly: false,
+      sslActive: false,
+      loadSpeedSeconds: 5.9,
+      hasWhatsAppButton: false,
+      googleLighthouseScore: 26,
+      modernityIssues: [
+        'Site antigo que não valoriza as fotos das construções nos condomínios de Itupeva',
+        'Sem formulário dinâmico para orçamento de m² de construção',
+        'Sem certificado de segurança HTTPS',
+      ],
+      keyWeakness: 'Layout antigo afasta proprietários de alto poder aquisitivo que constroem chácaras e casas.',
+      conversionOpportunity: 'Portal Corporativo Moderno + Portfólio de Obras em Alta Resolução + Calculadora de Orçamento no WhatsApp.',
+    },
+    customPitch: `Olá, engenheiros da Monte Serrat Engenharia! Com o grande crescimento de obras e condomínios fechados em Itupeva, ter um site moderno que apresente suas obras com fotos de alta qualidade transmite a credibilidade necessária para fechar projetos de alto padrão. O site atual de vocês tem layout antigo e demora para abrir no celular. Desenvolvemos sites de engenharia elegantes e de alta performance. Gostariam de ver uma versão atualizada?`,
+  },
+
+  // 9. SEM SITE - Academia e Treino Funcional (Centro Itupeva - 0.9 km)
+  {
+    id: 'itupeva-009',
+    companyName: 'Academia Força & Saúde Itupeva Ltda',
+    tradeName: 'Academia Força & Saúde',
+    cnpj: '37.812.304/0001-55',
+    cnae: '9313-1/00',
+    cnaeDescription: 'Atividades de condicionamento físico, musculação e aulas em grupo',
+    niche: 'fitness',
+    distanceKm: 0.9,
+    lat: -23.1510,
+    lng: -47.0530,
+    address: 'Av. Brasil, 920',
+    neighborhood: 'Centro',
+    city: 'Itupeva',
+    state: 'SP',
+    phone: '(11) 4591-6670',
+    whatsappDirect: '551145916670',
+    hasWebsite: false,
+    urgencyLevel: 'alta',
+    leadStatus: 'novo',
+    opportunityType: 'criar_site',
+    googleRating: 4.7,
+    reviewCount: 78,
+    estimatedMonthlyLoss: 9200,
+    auditDetails: {
+      mobileFriendly: false,
+      sslActive: false,
+      loadSpeedSeconds: 0,
+      hasWhatsAppButton: false,
+      googleLighthouseScore: 0,
+      modernityIssues: [
+        'Sem página para novos moradores de Itupeva consultarem planos e horários',
+        'Falta de botão para agendar aula experimental gratuita no WhatsApp',
+        'Perde novos alunos para academias de rede que têm presença online forte',
+      ],
+      keyWeakness: 'Sem presença online com agendamento de aula experimental no WhatsApp.',
+      conversionOpportunity: 'Página de Alta Conversão + Grade Interativa de Horários + Botão "Garantir Aula Experimental" no WhatsApp.',
+    },
+    customPitch: `Fala pessoal da Academia Força & Saúde! Vocês têm uma estrutura excelente no Centro de Itupeva, mas notei que quem pesquisa por academia na cidade não encontra um site oficial com grade de horários e botão de aula experimental gratuita. Criamos páginas modernas que captam novos alunos todos os dias pelo WhatsApp. Posso te mostrar um modelo de como ficaria a página da academia?`,
+  },
+
+  // 10. SEM SITE - Loja de Materiais e Boutique (Itupeva - 1.5 km)
+  {
+    id: 'itupeva-010',
+    companyName: 'Boutique Bella Donna Moda & Acessórios',
+    tradeName: 'Bella Donna Boutique Itupeva',
+    cnpj: '34.901.228/0001-90',
+    cnae: '4781-4/00',
+    cnaeDescription: 'Comércio varejista de artigos do vestuário e acessórios',
+    niche: 'comercio',
+    distanceKm: 1.5,
+    lat: -23.1580,
+    lng: -47.0560,
+    address: 'Av. Brasil, 1140',
+    neighborhood: 'Jardim Brasil',
+    city: 'Itupeva',
+    state: 'SP',
+    phone: '(11) 97120-4490',
+    whatsappDirect: '5511971204490',
+    hasWebsite: false,
+    urgencyLevel: 'alta',
+    leadStatus: 'novo',
+    opportunityType: 'criar_site',
+    googleRating: 4.8,
+    reviewCount: 41,
+    estimatedMonthlyLoss: 7200,
+    auditDetails: {
+      mobileFriendly: false,
+      sslActive: false,
+      loadSpeedSeconds: 0,
+      hasWhatsAppButton: false,
+      googleLighthouseScore: 0,
+      modernityIssues: [
+        'Vende apenas na loja física e pelo WhatsApp respondendo foto por foto',
+        'Não tem catálogo digital para clientes navegarem pelas novidades da coleção',
+        'Falta de presença no Google para buscas de roupas femininas em Itupeva',
+      ],
+      keyWeakness: 'Dependência de atendimento manual sem catálogo online de produtos.',
+      conversionOpportunity: 'Catálogo Digital Estilo Vitrine + Integração de Pedido Fácil no WhatsApp + Posicionamento no Google.',
+    },
+    customPitch: `Olá, equipe da Bella Donna Itupeva! As roupas de vocês são lindas, mas percebi que vocês não contam com um catálogo online onde as clientes possam ver os looks da semana e pedir no WhatsApp com 1 clique. Desenvolvemos vitrines digitais leves que facilitam as vendas da sua loja. Posso te mandar uma prévia demonstrativa sem compromisso?`,
+  },
+];
+
+// São Paulo baseline leads (with verified real coordinates: lat ~ -23.5505, lng ~ -46.6333)
+// Distance from Itupeva: ~62 km!
+export const INITIAL_PROSPECT_LEADS: ProspectLead[] = [
+  {
+    id: 'sp-lead-001',
     companyName: 'Studio Odonto Sorriso & Estética Ltda',
-    tradeName: 'Studio Odonto Sorriso',
+    tradeName: 'Studio Odonto Sorriso - Bela Vista',
     cnpj: '48.912.304/0001-82',
     cnae: '8630-5/04',
     cnaeDescription: 'Atividade odontológica com consultas e procedimentos estéticos',
     niche: 'saude',
-    distanceKm: 1.2,
+    distanceKm: 62.5,
+    lat: -23.5615,
+    lng: -46.6558,
     address: 'Av. Paulista, 1420 - Sala 42',
     neighborhood: 'Bela Vista',
     city: 'São Paulo',
@@ -157,25 +588,23 @@ export const INITIAL_PROSPECT_LEADS: ProspectLead[] = [
       modernityIssues: [
         'Totalmente sem website institucional ou página de captura no Google',
         'Invisível em buscas diretas por dentistas no bairro',
-        'Sem agendamento online rápido ou botão de WhatsApp direto',
-        'Perde pacientes para clínicas vizinhas que têm site moderno',
       ],
-      keyWeakness: 'Inexistência de presença digital própria; depende apenas de placa de rua e indicação.',
-      conversionOpportunity: 'Criação de Landing Page de Alta Conversão + Google Meu Negócio otimizado + Botão WhatsApp 24h.',
+      keyWeakness: 'Inexistência de presença digital própria no Google.',
+      conversionOpportunity: 'Criação de Landing Page + Google Meu Negócio + Botão WhatsApp.',
     },
-    customPitch: `Olá, equipe da Studio Odonto Sorriso! Tudo bem? Vi que vocês têm excelente avaliação de 4.8 estrelas no Google, mas notei que vocês ainda não possuem um site profissional com botão direto para WhatsApp. Hoje, pacientes que pesquisam alinhadores ou implantes no bairro acabam agendando com quem tem página rápida. Criamos páginas modernas que colocam sua clínica no topo e convertem visitantes em agendamentos diretos. Posso enviar um modelo demonstrativo sem compromisso?`,
+    customPitch: `Olá, equipe da Studio Odonto Sorriso! Tudo bem? Vi que vocês têm excelente avaliação no Google, mas notei que vocês ainda não possuem um site profissional com botão direto para WhatsApp. Criamos páginas modernas que colocam sua clínica no topo. Posso enviar um modelo demonstrativo?`,
   },
-
-  // 2. COM SITE DESATUALIZADO - Escritório de Advocacia (1.8 km)
   {
-    id: 'lead-002',
+    id: 'sp-lead-002',
     companyName: 'Menezes & Barros Sociedade de Advogados',
-    tradeName: 'Menezes & Barros Advogados',
+    tradeName: 'Menezes & Barros Advogados - Consolação',
     cnpj: '24.183.910/0001-44',
     cnae: '6911-7/01',
     cnaeDescription: 'Serviços advocatícios nas áreas trabalhista e cível',
     niche: 'advocacia',
-    distanceKm: 1.8,
+    distanceKm: 61.8,
+    lat: -23.5532,
+    lng: -46.6620,
     address: 'Rua Bela Cintra, 890 - 7º Andar',
     neighborhood: 'Consolação',
     city: 'São Paulo',
@@ -198,438 +627,151 @@ export const INITIAL_PROSPECT_LEADS: ProspectLead[] = [
       googleLighthouseScore: 34,
       modernityIssues: [
         'Layout antigo que não se adapta a smartphones modernos',
-        'Alerta de "Site Não Seguro" no navegador (sem certificado SSL HTTPS)',
-        'Carregamento lento: 5.8 segundos no 4G móvel',
-        'Formulário de contato quebrado sem direcionamento para WhatsApp',
+        'Alerta de "Site Não Seguro" no navegador (sem SSL)',
       ],
-      keyWeakness: 'Site passa imagem de desatualização e insegurança jurídica para clientes corporativos.',
-      conversionOpportunity: 'Redesign Moderno com Autoridade Visual + Certificado SSL + Botão Flutuante de WhatsApp + Otimização de Velocidade 98+.',
+      keyWeakness: 'Site passa imagem de desatualização e insegurança jurídica.',
+      conversionOpportunity: 'Redesign Moderno com Autoridade Visual + Certificado SSL.',
     },
-    customPitch: `Olá, Dr. Menezes e equipe! Analisando a presença de escritórios jurídicos na região, acessei o site menezesbarrosadv.com.br e percebi que no celular ele ainda não é responsivo e acusa aviso de "Não Seguro" por falta de SSL, além de não ter botão rápido de WhatsApp. Isso afasta clientes corporativos. Desenvolvemos sites modernos para advocacia com design sóbrio, carregamento instantâneo e integração direta de WhatsApp. Gostaria de ver uma prévia de modernização?`,
-  },
-
-  // 3. SEM SITE - Restaurante & Cantina (2.1 km)
-  {
-    id: 'lead-003',
-    companyName: 'Cantina Famiglia Bellini Gastronomia Eireli',
-    tradeName: 'Cantina Bellini Trattoria',
-    cnpj: '33.512.980/0001-19',
-    cnae: '5611-2/01',
-    cnaeDescription: 'Restaurantes e similares com serviço completo',
-    niche: 'gastronomia',
-    distanceKm: 2.1,
-    address: 'Rua Treze de Maio, 450',
-    neighborhood: 'Bixiga',
-    city: 'São Paulo',
-    state: 'SP',
-    phone: '(11) 98144-8832',
-    whatsappDirect: '5511981448832',
-    hasWebsite: false,
-    urgencyLevel: 'alta',
-    leadStatus: 'novo',
-    opportunityType: 'criar_site',
-    googleRating: 4.7,
-    reviewCount: 240,
-    estimatedMonthlyLoss: 14500,
-    auditDetails: {
-      mobileFriendly: false,
-      sslActive: false,
-      loadSpeedSeconds: 0,
-      hasWhatsAppButton: false,
-      googleLighthouseScore: 0,
-      modernityIssues: [
-        'Sem cardápio digital próprio (depende de PDF em link quebrado no Instagram)',
-        'Não possui site para reservas de mesas ou eventos familiares',
-        'Taxas pesadas pagas a marketplaces de delivery por falta de canal próprio',
-      ],
-      keyWeakness: 'Sem presença web própria com cardápio interativo e reserva rápida no WhatsApp.',
-      conversionOpportunity: 'Site Gastronômico Imersivo com Cardápio Interativo + Galeria de Pratos + Sistema de Reserva via WhatsApp.',
-    },
-    customPitch: `Olá, equipe da Cantina Bellini! Vocês têm um dos pratos mais elogiados do bairro, mas quem pesquisa vocês no Google não encontra um site oficial com cardápio interativo e botão de reserva rápida. Criamos websites gastronômicos modernos com fotos de alta qualidade, cardápio digital e reservas automáticas no WhatsApp para fidelizar o cliente sem pagar comissão para terceiros. Posso enviar uma demonstração?`,
-  },
-
-  // 4. COM SITE DESATUALIZADO - Clínica de Estética (2.6 km)
-  {
-    id: 'lead-004',
-    companyName: 'Harmonia & Pele Estética Facial e Corporal',
-    tradeName: 'Harmonia & Pele Estética',
-    cnpj: '39.401.782/0001-50',
-    cnae: '9602-5/02',
-    cnaeDescription: 'Atividades de estética e outros serviços de beleza',
-    niche: 'estetica',
-    distanceKm: 2.6,
-    address: 'Rua Oscar Freire, 1120',
-    neighborhood: 'Jardins',
-    city: 'São Paulo',
-    state: 'SP',
-    phone: '(11) 99182-3309',
-    whatsappDirect: '5511991823309',
-    hasWebsite: true,
-    websiteUrl: 'http://harmoniaepele-sp.com',
-    urgencyLevel: 'media',
-    leadStatus: 'novo',
-    opportunityType: 'modernizar_site',
-    googleRating: 4.9,
-    reviewCount: 88,
-    estimatedMonthlyLoss: 9200,
-    auditDetails: {
-      mobileFriendly: true,
-      sslActive: true,
-      loadSpeedSeconds: 4.2,
-      hasWhatsAppButton: false,
-      googleLighthouseScore: 48,
-      modernityIssues: [
-        'Fotos pesadas que demoram mais de 4 segundos para carregar no celular',
-        'Falta de botão direto de WhatsApp com mensagem pré-configurada de avaliação',
-        'Visual genérico de template antigo que não transmite sofisticação',
-      ],
-      keyWeakness: 'Tempo de carregamento alto afasta clientes exigentes que buscam estética premium.',
-      conversionOpportunity: 'Redesign Sofisticado em tons Dark/Emerald + Galeria Otimizada + CTA de Agendamento Imediato.',
-    },
-    customPitch: `Olá, equipe da Harmonia & Pele! Admiro o trabalho de estética avançada de vocês. Dei uma olhada no site harmoniaepele-sp.com e notei que as fotos de procedimentos demoram mais de 4 segundos no celular e falta um botão flutuante para agendamento direto de avaliação. Com um redesign leve e botão inteligente no WhatsApp, a conversão de pacientes sobe bastante. Quer ver como modernizamos a presença online de clínicas de estética?`,
-  },
-
-  // 5. SEM SITE - Oficina Mecânica Especializada (0.9 km)
-  {
-    id: 'lead-005',
-    companyName: 'Auto Center Precision & Diagnóstico Automotivo',
-    tradeName: 'Auto Center Precision',
-    cnpj: '18.774.209/0001-31',
-    cnae: '4520-0/01',
-    cnaeDescription: 'Serviços de manutenção e reparação mecânica',
-    niche: 'automotivo',
-    distanceKm: 0.9,
-    address: 'Rua Vergueiro, 2300',
-    neighborhood: 'Vila Mariana',
-    city: 'São Paulo',
-    state: 'SP',
-    phone: '(11) 97412-5501',
-    whatsappDirect: '5511974125501',
-    hasWebsite: false,
-    urgencyLevel: 'alta',
-    leadStatus: 'novo',
-    opportunityType: 'criar_site',
-    googleRating: 4.6,
-    reviewCount: 52,
-    estimatedMonthlyLoss: 16000,
-    auditDetails: {
-      mobileFriendly: false,
-      sslActive: false,
-      loadSpeedSeconds: 0,
-      hasWhatsAppButton: false,
-      googleLighthouseScore: 0,
-      modernityIssues: [
-        'Sem página na internet para agendamento de revisão e troca de óleo',
-        'Motoristas da região que pesquisam "oficina mecânica perto de mim" não encontram a loja',
-        'Não exibe especialidades de marcas e certificações da equipe',
-      ],
-      keyWeakness: 'Sem presença digital, perde clientes com sinistros e revisões para autocenters de rede.',
-      conversionOpportunity: 'Site Ágil com Botão de Socorro/Guincho Rápido + Agendamento de Revisão no WhatsApp + Lista de Serviços.',
-    },
-    customPitch: `Olá, equipe do Auto Center Precision! Vi que vocês são muito bem avaliados na região da Vila Mariana, mas hoje não têm um site profissional no ar. Quando um motorista quebra o carro ou precisa de revisão urgente, ele busca no Google e clica na primeira oficina que tem WhatsApp imediato. Criamos sites expressos para oficinas que geram orçamentos diários no seu WhatsApp. Posso mandar uma ideia rápida de modelo?`,
-  },
-
-  // 6. COM SITE DESATUALIZADO - Construtora & Reformas (3.4 km)
-  {
-    id: 'lead-006',
-    companyName: 'Vanguard Engenharia & Projetos Civis Ltda',
-    tradeName: 'Vanguard Engenharia',
-    cnpj: '29.301.844/0001-65',
-    cnae: '4120-4/00',
-    cnaeDescription: 'Construção de edifícios e reformas residenciais',
-    niche: 'construcao',
-    distanceKm: 3.4,
-    address: 'Av. Brigadeiro Faria Lima, 1800',
-    neighborhood: 'Pinheiros',
-    city: 'São Paulo',
-    state: 'SP',
-    phone: '(11) 98831-4490',
-    whatsappDirect: '5511988314490',
-    hasWebsite: true,
-    websiteUrl: 'http://vanguardeng-reformas.com.br',
-    urgencyLevel: 'alta',
-    leadStatus: 'novo',
-    opportunityType: 'modernizar_site',
-    googleRating: 4.5,
-    reviewCount: 31,
-    estimatedMonthlyLoss: 35000,
-    auditDetails: {
-      mobileFriendly: false,
-      sslActive: false,
-      loadSpeedSeconds: 6.1,
-      hasWhatsAppButton: false,
-      googleLighthouseScore: 29,
-      modernityIssues: [
-        'Site antigo em PHP antigo com carregamento de mais de 6 segundos',
-        'Galeria de fotos de obras antigas sem zoom e sem visual moderno',
-        'Não possui certificado de segurança SSL',
-        'Sem formulário dinâmico de solicitação de orçamento de m² de reforma',
-      ],
-      keyWeakness: 'Site passa impressão de empresa estagnada, perdendo obras de alto padrão para concorrentes.',
-      conversionOpportunity: 'Portal Corporativo Moderno + Portfólio de Obras em Alta Resolução + Calculadora de Orçamento no WhatsApp.',
-    },
-    customPitch: `Olá, engenheiros da Vanguard Engenharia! Tudo bem? Estive avaliando o site vanguardeng-reformas.com.br e notei que a página é de arquitetura antiga e não abre com agilidade no smartphone, além de faltar segurança HTTPS e botão direto de WhatsApp. Para clientes que investem em obras e reformas de alto padrão, um site ultramoderno transmite a segurança necessária para fechar contratos de dezenas de milhares de reais. Gostariam de ver uma versão atualizada do site de vocês?`,
-  },
-
-  // 7. SEM SITE - Loja & Boutique de Roupas (1.5 km)
-  {
-    id: 'lead-007',
-    companyName: 'Donna Bella Moda Feminina & Acessórios',
-    tradeName: 'Donna Bella Boutique',
-    cnpj: '35.192.401/0001-72',
-    cnae: '4781-4/00',
-    cnaeDescription: 'Comércio varejista de artigos do vestuário e acessórios',
-    niche: 'comercio',
-    distanceKm: 1.5,
-    address: 'Rua Augusta, 1920',
-    neighborhood: 'Cerqueira César',
-    city: 'São Paulo',
-    state: 'SP',
-    phone: '(11) 98223-1100',
-    whatsappDirect: '5511982231100',
-    hasWebsite: false,
-    urgencyLevel: 'alta',
-    leadStatus: 'novo',
-    opportunityType: 'criar_site',
-    googleRating: 4.7,
-    reviewCount: 65,
-    estimatedMonthlyLoss: 7800,
-    auditDetails: {
-      mobileFriendly: false,
-      sslActive: false,
-      loadSpeedSeconds: 0,
-      hasWhatsAppButton: false,
-      googleLighthouseScore: 0,
-      modernityIssues: [
-        'Vende apenas no balcão físico e no Direct do Instagram que fica desorganizado',
-        'Não tem catálogo online para clientes verem tamanhos e coleções novas',
-        'Falta de link na bio profissional que direcione compras diretamente para o WhatsApp',
-      ],
-      keyWeakness: 'Depende de responder cliente por cliente manualmente sem catálogo de produtos.',
-      conversionOpportunity: 'Catálogo Digital Estilo Vitrine + Integração de Pedido Fácil no WhatsApp + Posicionamento no Google.',
-    },
-    customPitch: `Oi pessoal da Donna Bella Boutique! Acompanho as novidades de vocês na Augusta e percebi que vocês não têm um catálogo online onde as clientes possam ver os looks da semana e pedir no WhatsApp com 1 clique. Ficar respondendo preço uma a uma no direct consome tempo. Desenvolvemos vitrines digitais leves que aumentam as vendas da loja pelo WhatsApp. Posso mandar uma prévia de como ficaria a vitrine de vocês?`,
-  },
-
-  // 8. COM SITE DESATUALIZADO - Contabilidade & Consultoria Fiscal (2.9 km)
-  {
-    id: 'lead-008',
-    companyName: 'Líder Contabilidade & Gestão Empresarial Eireli',
-    tradeName: 'Líder Contabilidade',
-    cnpj: '19.412.003/0001-99',
-    cnae: '6920-6/01',
-    cnaeDescription: 'Atividades de contabilidade e consultoria fiscal',
-    niche: 'contabilidade',
-    distanceKm: 2.9,
-    address: 'Rua São Bento, 365 - 11º Andar',
-    neighborhood: 'Centro Histórico',
-    city: 'São Paulo',
-    state: 'SP',
-    phone: '(11) 97100-3320',
-    whatsappDirect: '5511971003320',
-    hasWebsite: true,
-    websiteUrl: 'http://lidercontabil-sp.com.br',
-    urgencyLevel: 'alta',
-    leadStatus: 'novo',
-    opportunityType: 'modernizar_site',
-    googleRating: 4.3,
-    reviewCount: 15,
-    estimatedMonthlyLoss: 18000,
-    auditDetails: {
-      mobileFriendly: false,
-      sslActive: true,
-      loadSpeedSeconds: 5.2,
-      hasWhatsAppButton: false,
-      googleLighthouseScore: 38,
-      modernityIssues: [
-        'Design corporativo datado de 2012 com textos longos e burocráticos',
-        'Sem botão para abertura rápida de CNPJ ou migração de MEI para ME',
-        'Não possui canal ágil para pequenas e médias empresas conversarem no WhatsApp',
-      ],
-      keyWeakness: 'Site burocrático e lento que não atrai novas empresas e startups da região.',
-      conversionOpportunity: 'Site Moderno Foco em BPO Financeiro + Simulador de Economia Tributária + Botão WhatsApp de Atendimento Rápido.',
-    },
-    customPitch: `Olá, contadores da Líder Contabilidade! Sabiam que a maioria dos empreendedores que busca contabilidade hoje procura atendimento moderno e sem burocracia no Google? O site atual de vocês tem layout antigo e não possui botão de abertura fácil de CNPJ no WhatsApp. Criamos sites modernos para escritórios contábeis que geram novos contratos recorrentes todos os meses. Quer ver como fica uma versão moderna do site da Líder?`,
-  },
-
-  // 9. SEM SITE - Pet Shop & Clínica Veterinária (0.7 km)
-  {
-    id: 'lead-009',
-    companyName: 'Vida Animal Hospital Veterinário & Pet Care',
-    tradeName: 'Vida Animal Pet & Vet',
-    cnpj: '31.289.442/0001-10',
-    cnae: '7500-1/00',
-    cnaeDescription: 'Atividades veterinárias e comércio de artigos para animais',
-    niche: 'pets',
-    distanceKm: 0.7,
-    address: 'Rua Pamplona, 730',
-    neighborhood: 'Jardim Paulista',
-    city: 'São Paulo',
-    state: 'SP',
-    phone: '(11) 99341-2099',
-    whatsappDirect: '5511993412099',
-    hasWebsite: false,
-    urgencyLevel: 'alta',
-    leadStatus: 'novo',
-    opportunityType: 'criar_site',
-    googleRating: 4.8,
-    reviewCount: 110,
-    estimatedMonthlyLoss: 11000,
-    auditDetails: {
-      mobileFriendly: false,
-      sslActive: false,
-      loadSpeedSeconds: 0,
-      hasWhatsAppButton: false,
-      googleLighthouseScore: 0,
-      modernityIssues: [
-        'Sem site de emergência 24h para tutores com cães/gatos passando mal',
-        'Sem agendamento online de banho, tosa e vacinas',
-        'Perde buscas no Google para hospitais veterinários distantes com site indexado',
-      ],
-      keyWeakness: 'Sem presença online rápida, tutores em situação de emergência recorrem a outro hospital.',
-      conversionOpportunity: 'Site de Atendimento Emergencial 24h + Botão WhatsApp de Plantão + Agendamento de Estética Pet.',
-    },
-    customPitch: `Olá, equipe da Vida Animal! Vocês têm uma avaliação excelente no Jardim Paulista, mas não contam com um site oficial no Google com botão direto de plantão veterinário. Quando um tutor passa por uma emergência com o pet à noite, ele digita "veterinário 24h perto de mim" no Google e clica no primeiro botão de WhatsApp. Ter um site rápido garante que esses clientes cheguem direto a vocês. Posso enviar um modelo demonstrativo?`,
-  },
-
-  // 10. COM SITE DESATUALIZADO - Academia & Fitness (1.9 km)
-  {
-    id: 'lead-010',
-    companyName: 'Titanium Box Centro de Treinamento e Crossfit',
-    tradeName: 'Titanium Box Crossfit',
-    cnpj: '36.812.903/0001-20',
-    cnae: '9313-1/00',
-    cnaeDescription: 'Atividades de condicionamento físico e treinamento funcional',
-    niche: 'fitness',
-    distanceKm: 1.9,
-    address: 'Rua Haddock Lobo, 400',
-    neighborhood: 'Cerqueira César',
-    city: 'São Paulo',
-    state: 'SP',
-    phone: '(11) 98765-4321',
-    whatsappDirect: '5511987654321',
-    hasWebsite: true,
-    websiteUrl: 'http://titaniumbox-fit.com.br',
-    urgencyLevel: 'media',
-    leadStatus: 'novo',
-    opportunityType: 'modernizar_site',
-    googleRating: 4.8,
-    reviewCount: 94,
-    estimatedMonthlyLoss: 13500,
-    auditDetails: {
-      mobileFriendly: true,
-      sslActive: true,
-      loadSpeedSeconds: 4.9,
-      hasWhatsAppButton: false,
-      googleLighthouseScore: 42,
-      modernityIssues: [
-        'Sem botão direto para agendar "Aula Experimental Gratuita" no WhatsApp',
-        'Grade de horários ilegível na tela do celular',
-        'Vídeos de treino travando e pesando no carregamento móvel',
-      ],
-      keyWeakness: 'Falta de CTA de alta conversão para aula experimental rápida no WhatsApp.',
-      conversionOpportunity: 'Página de Alta Conversão + Grade Interativa de Treinos + Botão "Garantir Aula Experimental" no WhatsApp.',
-    },
-    customPitch: `Fala pessoal da Titanium Box! A estrutura de vocês é fera, mas o site de vocês não tem um botão fácil para o aluno garantir aquela aula experimental no WhatsApp, além da grade de horários ficar pequena no celular. Com uma landing page veloz focada em conversão, vocês lotam as turmas de funcional e musculação. Querem ver como modernizamos a página de vocês para captar novos alunos?`,
-  },
-
-  // 11. SEM SITE - Imobiliária de Bairro (2.4 km)
-  {
-    id: 'lead-011',
-    companyName: 'Prime Imóveis & Consultoria Patrimonial Ltda',
-    tradeName: 'Prime Imóveis Consultoria',
-    cnpj: '27.441.902/0001-88',
-    cnae: '6821-8/01',
-    cnaeDescription: 'Corretagem na compra, venda e avaliação de imóveis residenciais',
-    niche: 'imoveis',
-    distanceKm: 2.4,
-    address: 'Av. Ibirapuera, 2030',
-    neighborhood: 'Moema',
-    city: 'São Paulo',
-    state: 'SP',
-    phone: '(11) 99122-8700',
-    whatsappDirect: '5511991228700',
-    hasWebsite: false,
-    urgencyLevel: 'alta',
-    leadStatus: 'novo',
-    opportunityType: 'criar_site',
-    googleRating: 4.6,
-    reviewCount: 22,
-    estimatedMonthlyLoss: 28000,
-    auditDetails: {
-      mobileFriendly: false,
-      sslActive: false,
-      loadSpeedSeconds: 0,
-      hasWhatsAppButton: false,
-      googleLighthouseScore: 0,
-      modernityIssues: [
-        'Depende exclusivamente de portais terceirizados caros pagando mensalidades altas',
-        'Não tem catálogo próprio para divulgar coberturas e lançamentos no WhatsApp',
-        'Falta de página de captura para proprietários que querem cadastrar imóveis',
-      ],
-      keyWeakness: 'Refém dos portais imobiliários caros sem construir marca própria no Google.',
-      conversionOpportunity: 'Portal Imobiliário Próprio + Vitrine de Lançamentos + Integração Direta com WhatsApp dos Corretores.',
-    },
-    customPitch: `Olá, corretores da Prime Imóveis Moema! Pagar mensalidades caras nos grandes portais imobiliários sem ter um site próprio faz vocês perderem clientes que preferem falar direto com a imobiliária do bairro. Desenvolvemos sites imobiliários modernos, leves e integrados com WhatsApp, com vitrine de imóveis e formulário para proprietários cadastrarem imóveis sem complicação. Vamos marcar 10 minutos para eu mostrar como funciona?`,
+    customPitch: `Olá, Dr. Menezes e equipe! O site do seu escritório pode carregar mais rápido e transmitir maior segurança jurídica com design atualizado. Gostaria de ver uma prévia de modernização?`,
   },
 ];
 
-// Dynamic generator that guarantees high-quality, realistic prospects for ANY city, neighborhood, or radius typed by the user!
+// Helper to pick realistic street names based on city
+function getStreetsForCity(city: string): string[] {
+  const norm = city.toLowerCase();
+  if (norm.includes('itupeva')) {
+    return [
+      'Av. Brasil',
+      'Av. Emílio Checchinato',
+      'Rua Emídio Agostinho',
+      'Rua Vicente Tartalha',
+      'Rua Jundiaí',
+      'Rodovia Vice-Prefeito Hermenegildo Tonoli',
+      'Av. Nelson Gulla',
+      'Rua Santo Antônio',
+      'Rua Minas Gerais',
+      'Rua José Marchi',
+      'Estrada do Monte Serrat',
+      'Rua Vereador José Rabelo',
+    ];
+  }
+  if (norm.includes('jundiai') || norm.includes('jundiaí')) {
+    return [
+      'Av. Benedicto Castilho de Andrade',
+      'Av. 9 de Julho',
+      'Rua Barão de Jundiaí',
+      'Av. Jundiaí',
+      'Av. Osmundo dos Santos Pellegrini',
+      'Rua do Retiro',
+      'Av. Ferroviários',
+      'Rua Rangel Pestana',
+    ];
+  }
+  if (norm.includes('campinas')) {
+    return [
+      'Av. Francisco Glicério',
+      'Av. José de Souza Campos (Norte-Sul)',
+      'Rua Barreto Leme',
+      'Av. Barão de Itapura',
+      'Rua Coronel Quirino',
+      'Av. Aquidabã',
+    ];
+  }
+  // Generic Brazilian city streets
+  return [
+    'Av. Central',
+    'Rua das Palmeiras',
+    'Rua XV de Novembro',
+    'Av. Presidente Vargas',
+    'Rua São José',
+    'Rua Tiradentes',
+    'Av. Brasil',
+    'Rua Marechal Deodoro',
+  ];
+}
+
+function getNeighborhoodsForCity(city: string): string[] {
+  const norm = city.toLowerCase();
+  if (norm.includes('itupeva')) {
+    return [
+      'Centro',
+      'Jardim São Vicente',
+      'Parque das Hortênsias',
+      'Jardim Brasil',
+      'Guacuri',
+      'Monte Serrat',
+      'Medeiros',
+      'Terra Brasilis',
+      'Pacaembu',
+      'Bairro da Chave',
+      'Quilombo',
+    ];
+  }
+  if (norm.includes('jundiai') || norm.includes('jundiaí')) {
+    return [
+      'Eloy Chaves',
+      'Centro',
+      'Retiro',
+      'Vila Arens',
+      'Ponte São João',
+      'Anhangabaú',
+      'Jardim Botânico',
+    ];
+  }
+  return ['Centro', 'Jardim América', 'Bela Vista', 'Vila Nova', 'Planalto', 'São José'];
+}
+
+/**
+ * Intelligent Dynamic Prospect Generator based on PRECISE GEOGRAPHIC LOCATION.
+ * Places businesses strictly within radiusKm of the target location point.
+ * Guarantees real coordinates and prevents distant cities (like São Paulo when searching in Itupeva).
+ */
 export function generateDynamicProspects(
-  locationQuery: string,
+  centerPoint: GeoLocationPoint,
   radiusKm: number,
   nicheId: string = 'todos'
 ): ProspectLead[] {
-  const cleanLocation = locationQuery.trim() || 'Minha Região';
-  
-  // Extract city and state guess
-  const parts = cleanLocation.split(/[,-/]/).map((p) => p.trim());
-  const cityGuess = parts[0] || 'São Paulo';
-  const neighborhoodGuess = parts.length > 1 ? parts[1] : 'Centro';
-  const stateGuess = parts.length > 2 ? parts[2].slice(0, 2).toUpperCase() : 'SP';
+  const city = centerPoint.city || 'Itupeva';
+  const state = centerPoint.state || 'SP';
+  const centerLat = centerPoint.lat;
+  const centerLng = centerPoint.lng;
 
-  // Realistic DDD mapping
-  const dddMap: Record<string, string> = {
-    'sp': '11', 'são paulo': '11', 'campinas': '19', 'santos': '13',
-    'rj': '21', 'rio de janeiro': '21', 'niterói': '21',
-    'mg': '31', 'belo horizonte': '31', 'uberlândia': '34',
-    'pr': '41', 'curitiba': '41', 'londrina': '43',
-    'rs': '51', 'porto alegre': '51', 'caxias do sul': '54',
-    'sc': '48', 'florianópolis': '48', 'joinville': '47',
-    'ba': '71', 'salvador': '71',
-    'df': '61', 'brasília': '61',
-    'pe': '81', 'recife': '81',
-    'ce': '85', 'fortaleza': '85',
-    'go': '62', 'goiânia': '62',
-  };
-
-  const lowerQuery = cleanLocation.toLowerCase();
+  // DDD determination
   let ddd = '11';
-  for (const [key, val] of Object.entries(dddMap)) {
-    if (lowerQuery.includes(key)) {
-      ddd = val;
-      break;
-    }
+  const normCity = city.toLowerCase();
+  if (normCity.includes('campinas') || normCity.includes('indaiatuba') || normCity.includes('valinhos') || normCity.includes('vinhedo')) {
+    ddd = '19';
+  } else if (normCity.includes('santos')) {
+    ddd = '13';
+  } else if (normCity.includes('sorocaba')) {
+    ddd = '15';
+  } else if (normCity.includes('rio de janeiro')) {
+    ddd = '21';
+  } else if (normCity.includes('curitiba')) {
+    ddd = '41';
+  } else if (normCity.includes('belo horizonte')) {
+    ddd = '31';
   }
+
+  const streets = getStreetsForCity(city);
+  const neighborhoods = getNeighborhoodsForCity(city);
 
   // Business templates for every niche
   const nicheTemplates: Record<string, {
     names: string[];
     cnae: string;
     desc: string;
-    streets: string[];
     lossWithout: number;
     lossOutdated: number;
     offerWithout: string;
     offerOutdated: string;
   }> = {
     saude: {
-      names: ['Clínica Odonto Prime', 'Instituto Médico Integrado', 'Consultório Dra. Camila Saúde', 'Centro Odontológico Bem Estar', 'Clínica BellaFace Harmonização'],
+      names: ['Odonto Prime', 'Instituto Médico & Saúde', 'Clínica Bem Estar', 'Consultório Dentário Dr. Silva', 'Harmoniza Estética Facial & Odonto'],
       cnae: '8630-5/01',
       desc: 'Atividade médica ambulatorial e odontologia especializada',
-      streets: ['Av. Central', 'Rua das Palmeiras', 'Rua São José', 'Av. Presidente Vargas', 'Rua XV de Novembro'],
-      lossWithout: 9500,
-      lossOutdated: 6200,
+      lossWithout: 8500,
+      lossOutdated: 5800,
       offerWithout: 'Landing Page de Consultório + Agendamento Direto no WhatsApp + Google Local',
       offerOutdated: 'Redesign Ágil para Celular + Botão Flutuante de WhatsApp + Certificado SSL',
     },
@@ -637,7 +779,6 @@ export function generateDynamicProspects(
       names: ['Almeida & Prado Sociedade de Advogados', 'Juris Consultoria & Advocacia', 'Santos & Faria Advogados Associados', 'Dra. Vanessa Advocacia Especializada'],
       cnae: '6911-7/01',
       desc: 'Serviços advocatícios e consultoria societária',
-      streets: ['Rua Riachuelo', 'Av. Rio Branco', 'Rua da Quitanda', 'Rua Marechal Deodoro'],
       lossWithout: 14000,
       lossOutdated: 8500,
       offerWithout: 'Site Institucional de Alta Autoridade + Triagem Rápida no WhatsApp',
@@ -647,7 +788,6 @@ export function generateDynamicProspects(
       names: ['Pizzaria Forno a Lenha Bella', 'Restaurante Sabor da Vila', 'Boteco & Grill Gourmet', 'Hamburgueria Artesanal Roots', 'Café & Bistrô Aromas'],
       cnae: '5611-2/01',
       desc: 'Restaurantes e lanchonetes com serviço gastronômico',
-      streets: ['Rua Augusta', 'Rua das Flores', 'Av. Principal', 'Rua do Comércio'],
       lossWithout: 16000,
       lossOutdated: 9000,
       offerWithout: 'Cardápio Digital Interativo + Sistema de Pedidos sem Taxa via WhatsApp',
@@ -657,7 +797,6 @@ export function generateDynamicProspects(
       names: ['Espaço Beleza Pura Salão & Spa', 'Studio Vip Sobrancelhas e Make', 'Harmoniza Estética Facial', 'Barbearia Retrô dos Amigos'],
       cnae: '9602-5/01',
       desc: 'Cabeleireiros, barbearias e estética avançada',
-      streets: ['Av. Brasil', 'Rua dos Pinheiros', 'Rua do Ouro', 'Av. Independência'],
       lossWithout: 8200,
       lossOutdated: 5400,
       offerWithout: 'Vitrine Visual dos Procedimentos + Agendamento VIP no WhatsApp',
@@ -667,7 +806,6 @@ export function generateDynamicProspects(
       names: ['Boutique Elegance Moda', 'Empório & Conveniência Central', 'Ótica Visão Perfeita', 'Loja Estilo Casa & Decoração'],
       cnae: '4712-1/00',
       desc: 'Comércio varejista em geral',
-      streets: ['Rua do Comércio', 'Av. Getúlio Vargas', 'Rua Marechal Floriano', 'Rua Barão do Rio Branco'],
       lossWithout: 11000,
       lossOutdated: 7000,
       offerWithout: 'Catálogo de Produtos Online + Link de Compra Rápida no WhatsApp',
@@ -677,7 +815,6 @@ export function generateDynamicProspects(
       names: ['Mecânica Central de Injeção Eletrônica', 'Auto Center & Pneus Confiança', 'Oficina dos Amigos Funilaria e Pintura', 'Oficina Mecânica Especializada Turbo'],
       cnae: '4520-0/01',
       desc: 'Serviços mecânicos e manutenção de veículos',
-      streets: ['Av. Industrial', 'Rua dos Ferroviários', 'Av. dos Estados', 'Rodovia Local Km 2'],
       lossWithout: 15000,
       lossOutdated: 8900,
       offerWithout: 'Landing Page de Confiança + Botão de Socorro Rápido no WhatsApp',
@@ -687,7 +824,6 @@ export function generateDynamicProspects(
       names: ['Aliança Reformas & Construções', 'Mestre de Obras & Pinturas Express', 'Projetos & Design Arquitetura', 'Construtora Horizonte Urbano'],
       cnae: '4120-4/00',
       desc: 'Construção civil, reformas e acabamentos',
-      streets: ['Av. Engenheiro Carlos', 'Rua das Acácias', 'Av. Castelo Branco'],
       lossWithout: 25000,
       lossOutdated: 18000,
       offerWithout: 'Portfólio de Obras Realizadas + Captação de Orçamentos no WhatsApp',
@@ -697,7 +833,6 @@ export function generateDynamicProspects(
       names: ['Imobiliária Horizonte Imóveis', 'Corretora Solidez Imóveis e Aluguéis', 'Habitar Gestão Imobiliária', 'Imobiliária Prime Seleção'],
       cnae: '6821-8/01',
       desc: 'Intermediação e venda de imóveis',
-      streets: ['Av. das Américas', 'Rua das Hortênsias', 'Av. Sete de Setembro'],
       lossWithout: 32000,
       lossOutdated: 22000,
       offerWithout: 'Portal de Imóveis Próprio + Vitrine de Lançamentos no WhatsApp',
@@ -707,7 +842,6 @@ export function generateDynamicProspects(
       names: ['Exata Contabilidade & BPO', 'Solução Fiscal Escritório Contábil', 'Confiance Assessoria Empresarial'],
       cnae: '6920-6/01',
       desc: 'Serviços contábeis e fiscais',
-      streets: ['Rua Álvares Penteado', 'Av. Afonso Pena', 'Rua Bahia'],
       lossWithout: 17500,
       lossOutdated: 12000,
       offerWithout: 'Site de Captação B2B + Botão de Abertura de CNPJ Grátis no WhatsApp',
@@ -717,7 +851,6 @@ export function generateDynamicProspects(
       names: ['Clínica Veterinária Amigo Fiel', 'Pet Care & Banho Amor de Quatro Patas', 'Hospital Veterinário ProntoVet 24h'],
       cnae: '7500-1/00',
       desc: 'Atividades veterinárias e pet shop',
-      streets: ['Rua dos Bem-Te-Vis', 'Av. Dr. Arnaldo', 'Rua Santa Catarina'],
       lossWithout: 10500,
       lossOutdated: 6500,
       offerWithout: 'Site de Plantão Emergencial 24h + Agendamento de Banho e Tosa',
@@ -727,7 +860,6 @@ export function generateDynamicProspects(
       names: ['PowerFit Academia & Musculação', 'Studio Pilates & Corpo em Movimento', 'CT Guerreiros Funcional e Lutas'],
       cnae: '9313-1/00',
       desc: 'Condicionamento físico e treinos funcionais',
-      streets: ['Rua dos Esportes', 'Av. Getúlio Vargas', 'Rua Dom Pedro II'],
       lossWithout: 13000,
       lossOutdated: 7500,
       offerWithout: 'Página de Aula Experimental Grátis + Grade de Aulas no Celular',
@@ -742,45 +874,57 @@ export function generateDynamicProspects(
   const generatedLeads: ProspectLead[] = [];
   let leadCounter = 1;
 
-  // Generate leads for each selected niche
   for (const nKey of selectedNiches) {
     const template = nicheTemplates[nKey] || nicheTemplates.saude;
-    
-    // Generate 2 to 4 leads per niche (half without site, half with outdated site)
     const countToGenerate = nicheId === 'todos' ? 2 : 5;
 
     for (let i = 0; i < countToGenerate; i++) {
       const isWithoutWebsite = i % 2 === 0;
-      const baseName = template.names[i % template.names.length];
-      const street = template.streets[i % template.streets.length];
-      const streetNumber = Math.floor(Math.random() * 1800) + 50;
-      
-      // Calculate realistic distance within the chosen radius
-      // Ensures leads are distributed nicely: some very close (0.5 - 1.5 km), some medium
-      const distance = Math.max(0.4, Math.round(((i + 1) / (countToGenerate + 1) * radiusKm * 0.85 + 0.3) * 10) / 10);
-      
-      const phoneSuffix = Math.floor(1000 + Math.random() * 9000);
-      const phoneMiddle = Math.floor(98000 + Math.random() * 1999);
-      const phoneFormatted = `(${ddd}) ${phoneMiddle}-${phoneSuffix}`;
-      const whatsappClean = `55${ddd}${phoneMiddle}${phoneSuffix}`;
-      
-      const cnpjRandom = `${Math.floor(10 + Math.random() * 89)}.${Math.floor(100 + Math.random() * 899)}.${Math.floor(100 + Math.random() * 899)}/0001-${Math.floor(10 + Math.random() * 89)}`;
+      const baseName = `${template.names[i % template.names.length]} - ${city}`;
+      const street = streets[i % streets.length];
+      const neighborhood = neighborhoods[i % neighborhoods.length];
+      const streetNumber = Math.floor(Math.random() * 1500) + 40;
 
-      const fakeDomain = isWithoutWebsite ? undefined : `http://${baseName.toLowerCase().replace(/[^a-z0-9]/g, '')}-${cityGuess.toLowerCase().slice(0, 4)}.com.br`;
+      // Calculate a controlled distance strictly within radiusKm
+      // Distribute from 0.4 km up to 92% of the radius
+      const targetDist = Math.max(
+        0.4,
+        Math.round(((i + 1) / (countToGenerate + 1) * (radiusKm * 0.88) + 0.3) * 10) / 10
+      );
+
+      // Distribute angles in a circular sweep
+      const bearing = (leadCounter * 53 + i * 37) % 360;
+      const coords = createOffsetCoordinates(centerLat, centerLng, targetDist, bearing);
+
+      // Verify exact Haversine distance
+      const exactDistance = calculateHaversineDistanceKm(centerLat, centerLng, coords.lat, coords.lng);
+
+      // Strict enforcement: MUST NOT exceed radiusKm
+      if (exactDistance > radiusKm) continue;
+
+      const phonePrefix = city.toLowerCase().includes('itupeva') ? '4591' : '98' + Math.floor(10 + Math.random() * 89);
+      const phoneSuffix = Math.floor(1000 + Math.random() * 9000);
+      const phoneFormatted = `(${ddd}) ${phonePrefix}-${phoneSuffix}`;
+      const whatsappClean = `55${ddd}${phonePrefix}${phoneSuffix}`;
+
+      const cnpjRandom = `${Math.floor(10 + Math.random() * 89)}.${Math.floor(100 + Math.random() * 899)}.${Math.floor(100 + Math.random() * 899)}/0001-${Math.floor(10 + Math.random() * 89)}`;
+      const fakeDomain = isWithoutWebsite ? undefined : `http://${template.names[0].toLowerCase().replace(/[^a-z0-9]/g, '')}-${city.toLowerCase().slice(0, 5)}.com.br`;
 
       const lead: ProspectLead = {
-        id: `gen-lead-${leadCounter++}-${Date.now()}`,
+        id: `lead-loc-${leadCounter++}-${Date.now()}`,
         companyName: `${baseName} Ltda`,
-        tradeName: `${baseName} - ${neighborhoodGuess}`,
+        tradeName: baseName,
         cnpj: cnpjRandom,
         cnae: template.cnae,
         cnaeDescription: template.desc,
         niche: nKey,
-        distanceKm: distance,
+        distanceKm: exactDistance,
+        lat: coords.lat,
+        lng: coords.lng,
         address: `${street}, ${streetNumber}`,
-        neighborhood: neighborhoodGuess,
-        city: cityGuess,
-        state: stateGuess,
+        neighborhood: neighborhood,
+        city: city,
+        state: state,
         phone: phoneFormatted,
         whatsappDirect: whatsappClean,
         hasWebsite: !isWithoutWebsite,
@@ -788,18 +932,18 @@ export function generateDynamicProspects(
         urgencyLevel: isWithoutWebsite ? 'alta' : 'media',
         leadStatus: 'novo',
         opportunityType: isWithoutWebsite ? 'criar_site' : 'modernizar_site',
-        googleRating: Math.round((4.2 + Math.random() * 0.7) * 10) / 10,
-        reviewCount: Math.floor(15 + Math.random() * 120),
+        googleRating: Math.round((4.4 + Math.random() * 0.5) * 10) / 10,
+        reviewCount: Math.floor(20 + Math.random() * 80),
         estimatedMonthlyLoss: isWithoutWebsite ? template.lossWithout : template.lossOutdated,
         auditDetails: {
-          mobileFriendly: !isWithoutWebsite && Math.random() > 0.5,
-          sslActive: !isWithoutWebsite && Math.random() > 0.6,
-          loadSpeedSeconds: isWithoutWebsite ? 0 : Math.round((4.0 + Math.random() * 2.8) * 10) / 10,
+          mobileFriendly: !isWithoutWebsite && Math.random() > 0.4,
+          sslActive: !isWithoutWebsite && Math.random() > 0.5,
+          loadSpeedSeconds: isWithoutWebsite ? 0 : Math.round((4.2 + Math.random() * 2.5) * 10) / 10,
           hasWhatsAppButton: false,
-          googleLighthouseScore: isWithoutWebsite ? 0 : Math.floor(25 + Math.random() * 30),
+          googleLighthouseScore: isWithoutWebsite ? 0 : Math.floor(28 + Math.random() * 32),
           modernityIssues: isWithoutWebsite
             ? [
-                `Inexistência de website oficial indexado para buscas em ${cityGuess}`,
+                `Inexistência de website oficial para buscas locais em ${city}`,
                 'Não possui botão direto de WhatsApp integrado para orçamentos rápidos',
                 'Depende de indicações e fluxo físico de pedestres no bairro',
               ]
@@ -807,24 +951,22 @@ export function generateDynamicProspects(
                 'Carregamento superior a 4.5 segundos no 4G móvel',
                 'Layout não adaptado adequadamente para telas de celulares modernos',
                 'Falta de botão flutuante com mensagem pré-configurada no WhatsApp',
-                'Visual antigo que gera perda de credibilidade perante a concorrência',
               ],
           keyWeakness: isWithoutWebsite
-            ? `Totalmente sem presença digital própria no Google da região de ${cityGuess}.`
-            : 'Site desatualizado e lento que afasta novos clientes que buscam pelo celular.',
+            ? `Sem presença digital própria no Google da região de ${city}.`
+            : `Site desatualizado que afasta clientes de ${city} que buscam pelo celular.`,
           conversionOpportunity: isWithoutWebsite
             ? template.offerWithout
             : template.offerOutdated,
         },
         customPitch: isWithoutWebsite
-          ? `Olá, equipe da ${baseName}! Vi que vocês oferecem um excelente atendimento na região de ${cityGuess}, mas notei que quando alguém pesquisa pelos seus serviços no Google, vocês ainda não contam com um site oficial com botão de WhatsApp. Criamos websites modernos de alta performance que posicionam sua empresa no topo das buscas locais e geram novos clientes todos os dias. Posso enviar um modelo demonstrativo sem compromisso?`
-          : `Olá, equipe da ${baseName}! Estive analisando a presença digital de empresas da região de ${cityGuess} e percebi que o site de vocês pode carregar bem mais rápido no celular e converter mais visitantes com um botão dinâmico de WhatsApp. Modernizamos sites para empresas da sua área aumentando os agendamentos imediatos. Gostariam de ver uma prévia de modernização?`,
+          ? `Olá, equipe da ${baseName}! Vi que vocês oferecem um excelente atendimento na região de ${city}, mas notei que quando alguém pesquisa pelos seus serviços no Google, vocês ainda não contam com um site oficial com botão de WhatsApp. Criamos websites modernos de alta performance que posicionam sua empresa no topo das buscas locais e geram novos clientes todos os dias. Posso enviar um modelo demonstrativo sem compromisso?`
+          : `Olá, equipe da ${baseName}! Estive analisando a presença digital de empresas da região de ${city} e percebi que o site de vocês pode carregar bem mais rápido no celular e converter mais visitantes com um botão dinâmico de WhatsApp. Modernizamos sites para empresas da sua área aumentando os agendamentos imediatos. Gostariam de ver uma prévia de modernização?`,
       };
 
       generatedLeads.push(lead);
     }
   }
 
-  // Sort by closest distance first
   return generatedLeads.sort((a, b) => a.distanceKm - b.distanceKm);
 }

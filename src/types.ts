@@ -178,6 +178,17 @@ export interface ProspectLead {
   customPitch: string;
   googleRating?: number;
   reviewCount?: number;
+  lat?: number;
+  lng?: number;
+}
+
+export interface GeoLocationPoint {
+  lat: number;
+  lng: number;
+  city: string;
+  state: string;
+  neighborhood?: string;
+  formattedAddress: string;
 }
 
 export interface CnaeNicheOption {
@@ -200,4 +211,30 @@ export interface ProspectingFilters {
   locationCity: string;
 }
 
-
+export interface SocialPost {
+  id: string;
+  title: string;
+  caption: string;
+  platform: 'instagram' | 'facebook' | 'both';
+  format: 'feed' | 'carousel' | 'reels' | 'story';
+  scheduledDate: string;
+  scheduledTime: string;
+  status: 'agendado' | 'publicado' | 'rascunho';
+  mediaUrl?: string;
+  mediaType?: 'image' | 'video';
+  hashtags: string[];
+  bannerHeadline?: string;
+  bannerSubtext?: string;
+  bannerTheme?: 'emerald' | 'cyan' | 'purple' | 'amber' | 'dark';
+  autoDmTrigger?: {
+    enabled: boolean;
+    keyword: string;
+    autoReplyText: string;
+  };
+  metrics?: {
+    likes: number;
+    comments: number;
+    reach: number;
+    dmsTriggered: number;
+  };
+}

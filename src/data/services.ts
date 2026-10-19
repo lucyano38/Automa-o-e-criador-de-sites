@@ -66,20 +66,21 @@ export const SERVICES_DATA: Service[] = [
     popularFor: 'Profissionais e marcas que desejam manter o perfil ativo, atraente e autoritário no Instagram'
   },
   {
-    id: 'edicao-videos-cortes-ia',
+    id: 'edicao-videos-reels-profissional',
     icon: 'Video',
-    title: 'Edição Automática de Vídeos & Cortes com IA',
-    subtitle: 'Reels, TikToks e Shorts de Alta Retenção & Legendas Hormozi',
-    description: 'Transformação de gravações brutas em vídeos magnéticos com cortes rápidos de silêncio, legendas dinâmicas sincronizadas palavra por palavra, auto zoom e efeitos de retenção para viralizar e atrair clientes.',
+    title: 'Edição Profissional de Vídeos & Reels',
+    subtitle: 'Edição Manual Estratégica Realizada por Luciano Tavares',
+    description: 'Transformação das suas gravações brutas em vídeos magnéticos com cortes precisos de pausas, legendas dinâmicas palavra por palavra, auto zoom e efeitos de retenção máxima para Reels, Shorts e TikTok.',
     deliverables: [
-      'Remoção automática de pausas mortas e silêncios (jump-cuts)',
-      'Legendas sincronizadas no estilo Alex Hormozi (amarelo / verde) e TikTok Pop',
-      'Auto Zoom dinâmico a cada 3 a 5 segundos para prender a atenção',
-      'Inclusão de trilha de fundo sem royalties e efeitos sonoros de impacto',
-      'Roteirização inteligente e geração de ganchos virais (0-3s) com IA'
+      'Edição manual cuidadosa feita diretamente por Luciano Tavares',
+      'Remoção cirúrgica de pausas, vícios de fala e silêncios mortos (jump-cuts)',
+      'Legendas dinâmicas palavra por palavra no estilo Alex Hormozi (amarelo/verde/branco)',
+      'Zooms de retenção a cada 3 a 5 segundos para prender a atenção do público',
+      'Trilha de fundo e efeitos sonoros profissionais sincronizados',
+      'Entrega em formato vertical (9:16) pronto para postar'
     ],
-    technologies: ['Auto Video AI Engine', 'Gemini AI', 'Adobe Premiere Pro', 'CapCut Pro', 'FFmpeg', 'Dynamic Captions'],
-    popularFor: 'Criadores, empresários e profissionais que gravam vídeos e precisam de edição ágil e profissional em escala'
+    technologies: ['Adobe Premiere Pro', 'CapCut Pro', 'DaVinci Resolve', 'Edição Manual por Luciano'],
+    popularFor: 'Criadores, empresários e profissionais que gravam seus vídeos e querem uma edição profissional e estratégica sem dor de cabeça'
   },
   {
     id: 'analise-dados-dashboards',

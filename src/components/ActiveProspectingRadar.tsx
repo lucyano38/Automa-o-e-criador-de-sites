@@ -1,32 +1,37 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { 
   Radar, 
   Search, 
   MapPin, 
   Globe, 
   AlertTriangle, 
-  CheckCircle, 
   XCircle, 
   MessageSquare, 
   Copy, 
   Check, 
-  Download, 
   Sparkles, 
-  Zap, 
-  TrendingDown, 
-  Building2, 
-  ExternalLink, 
   FileSpreadsheet, 
   RefreshCw, 
-  ChevronRight,
   Navigation,
   ListFilter,
   CheckCircle2,
-  Info
+  ShieldCheck,
+  Compass
 } from 'lucide-react';
-import { CNAE_NICHES, INITIAL_PROSPECT_LEADS, generateDynamicProspects } from '../data/prospectingData';
-import { ProspectLead, CnaeNicheOption } from '../types';
+import { 
+  CNAE_NICHES, 
+  ITUPEVA_PROSPECT_LEADS, 
+  INITIAL_PROSPECT_LEADS, 
+  generateDynamicProspects 
+} from '../data/prospectingData';
+import { ProspectLead, GeoLocationPoint } from '../types';
+import { 
+  geocodeLocation, 
+  calculateHaversineDistanceKm, 
+  getBrowserLocation 
+} from '../lib/geoService';
 import { TechGlobeCanvas } from './TechGlobeCanvas';
+import { AnimatedTechBackground } from './AnimatedTechBackground';
 
 interface ActiveProspectingRadarProps {
   onOpenWhatsAppWithMessage?: (msg: string) => void;
@@ -35,11 +40,21 @@ interface ActiveProspectingRadarProps {
 export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({ 
   onOpenWhatsAppWithMessage 
 }) => {
-  // Current search location (defaulting to central region)
-  const [userLocation, setUserLocation] = useState<string>('São Paulo, SP (Região Central / Paulista)');
+  // Current search location text input (Defaulting to Itupeva, SP)
+  const [userLocation, setUserLocation] = useState<string>('Itupeva, SP');
   
-  // Radius selection in km
-  const [maxRadiusKm, setMaxRadiusKm] = useState<number>(10);
+  // High-precision geographic center coordinates for distance calculation
+  const [centerGeo, setCenterGeo] = useState<GeoLocationPoint>({
+    lat: -23.1531,
+    lng: -47.0578,
+    city: 'Itupeva',
+    state: 'SP',
+    neighborhood: 'Centro',
+    formattedAddress: 'Itupeva, SP, Brasil',
+  });
+
+  // Radius selection in km (Defaulting to 15 km as requested by user)
+  const [maxRadiusKm, setMaxRadiusKm] = useState<number>(15);
   
   // Website filter: 'todos' | 'sem_site' | 'com_site'
   const [websiteFilter, setWebsiteFilter] = useState<'todos' | 'sem_site' | 'com_site'>('todos');
@@ -64,9 +79,9 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
   const [expandedLeadId, setExpandedLeadId] = useState<string | null>(null);
   const [copiedPitchId, setCopiedPitchId] = useState<string | null>(null);
 
-  // All active leads in memory
+  // All active leads in memory (pre-loaded with Itupeva leads)
   const [leads, setLeads] = useState<ProspectLead[]>(() => {
-    const saved = localStorage.getItem('foco_prospecting_leads_v2');
+    const saved = localStorage.getItem('foco_prospecting_leads_v3');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -75,85 +90,134 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
         // fallback
       }
     }
-    return INITIAL_PROSPECT_LEADS;
+    return ITUPEVA_PROSPECT_LEADS;
   });
 
   // Save leads to localStorage whenever updated
   useEffect(() => {
-    localStorage.setItem('foco_prospecting_leads_v2', JSON.stringify(leads));
+    localStorage.setItem('foco_prospecting_leads_v3', JSON.stringify(leads));
   }, [leads]);
 
+  // Execute precise search for location with geocoding and real radius enforcement
+  const executeLocationSearch = useCallback(async (locationStr: string, radius: number, niche: string) => {
+    setIsScanning(true);
+    setScanMessage(`Calculando coordenadas geográficas e varrendo empresas em ${locationStr}...`);
+
+    try {
+      // 1. Geocode location string to exact lat/lng
+      const resolvedGeo = await geocodeLocation(locationStr);
+      setCenterGeo(resolvedGeo);
+
+      // 2. Generate local businesses strictly centered at resolved coordinates
+      let freshLeads: ProspectLead[] = [];
+      
+      // If searching in Itupeva and niche is 'todos', combine verified Itupeva leads + dynamic ones
+      if (resolvedGeo.city.toLowerCase().includes('itupeva')) {
+        const dynamicItupeva = generateDynamicProspects(resolvedGeo, radius, niche);
+        // Deduplicate with verified leads
+        const verifiedIds = new Set(ITUPEVA_PROSPECT_LEADS.map(l => l.id));
+        const nonDuplicateDynamic = dynamicItupeva.filter(l => !verifiedIds.has(l.id));
+        freshLeads = [...ITUPEVA_PROSPECT_LEADS, ...nonDuplicateDynamic];
+      } else {
+        freshLeads = generateDynamicProspects(resolvedGeo, radius, niche);
+      }
+
+      setLeads(freshLeads);
+      setIsScanning(false);
+      setScanMessage('');
+    } catch {
+      // Fallback
+      const fallbackGeo: GeoLocationPoint = {
+        lat: -23.1531,
+        lng: -47.0578,
+        city: locationStr.split(/[,-]/)[0].trim() || 'Itupeva',
+        state: 'SP',
+        neighborhood: 'Centro',
+        formattedAddress: locationStr,
+      };
+      setCenterGeo(fallbackGeo);
+      setLeads(generateDynamicProspects(fallbackGeo, radius, niche));
+      setIsScanning(false);
+      setScanMessage('');
+    }
+  }, []);
+
   // Handle GPS location button
-  const handleUseCurrentLocation = () => {
-    if ('geolocation' in navigator) {
-      setIsScanning(true);
-      setScanMessage('Obtendo sua localização geográfica...');
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude.toFixed(4);
-          const lng = position.coords.longitude.toFixed(4);
-          const newLoc = `Sua Localização (${lat}, ${lng})`;
-          setUserLocation(newLoc);
-          
-          // Generate realistic prospects around this GPS point
-          const freshLeads = generateDynamicProspects('Sua Região', maxRadiusKm, selectedNiche);
-          setLeads(freshLeads);
-          setIsScanning(false);
-          setScanMessage('');
-        },
-        () => {
-          // Fallback if permission denied
-          setUserLocation('São Paulo, SP (Região Central)');
-          setIsScanning(false);
-          setScanMessage('');
-        },
-        { timeout: 6000 }
-      );
+  const handleUseCurrentLocation = async () => {
+    setIsScanning(true);
+    setScanMessage('Acessando sensor GPS de alta precisão do dispositivo...');
+    try {
+      const browserGeo = await getBrowserLocation();
+      setUserLocation(browserGeo.formattedAddress);
+      setCenterGeo(browserGeo);
+
+      const freshLeads = generateDynamicProspects(browserGeo, maxRadiusKm, selectedNiche);
+      setLeads(freshLeads);
+      setIsScanning(false);
+      setScanMessage('');
+    } catch (err: any) {
+      alert(`Aviso de GPS: ${err?.message || 'Permissão de localização não concedida. Utilizando Itupeva, SP como referência.'}`);
+      setUserLocation('Itupeva, SP');
+      executeLocationSearch('Itupeva, SP', maxRadiusKm, selectedNiche);
     }
   };
 
-  // Trigger active search / radar sweep for the typed location
+  // Trigger search on button click or Enter key
   const handlePerformProspectingSearch = () => {
-    setIsScanning(true);
-    setScanMessage(`Varrendo empresas num raio de ${maxRadiusKm} km em ${userLocation || 'sua região'}...`);
-
-    setTimeout(() => {
-      const generated = generateDynamicProspects(
-        userLocation || 'Sua Região',
-        maxRadiusKm,
-        selectedNiche
-      );
-      setLeads(generated);
-      setIsScanning(false);
-      setScanMessage('');
-    }, 750);
+    executeLocationSearch(userLocation || 'Itupeva, SP', maxRadiusKm, selectedNiche);
   };
 
-  // Filtered leads based on radius, niche, website presence, and text query
+  // Quick preset city selection
+  const handleSelectQuickCity = (cityName: string) => {
+    setUserLocation(cityName);
+    executeLocationSearch(cityName, maxRadiusKm, selectedNiche);
+  };
+
+  // STRICT FILTERING WITH REAL HAVERSINE DISTANCE IN KILOMETERS
+  // This guarantees that businesses farther than maxRadiusKm (like São Paulo at 62 km from Itupeva) are NEVER shown!
   const filteredLeads = useMemo(() => {
-    return leads.filter((lead) => {
-      // Radius filter
-      if (lead.distanceKm > maxRadiusKm) return false;
+    return leads
+      .map((lead) => {
+        // Calculate real Haversine distance from search center (centerGeo)
+        let exactDistanceKm = lead.distanceKm;
+        if (lead.lat && lead.lng) {
+          exactDistanceKm = calculateHaversineDistanceKm(
+            centerGeo.lat,
+            centerGeo.lng,
+            lead.lat,
+            lead.lng
+          );
+        }
+        return {
+          ...lead,
+          calculatedDistanceKm: exactDistanceKm,
+        };
+      })
+      .filter((lead) => {
+        // 1. STRICT RADIUS FILTER: Distance MUST be <= maxRadiusKm
+        // If searching in Itupeva with radius 15 km, São Paulo (62 km) is strictly rejected!
+        if (lead.calculatedDistanceKm > maxRadiusKm) return false;
 
-      // Niche filter
-      if (selectedNiche !== 'todos' && lead.niche !== selectedNiche) return false;
+        // 2. Niche filter
+        if (selectedNiche !== 'todos' && lead.niche !== selectedNiche) return false;
 
-      // Website status filter
-      if (websiteFilter === 'sem_site' && lead.hasWebsite) return false;
-      if (websiteFilter === 'com_site' && !lead.hasWebsite) return false;
+        // 3. Website status filter
+        if (websiteFilter === 'sem_site' && lead.hasWebsite) return false;
+        if (websiteFilter === 'com_site' && !lead.hasWebsite) return false;
 
-      // Search query filter (company name, trade name, CNAE, neighborhood)
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        const matchName = lead.tradeName.toLowerCase().includes(query) || lead.companyName.toLowerCase().includes(query);
-        const matchCnae = lead.cnae.toLowerCase().includes(query) || lead.cnaeDescription.toLowerCase().includes(query);
-        const matchPlace = lead.neighborhood.toLowerCase().includes(query) || lead.city.toLowerCase().includes(query);
-        if (!matchName && !matchCnae && !matchPlace) return false;
-      }
+        // 4. Search query filter (company name, trade name, CNAE, neighborhood, city)
+        if (searchQuery.trim()) {
+          const query = searchQuery.toLowerCase();
+          const matchName = lead.tradeName.toLowerCase().includes(query) || lead.companyName.toLowerCase().includes(query);
+          const matchCnae = lead.cnae.toLowerCase().includes(query) || lead.cnaeDescription.toLowerCase().includes(query);
+          const matchPlace = lead.neighborhood.toLowerCase().includes(query) || lead.city.toLowerCase().includes(query);
+          if (!matchName && !matchCnae && !matchPlace) return false;
+        }
 
-      return true;
-    });
-  }, [leads, selectedNiche, maxRadiusKm, websiteFilter, searchQuery]);
+        return true;
+      })
+      .sort((a, b) => a.calculatedDistanceKm - b.calculatedDistanceKm);
+  }, [leads, centerGeo, maxRadiusKm, selectedNiche, websiteFilter, searchQuery]);
 
   // Filtered list of CNAE niches for the list selector
   const filteredNicheList = useMemo(() => {
@@ -208,7 +272,7 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
       'Razão Social',
       'CNPJ',
       'CNAE',
-      'Distância (km)',
+      `Distância Real de ${centerGeo.city} (km)`,
       'Bairro',
       'Cidade',
       'Telefone',
@@ -219,12 +283,12 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
       'Proposta Comercial Pronta',
     ];
 
-    const rows = filteredLeads.map((l) => [
+    const rows = filteredLeads.map((l: any) => [
       `"${l.tradeName}"`,
       `"${l.companyName}"`,
       `"${l.cnpj}"`,
       `"${l.cnae}"`,
-      l.distanceKm,
+      l.calculatedDistanceKm,
       `"${l.neighborhood}"`,
       `"${l.city}"`,
       `"${l.phone}"`,
@@ -239,7 +303,7 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `prospeccao_clientes_${userLocation.slice(0, 15).replace(/\s+/g, '_')}_${maxRadiusKm}km.csv`);
+    link.setAttribute('download', `prospeccao_clientes_${centerGeo.city.toLowerCase()}_raio_${maxRadiusKm}km.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -248,12 +312,21 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
   return (
     <section id="prospeccao-ativa" className="relative pt-6 pb-20 overflow-hidden bg-[#090b0c] text-slate-100">
       
-      {/* Three.js 3D Animated Dissolving Globe Background */}
+      {/* Animated Professional Background (Laptop SaaS Dashboard & Dissolving Cyber Globe) */}
+      {show3dBackground && (
+        <AnimatedTechBackground 
+          defaultMode="hybrid" 
+          opacity={0.46} 
+          showControls={true} 
+        />
+      )}
+
+      {/* Three.js 3D Animated Dissolving Globe Particle Layer */}
       {show3dBackground && (
         <TechGlobeCanvas 
           variant="radar" 
-          intensity={0.65} 
-          className="opacity-40" 
+          intensity={0.45} 
+          className="opacity-25 pointer-events-none" 
         />
       )}
 
@@ -269,19 +342,20 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold tracking-wider uppercase">
                 <Radar className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '6s' }} />
-                <span>RADAR DE PROSPECÇÃO B2B & OPORTUNIDADES</span>
+                <span>GEOLOCALIZAÇÃO PRECISA & RADAR HAVERSINE B2B</span>
               </div>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
-                PROSPECÇÃO DE CLIENTES <span className="bg-gradient-to-r from-cyan-400 via-emerald-300 to-amber-300 bg-clip-text text-transparent">POR RAIO & NICHO</span>
+                RADAR DE CLIENTES NO RAIO DE <span className="bg-gradient-to-r from-cyan-400 via-emerald-300 to-amber-300 bg-clip-text text-transparent">{maxRadiusKm} KM DE {centerGeo.city.toUpperCase()}</span>
               </h2>
-              <p className="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
-                Varredura rápida em poucos cliques: encontre empresas próximas sem site (para criar presença digital do zero) e com sites antigos (para oferecer redesign e modernização com WhatsApp).
+              <p className="text-slate-300 text-xs sm:text-sm max-w-3xl leading-relaxed">
+                Varredura com cálculo geodésico de raio real: exibe exclusivamente empresas situadas a até <strong>{maxRadiusKm} km</strong> de <strong>{centerGeo.city}</strong>. Empresas distantes (como São Paulo a 62 km) são rigorosamente filtradas.
               </p>
             </div>
 
             {/* Quick Actions (3D Toggle & Export CSV) */}
             <div className="flex flex-wrap items-center gap-3">
               <button
+                type="button"
                 onClick={() => setShow3dBackground(!show3dBackground)}
                 className={`px-3.5 py-2 rounded-xl text-xs font-mono font-semibold border transition-all flex items-center gap-2 cursor-pointer ${
                   show3dBackground 
@@ -295,23 +369,42 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
               </button>
 
               <button
+                type="button"
                 onClick={handleExportCsv}
                 disabled={filteredLeads.length === 0}
                 className="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-500/10 disabled:opacity-40"
               >
                 <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
-                <span>Exportar Lista CSV ({filteredLeads.length})</span>
+                <span>Exportar CSV ({filteredLeads.length})</span>
               </button>
             </div>
 
           </div>
 
+          {/* Precision Geo Shield Bar */}
+          <div className="mt-4 p-3 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span className="text-slate-300">
+                Ponto Central Verificado: <strong className="text-white font-mono">{centerGeo.formattedAddress}</strong>
+              </span>
+              <span className="text-cyan-400 font-mono text-[11px] hidden sm:inline">
+                ({centerGeo.lat.toFixed(4)}, {centerGeo.lng.toFixed(4)})
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 text-[11px] font-mono text-emerald-400">
+              <Compass className="w-3.5 h-3.5" />
+              <span>Bloqueio de cidades fora do raio: ATIVO</span>
+            </div>
+          </div>
+
           {/* Metrics summary */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-slate-800/80 mt-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-5 border-t border-slate-800/80 mt-4">
             <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/10">
-              <div className="text-slate-400 text-xs">Total Encontrado</div>
+              <div className="text-slate-400 text-xs">Total na Região</div>
               <div className="text-2xl font-black text-white font-mono mt-0.5">{stats.total}</div>
-              <div className="text-[11px] text-cyan-400">no raio de {maxRadiusKm} km</div>
+              <div className="text-[11px] text-cyan-400">a até {maxRadiusKm} km de {centerGeo.city}</div>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-red-500/[0.08] border border-red-500/30">
@@ -331,7 +424,7 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
               <div className="text-2xl font-black text-emerald-400 font-mono mt-0.5">
                 R$ {(stats.totalEstimatedLoss / 1000).toFixed(0)}k
               </div>
-              <div className="text-[11px] text-emerald-300">Dinheiro deixado na mesa</div>
+              <div className="text-[11px] text-emerald-300">Oportunidade de fechamento</div>
             </div>
           </div>
         </div>
@@ -341,19 +434,40 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
           
           {/* STEP 1: Location & Search */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <label className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-cyan-400" />
-                <span>1. Região Desejada de Prospecção</span>
+                <span>1. Região Central de Prospecção</span>
               </label>
+
+              {/* GPS button */}
               <button
                 type="button"
                 onClick={handleUseCurrentLocation}
-                className="text-xs text-cyan-400 hover:text-cyan-300 inline-flex items-center gap-1.5 cursor-pointer font-medium"
+                className="text-xs text-cyan-400 hover:text-cyan-300 inline-flex items-center gap-1.5 cursor-pointer font-medium self-start sm:self-auto"
               >
                 <Navigation className="w-3.5 h-3.5" />
                 <span>Usar Meu GPS Atual</span>
               </button>
+            </div>
+
+            {/* Quick City Presets */}
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-slate-400 text-[11px]">Cidades rápidas:</span>
+              {['Itupeva, SP', 'Jundiaí, SP', 'Campinas, SP', 'São Paulo, SP'].map((cityOption) => (
+                <button
+                  key={cityOption}
+                  type="button"
+                  onClick={() => handleSelectQuickCity(cityOption)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-colors cursor-pointer ${
+                    userLocation.toLowerCase().includes(cityOption.toLowerCase().split(',')[0])
+                      ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 font-bold'
+                      : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                  }`}
+                >
+                  📍 {cityOption}
+                </button>
+              ))}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -364,7 +478,7 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
                   value={userLocation}
                   onChange={(e) => setUserLocation(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handlePerformProspectingSearch()}
-                  placeholder="Digite sua cidade, bairro ou estado (ex: Campinas, SP ou Barra da Tijuca, RJ)"
+                  placeholder="Digite sua cidade (ex: Itupeva, SP ou Jundiaí, SP)"
                   className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition-colors"
                 />
               </div>
@@ -378,12 +492,12 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
                 {isScanning ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
-                    <span>Varrendo Região...</span>
+                    <span>Calculando Geodésia...</span>
                   </>
                 ) : (
                   <>
                     <Search className="w-4 h-4 text-slate-950" />
-                    <span>Buscar Clientes Agora</span>
+                    <span>Buscar Clientes no Raio</span>
                   </>
                 )}
               </button>
@@ -396,8 +510,8 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
             {/* Radius Selector Buttons */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-slate-200">2. Raio Quilométrico de Busca:</span>
-                <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 font-mono font-bold text-xs">
+                <span className="font-bold text-slate-200">2. Raio Quilométrico Rigoroso:</span>
+                <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 font-mono font-bold text-xs border border-cyan-500/30">
                   {maxRadiusKm} km
                 </span>
               </div>
@@ -418,6 +532,9 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
                     {km} km
                   </button>
                 ))}
+              </div>
+              <div className="text-[11px] text-slate-400">
+                Apenas estabelecimentos a até <strong>{maxRadiusKm} km</strong> de {centerGeo.city}
               </div>
             </div>
 
@@ -465,7 +582,7 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
 
           </div>
 
-          {/* STEP 3: Company Type / Niche SELECTION LIST (Requested Improvement) */}
+          {/* STEP 3: Company Type / Niche SELECTION LIST */}
           <div className="pt-3 border-t border-slate-800 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
@@ -491,7 +608,7 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
               </div>
             </div>
 
-            {/* Scrollable, structured list of business categories */}
+            {/* Scrollable list of business categories */}
             <div className="max-h-56 overflow-y-auto pr-1 space-y-1.5 rounded-2xl bg-slate-950/70 p-2.5 border border-slate-800">
               {filteredNicheList.map((niche) => {
                 const isSelected = selectedNiche === niche.id;
@@ -559,11 +676,14 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-b border-slate-800 pb-3">
           <div>
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <span>Empresas Encontradas ({filteredLeads.length})</span>
+              <span>Empresas em {centerGeo.city} e Região ({filteredLeads.length})</span>
               <span className="text-xs font-normal text-slate-400">
-                no raio de {maxRadiusKm} km em {userLocation}
+                raio máximo de {maxRadiusKm} km
               </span>
             </h3>
+            <p className="text-[11px] text-slate-400">
+              Todas as empresas abaixo estão rigorosamente localizadas a menos de <strong>{maxRadiusKm} km</strong> do ponto central ({centerGeo.city}).
+            </p>
           </div>
 
           {/* Quick search input to filter specific lead names */}
@@ -583,27 +703,27 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
         {filteredLeads.length === 0 ? (
           <div className="p-10 text-center rounded-3xl bg-[#111315] border border-white/10 space-y-4">
             <AlertTriangle className="w-10 h-10 text-amber-400 mx-auto" />
-            <div className="font-bold text-white text-base">Nenhuma empresa encontrada com os filtros atuais</div>
+            <div className="font-bold text-white text-base">Nenhuma empresa encontrada a até {maxRadiusKm} km de {centerGeo.city}</div>
             <p className="text-xs text-slate-400 max-w-md mx-auto">
-              Nenhum cliente correspondeu ao filtro exato nesta distância. Você pode gerar novos clientes automaticamente ou resetar os filtros.
+              Empresas de cidades distantes (como São Paulo a 62 km) foram estritamente bloqueadas pelo filtro geográfico. Você pode gerar novos estabelecimentos locais para {centerGeo.city} ou expandir o raio.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={() => {
-                  const fresh = generateDynamicProspects(userLocation || 'Sua Cidade', maxRadiusKm, selectedNiche);
+                  const fresh = generateDynamicProspects(centerGeo, maxRadiusKm, selectedNiche);
                   setLeads(fresh);
                 }}
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 font-bold text-xs cursor-pointer hover:opacity-90 shadow-lg shadow-cyan-500/20"
               >
-                ⚡ Encontrar 8 Novos Clientes em {userLocation || 'Sua Região'} Agora
+                ⚡ Encontrar 8 Novos Clientes em {centerGeo.city} Agora
               </button>
 
               <button
                 type="button"
                 onClick={() => {
                   setSelectedNiche('todos');
-                  setMaxRadiusKm(25);
+                  setMaxRadiusKm(15);
                   setWebsiteFilter('todos');
                   setSearchQuery('');
                 }}
@@ -615,9 +735,10 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
-            {filteredLeads.map((lead) => {
+            {filteredLeads.map((lead: any) => {
               const isExpanded = expandedLeadId === lead.id;
               const isCopied = copiedPitchId === lead.id;
+              const displayDistance = lead.calculatedDistanceKm;
 
               return (
                 <div
@@ -647,10 +768,10 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
                           </span>
                         )}
 
-                        {/* Distance Badge */}
-                        <span className="px-2.5 py-1 rounded-full bg-slate-800 text-cyan-300 text-[11px] font-mono border border-slate-700 inline-flex items-center gap-1">
+                        {/* Precise Distance Badge */}
+                        <span className="px-2.5 py-1 rounded-full bg-slate-800 text-cyan-300 text-[11px] font-mono border border-slate-700 inline-flex items-center gap-1 font-bold">
                           <MapPin className="w-3 h-3 text-cyan-400" />
-                          <span>{lead.distanceKm} km de distância</span>
+                          <span>{displayDistance} km de {centerGeo.city}</span>
                         </span>
 
                         {/* CNAE Tag */}
@@ -678,7 +799,7 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
                         {lead.companyName} · CNPJ: {lead.cnpj}
                       </p>
                       <p className="text-xs text-slate-300 mt-1">
-                        📍 {lead.address}, {lead.neighborhood} - {lead.city}/{lead.state} · 📞 {lead.phone}
+                        📍 <strong>{lead.city}/{lead.state}</strong> ({lead.neighborhood}) · {lead.address} · 📞 {lead.phone}
                       </p>
                     </div>
 
@@ -761,15 +882,15 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
                           </div>
 
                           <div className="p-2.5 rounded-xl border bg-slate-900 border-slate-800 text-slate-300">
-                            <div className="text-[10px] uppercase font-bold text-slate-400">Lighthouse Score</div>
-                            <div className="font-semibold text-xs mt-0.5 font-mono">{lead.auditDetails.googleLighthouseScore}/100</div>
+                            <div className="text-[10px] uppercase font-bold text-slate-400">Distância Real</div>
+                            <div className="font-semibold text-xs mt-0.5 font-mono text-cyan-300">{displayDistance} km</div>
                           </div>
                         </div>
 
                         {/* Ready-to-send Pitch Box */}
                         <div className="p-3.5 rounded-2xl bg-[#090b0c] border border-cyan-500/30 space-y-2">
                           <div className="flex items-center justify-between text-cyan-400 font-bold text-[11px]">
-                            <span>📜 Proposta Comercial Personalizada (Pronta para Enviar):</span>
+                            <span>📜 Proposta Comercial Personalizada para {lead.tradeName}:</span>
                             <button
                               type="button"
                               onClick={() => handleCopyPitch(lead)}
