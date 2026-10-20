@@ -391,7 +391,7 @@ export const CrmPipelineScreen: React.FC = () => {
                       {/* WhatsApp trigger */}
                       <div className="pt-1 flex items-center justify-between">
                         <a
-                          href={`https://wa.me/${deal.telefone.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${deal.contatoNome}, aqui é o Luciano do Foco em Dados! Gostaria de conversar sobre a proposta de ${deal.servico}.`)}`}
+                          href={`https://wa.me/${(deal.telefone || '').replace(/\D/g, '').replace(/^(?:55)?(\d{10,11})$/, '55$1')}?text=${encodeURIComponent(`Olá ${deal.contatoNome}, aqui é da equipe Foco em Dados! Gostaria de conversar sobre a proposta de ${deal.servico}.`)}`}
                           target="_blank"
                           rel="noreferrer"
                           className="text-[10px] font-mono text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-bold"

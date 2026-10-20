@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
+import Stripe from 'stripe';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -169,7 +170,14 @@ async function startServer() {
         });
       }
 
-      const ai = new GoogleGenAI({ apiKey });
+      const ai = new GoogleGenAI({ 
+        apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build'
+          }
+        }
+      });
 
       const prompt = `Você é um editor de vídeo profissional e estrategista de vídeos curtos virais (Reels, TikTok, Shorts e VSLs).
 Gere uma estrutura completa de edição automática e roteiro de alta retenção para o seguinte vídeo:
@@ -201,7 +209,7 @@ Retorne APENAS um JSON válido no seguinte formato:
 }`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.8-flash',
         contents: prompt,
         config: {
           responseMimeType: 'application/json'
@@ -271,10 +279,16 @@ Retorne APENAS um JSON válido no seguinte formato:
       }
 
       // Initialize Gemini API
-      const ai = new GoogleGenAI({ apiKey });
+      const ai = new GoogleGenAI({ 
+        apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build'
+          }
+        }
+      });
 
-      const prompt = `Você é o assistente virtual do Luciano, desenvolvedor especialista em Websites, Landing Pages de Alta Conversão, Automações de WhatsApp & Telegram, Integração de Sistemas/Webhooks e Design de Posts para Instagram. Ele também é o responsável pelos portais soscuidadores.com e focoemdados.com.br.
-
+      const prompt = `Você é o consultor de soluções técnicas e comerciais do "Foco em Dados" (focoemdados.com.br).
 Gere um diagnóstico técnico e comercial em formato JSON estrito para o seguinte cliente:
 - Nome/Empresa: ${storeName}
 - Atuação / Plataforma: ${storePlatform || 'Não especificada'}
@@ -297,11 +311,11 @@ Retorne APENAS um objeto JSON válido (sem markdown de código) com o seguinte e
     "revenueBoostPercentage": "20% a 35%",
     "paybackTime": "2 a 4 semanas"
   },
-  "nextSteps": "string - Chamada direta para conversar com o Luciano no WhatsApp"
+  "nextSteps": "string - Chamada direta para conversar com nossa equipe no WhatsApp"
 }`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.8-flash',
         contents: prompt,
         config: {
           responseMimeType: 'application/json'
@@ -359,8 +373,15 @@ Retorne APENAS um objeto JSON válido (sem markdown de código) com o seguinte e
         });
       }
 
-      const ai = new GoogleGenAI({ apiKey });
-      const prompt = `Você é um estrategista sênior de marketing de conteúdo, copywriting direto e vendas B2B para o "Foco em Dados" (fundado por Luciano Tavares Silva, focoemdados.com.br).
+      const ai = new GoogleGenAI({ 
+        apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build'
+          }
+        }
+      });
+      const prompt = `Você é um estrategista sênior de marketing de conteúdo, copywriting direto e vendas B2B para o "Foco em Dados" (focoemdados.com.br).
 Gere uma copy profissional de alto engajamento e conversão para ${platform}:
 - Nicho de Mercado: ${niche || 'Geral / PMEs'}
 - Tema da Postagem: ${topic || 'Crescimento e automação de vendas'}
@@ -381,7 +402,7 @@ Retorne APENAS um objeto JSON válido (sem tags markdown de código) com o segui
 }`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.8-flash',
         contents: prompt,
         config: { responseMimeType: 'application/json' }
       });
@@ -437,7 +458,14 @@ Retorne APENAS um objeto JSON válido (sem tags markdown de código) com o segui
         });
       }
 
-      const ai = new GoogleGenAI({ apiKey });
+      const ai = new GoogleGenAI({ 
+        apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build'
+          }
+        }
+      });
       const prompt = `Você é um Cientista de Dados e Especialista em BI do "Foco em Dados" (focoemdados.com.br).
 Analise o seguinte conjunto de dados e responda à pergunta do usuário com precisão cirúrgica, números e recomendações de negócios práticas:
 
@@ -465,7 +493,7 @@ Retorne APENAS um objeto JSON válido (sem marcação de bloco de código) com o
 }`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.8-flash',
         contents: prompt,
         config: { responseMimeType: 'application/json' }
       });
@@ -486,6 +514,229 @@ Retorne APENAS um objeto JSON válido (sem marcação de bloco de código) com o
     } catch (err: any) {
       console.error('Data Analysis API error:', err);
       res.status(500).json({ error: 'Erro ao processar análise de dados com IA.' });
+    }
+  });
+
+  // API Route: Stripe Checkout Session Creation
+  app.post('/api/create-checkout-session', async (req, res) => {
+    try {
+      const { serviceId, title, priceInCents, customerEmail, customerName } = req.body;
+      const stripeSecret = process.env.STRIPE_SECRET_KEY;
+
+      if (stripeSecret && stripeSecret.startsWith('sk_')) {
+        const stripe = new Stripe(stripeSecret);
+        const session = await stripe.checkout.sessions.create({
+          line_items: [
+            {
+              price_data: {
+                currency: 'brl',
+                product_data: {
+                  name: title || 'Serviço Foco em Dados',
+                  description: 'Contratação com valor promocional de entrada - Foco em Dados (focoemdados.com.br)',
+                },
+                unit_amount: priceInCents || 49700,
+              },
+              quantity: 1,
+            },
+          ],
+          mode: 'payment',
+          success_url: `${req.headers.origin || 'http://localhost:3000'}/?checkout=success&service=${serviceId}`,
+          cancel_url: `${req.headers.origin || 'http://localhost:3000'}/?checkout=cancel`,
+          customer_email: customerEmail || undefined,
+        });
+
+        return res.json({ id: session.id, url: session.url, mode: 'live_stripe' });
+      }
+
+      // Preview / Sandbox mode simulation with complete transparency
+      return res.json({
+        mode: 'preview_simulation',
+        serviceId,
+        title,
+        priceFormatted: ((priceInCents || 49700) / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+        message: 'Checkout seguro preparado via Stripe. Pagamento processável por Cartão de Crédito em até 12x ou PIX.',
+        checkoutDetails: {
+          amount: priceInCents || 49700,
+          currency: 'BRL',
+          paymentMethods: ['Cartão de Crédito em até 12x', 'PIX Instantâneo', 'Boleto Bancário'],
+          guarantee: 'Garantia incondicional de 7 dias com entrega técnica por Luciano Tavares Silva.'
+        }
+      });
+    } catch (err: any) {
+      console.error('Stripe checkout session error:', err);
+      res.status(500).json({ error: 'Erro ao processar checkout Stripe.' });
+    }
+  });
+
+  // API Route: Integrated Site Chatbot (Answers ANY question about the site, services, prices, stack)
+  app.post('/api/site-chat', async (req, res) => {
+    try {
+      const { message, conversationHistory = [] } = req.body;
+      if (!message) {
+        return res.status(400).json({ error: 'Mensagem não informada.' });
+      }
+
+      const apiKey = process.env.GEMINI_API_KEY;
+
+      const systemContext = `Você é o Consultor e Assistente Oficial do ecossistema "Foco em Dados" (focoemdados.com.br).
+Sua missão primordial é responder com precisão cirúrgica a QUALQUER dúvida técnica ou comercial sobre o site, arquitetura de software, automações, estratégias de tráfego/prospecção e contratações.
+
+=== DIRETRIZ FUNDAMENTAL DE ATENDIMENTO ===
+- RESPONDA DIRETAMENTE À DÚVIDA DO CLIENTE! Você não é um mero redirecionador de cliques.
+- Tire dúvidas sobre código, arquitetura, integrações, stack, prazos e preços com profundidade.
+- Nunca responda simplesmente "fale no WhatsApp". O visitante veio para obter respostas imediatas aqui no chat.
+- Ao final de uma resposta completa e elucidativa, forneça as opções práticas: contratar diretamente com segurança via Stripe (em até 12x ou PIX) ou falar com um especialista no WhatsApp se desejar um escopo customizado.
+
+=== IDENTIDADE INSTITUCIONAL ===
+- Marca: Foco em Dados (focoemdados.com.br)
+- Proposta de Valor: Transformar dados brutos em máquinas de faturamento que rodam 24/7 através de inteligência analítica, prospecção B2B de alta precisão e automações no piloto automático.
+- Portais oficiais ativos: focoemdados.com.br (Inteligência & Prospecção) e soscuidadores.com (Portal Nacional de Cuidadores).
+- Contatos de suporte: atendimento@focoemdados.com.br e lucyano.pci@gmail.com.
+- WhatsApp Direto: (11) 99441-1307.
+
+=== CATÁLOGO DE SERVIÇOS & PREÇOS (CONDIÇÕES PROMOCIONAIS DE ENTRADA) ===
+*Preços especiais de lançamento, cobrados abaixo do mercado para formação de portfólio e clientes parceiros, com pagamento 100% integrado via Stripe:*
+
+1. LANDING PAGE DE ALTA CONVERSÃO:
+   - Preço de Mercado: R$ 1.500 a R$ 2.800
+   - Preço Especial Foco em Dados: R$ 497,00 (ou em até 12x de R$ 49,90 via Stripe)
+   - Prazo de Entrega: 3 a 5 dias úteis
+   - Diferenciais: Carregamento instantâneo (< 1s), layout exclusivo e responsivo para mobile, copywriting persuasivo, botão de WhatsApp flutuante pré-configurado, pixels instalados (Meta/Google Ads/Analytics) e certificado SSL.
+
+2. WEBSITE INSTITUCIONAL COMPLETO:
+   - Preço de Mercado: R$ 2.400 a R$ 4.500
+   - Preço Especial Foco em Dados: R$ 790,00 (ou em até 12x de R$ 79,00 via Stripe)
+   - Prazo de Entrega: 7 a 12 dias úteis
+   - Diferenciais: Estrutura multi-páginas (Início, Quem Somos, Serviços, Portfólio, Localização, Contato), SEO local otimizado para ranqueamento regional no Google, formulário inteligente integrado ao WhatsApp/Telegram, painel de métricas.
+
+3. AUTOMAÇÃO DE ATENDIMENTO 24H (WHATSAPP & TELEGRAM):
+   - Preço de Mercado: R$ 1.800 a R$ 3.800
+   - Preço Especial Foco em Dados: R$ 590,00 (taxa única de setup, SEM mensalidades abusivas de terceiros)
+   - Prazo de Entrega: 3 a 5 dias úteis
+   - Diferenciais: Resposta automática em menos de 5 segundos, envio de catálogo de produtos/serviços, qualificação inicial de leads, agendamento de reuniões/consultas 24/7 e transição fluida para atendimento humano.
+
+4. GESTÃO & POSTAGENS INSTAGRAM E FACEBOOK:
+   - Preço de Mercado: R$ 1.200 a R$ 2.500 / mês
+   - Preço Especial Foco em Dados: R$ 397,00 / mês (sem fidelidade contratual)
+   - Prazo: Início em até 48 horas
+   - Diferenciais: Criação de artes para Feed (1:1 e 4:5), Carrosséis explicativos e Stories, copywriting magnético para legendas com hashtags estratégicas, agendamento automatizado, bot de resposta em DM para comentários e relatório mensal de métricas.
+
+5. EDIÇÃO PROFISSIONAL DE VÍDEO & REELS:
+   - Preço Especial Foco em Dados: R$ 290,00 (pacote inicial)
+   - Prazo: 2 a 4 dias úteis
+   - Diferenciais: Cortes rápidos sem silêncios (jump cuts), legendas dinâmicas palavra por palavra no estilo Hormozi / TikTok Pop, zooms de ênfase, formato 9:16 vertical e trilha sem royalties.
+
+6. COMBO ECOSSISTEMA COMPLETO (SUPER DESCONTO):
+   - Valor Promocional: R$ 1.190,00 (economiza mais de R$ 1.500)
+   - Inclui: Landing Page de Alta Conversão + Robô WhatsApp 24h + Gestão de Redes Sociais.
+
+=== PAGAMENTOS INTEGRADOS VIA STRIPE ===
+- Integração oficial com Stripe Checkout para segurança bancária máxima.
+- Formas aceitas: Cartão de Crédito em até 12x, PIX Instantâneo com confirmação em segundos e Boleto.
+- Recibo e nota emitidos automaticamente no ato da contratação.
+
+=== ARQUITETURA TÉCNICA (PARA DÚVIDAS TÉCNICAS) ===
+- Frontend: React 19, TypeScript, Tailwind CSS v4, Motion (animações de interface), Three.js (globo 3D interativo).
+- Backend: Node.js com Express e TypeScript, arquitetura RESTful.
+- IA: SDK oficial @google/genai com Gemini 3.8 Flash para geração de diagnósticos e conteúdo.
+- Banco de Dados & Sessão: Firebase Firestore e Firebase Auth com restrição de rotas privadas (/dashboard, /prospecting, /crm, /content, /data-analysis).
+- Prospecção Georreferenciada: Filtro de raio cirúrgico de 15km, varredura multi-fonte com Google Places, Receita Federal e auditoria DNS.
+- Segurança: Criptografia SSL ponta a ponta, sem cookies intrusivos, 100% de conformidade com a LGPD.
+
+=== DIRETRIZES DE FORMATAÇÃO ===
+- Escreva em Português do Brasil de forma elegante, clara, acolhedora e altamente profissional.
+- Use listas com tópicos (•) e negrito para destacar valores e especificações.`;
+
+      if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
+        const lower = message.toLowerCase();
+        let answer = '';
+
+        if (lower.includes('preço') || lower.includes('valor') || lower.includes('custa') || lower.includes('quanto') || lower.includes('promo')) {
+          answer = 'Nossos preços são cobrados em valor promocional de entrada (abaixo da média de agências) para construção acelerada de parcerias:\n\n' +
+            '• **Landing Page de Alta Conversão**: R$ 497,00 (ou em até 12x de R$ 49,90 via Stripe)\n' +
+            '• **Website Institucional Completo**: R$ 790,00 (ou em até 12x de R$ 79,00 via Stripe)\n' +
+            '• **Automação de WhatsApp/Telegram 24h**: R$ 590,00 (taxa única de setup, sem mensalidade)\n' +
+            '• **Gestão & Postagens Instagram/Facebook**: R$ 397,00/mês (sem fidelidade contratual)\n' +
+            '• **Edição Profissional de Vídeos/Reels**: R$ 290,00\n' +
+            '• **Combo Ecossistema Completo (Site + Bot + Redes)**: R$ 1.190,00\n\n' +
+            'Todos os serviços podem ser contratados diretamente com **Cartão de Crédito em até 12x ou PIX** através do checkout oficial e 100% seguro do **Stripe**!';
+        } else if (lower.includes('tecnolog') || lower.includes('stack') || lower.includes('react') || lower.includes('vite') || lower.includes('tailwind') || lower.includes('código')) {
+          answer = 'A arquitetura técnica do **Foco em Dados** foi desenhada para máxima performance e segurança:\n\n' +
+            '• **Frontend**: React 19, TypeScript e Tailwind CSS v4 (carregamento instantâneo < 1s)\n' +
+            '• **Backend**: Node.js com Express e TypeScript em arquitetura RESTful\n' +
+            '• **Inteligência Artificial**: SDK oficial `@google/genai` com Gemini 3.8 Flash para análise de dados e copywriting\n' +
+            '• **Automações**: Webhooks e APIs oficiais do WhatsApp Business e Telegram\n' +
+            '• **Pagamentos**: Stripe SDK oficial com checkout seguro (Cartão até 12x e PIX)\n' +
+            '• **Segurança**: Criptografia SSL/TLS e total conformidade com a LGPD.';
+        } else if (lower.includes('stripe') || lower.includes('cartão') || lower.includes('pix') || lower.includes('pagamento')) {
+          answer = 'Todos os nossos pagamentos são processados de forma 100% segura pelo **Stripe**, a maior e mais confiável plataforma de pagamentos do mundo. Você pode optar por:\n\n' +
+            '• **Cartão de Crédito em até 12x**\n' +
+            '• **PIX Instantâneo** com liberação imediata\n' +
+            '• **Boleto Bancário**\n\n' +
+            'O recibo oficial e o início do desenvolvimento são disparados automaticamente após a confirmação.';
+        } else if (lower.includes('whatsapp') || lower.includes('bot') || lower.includes('autom')) {
+          answer = 'Nossa **Automação de Atendimento 24h no WhatsApp & Telegram**:\n\n' +
+            '• Responde clientes em menos de 5 segundos com menu interativo;\n' +
+            '• Envia catálogos de serviços ou tabelas de preços em PDF/texto;\n' +
+            '• Qualifica orçamentos e agenda reuniões ou consultas automaticamente;\n' +
+            '• Direciona para atendimento humano quando necessário preservando o histórico;\n' +
+            '• **Sem mensalidades recorrentes**: você paga apenas a taxa única de implementação (R$ 590,00)!';
+        } else if (lower.includes('instagram') || lower.includes('facebook') || lower.includes('post') || lower.includes('rede')) {
+          answer = 'Na **Gestão & Postagens para Instagram e Facebook** (R$ 397,00/mês):\n\n' +
+            '• Desenvolvemos artes de alta resolução para Feed (1:1 e 4:5), Carrosséis explicativos e Stories;\n' +
+            '• Escrevemos legendas persuasivas com ganchos de retenção e hashtags do seu nicho;\n' +
+            '• Agendamos todas as publicações no calendário oficial da Meta;\n' +
+            '• Configuramos robô para envio de catálogo por Direct quando comentam no post;\n' +
+            '• Emitimos relatório mensal de métricas de alcance e novos contatos.';
+        } else if (lower.includes('prazo') || lower.includes('tempo') || lower.includes('entrega')) {
+          answer = 'Nossos prazos de entrega técnica são ágeis e pontuais:\n\n' +
+            '• **Landing Page**: 3 a 5 dias úteis;\n' +
+            '• **Automação de WhatsApp/Telegram**: 3 a 5 dias úteis;\n' +
+            '• **Website Institucional Completo**: 7 a 12 dias úteis;\n' +
+            '• **Gestão de Redes Sociais**: Início das primeiras publicações em até 48 horas.';
+        } else {
+          answer = 'O **Foco em Dados** transforma o seu negócio em uma máquina de faturamento que roda 24/7. Nós desenvolvemos:\n\n' +
+            '1. **Websites e Landing Pages** com carregamento instantâneo;\n' +
+            '2. **Robôs de WhatsApp 24h** que atendem e vendem no piloto automático;\n' +
+            '3. **Gestão de Redes Sociais** (Instagram e Facebook);\n' +
+            '4. **Inteligência de Dados e Prospecção B2B** georreferenciada.\n\n' +
+            'Tudo com preços promocionais de entrada e pagamento 100% integrado pelo Stripe!';
+        }
+
+        return res.json({ reply: answer, source: 'smart_fallback' });
+      }
+
+      const ai = new GoogleGenAI({ 
+        apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build'
+          }
+        }
+      });
+
+      // Format multi-turn conversation history for @google/genai
+      const contents = conversationHistory.map((m: any) => ({
+        role: m.sender === 'user' ? 'user' : 'model',
+        parts: [{ text: m.text }]
+      }));
+      contents.push({
+        role: 'user',
+        parts: [{ text: message }]
+      });
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.8-flash',
+        contents,
+        config: {
+          systemInstruction: systemContext
+        }
+      });
+
+      return res.json({ reply: response.text || 'Olá! Posso tirar qualquer dúvida técnica ou comercial sobre nossos serviços, preços pelo Stripe e prazos de entrega.', source: 'gemini' });
+    } catch (err: any) {
+      console.error('Site chat error:', err);
+      res.status(500).json({ error: 'Erro no chat do site.' });
     }
   });
 

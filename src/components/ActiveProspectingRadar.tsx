@@ -254,15 +254,15 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
     setTimeout(() => setCopiedPitchId(null), 2500);
   };
 
-  // Open WhatsApp with prefilled message
+  // Open WhatsApp with prefilled message directly to lead's phone
   const handleWhatsAppContact = (lead: ProspectLead) => {
-    if (onOpenWhatsAppWithMessage) {
-      onOpenWhatsAppWithMessage(lead.customPitch);
-    } else {
-      const cleanPhone = lead.whatsappDirect.replace(/\D/g, '');
-      const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(lead.customPitch)}`;
-      window.open(url, '_blank', 'noopener,noreferrer');
+    const rawPhone = lead.phone || lead.whatsappDirect || '';
+    let cleanPhone = rawPhone.replace(/\D/g, '');
+    if (cleanPhone.length >= 10 && cleanPhone.length <= 11 && !cleanPhone.startsWith('55')) {
+      cleanPhone = `55${cleanPhone}`;
     }
+    const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(lead.customPitch)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   // Export CSV
@@ -819,14 +819,15 @@ export const ActiveProspectingRadar: React.FC<ActiveProspectingRadarProps> = ({
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
                       
                       {/* WhatsApp Direct Action Button */}
-                      <button
-                        type="button"
-                        onClick={() => handleWhatsAppContact(lead)}
+                      <a
+                        href={`https://wa.me/${(lead.phone || lead.whatsappDirect || '').replace(/\D/g, '').replace(/^(?:55)?(\d{10,11})$/, '55$1')}?text=${encodeURIComponent(lead.customPitch)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs inline-flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md shadow-emerald-500/20"
                       >
                         <MessageSquare className="w-4 h-4 text-slate-950" />
                         <span>Chamar no WhatsApp ({lead.phone})</span>
-                      </button>
+                      </a>
 
                       <div className="flex items-center gap-2">
                         {/* Copy Pitch Button */}

@@ -124,8 +124,8 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAuthModal, onNavigate, isO
               <div className="text-[11px] text-slate-400 font-mono">
                 E-mail Profissional: <a href="mailto:atendimento@focoemdados.com.br" className="text-slate-300 hover:text-cyan-400">atendimento@focoemdados.com.br</a>
               </div>
-              <div className="text-[11px] text-slate-500 font-mono">
-                Titular & Desenvolvedor: <span className="text-slate-300 font-bold">Luciano Tavares Silva</span>
+              <div className="text-[11px] text-slate-400 font-mono">
+                Atendimento Rápido: <span className="text-emerald-400 font-bold">Segunda a Sábado, das 8h às 20h</span>
               </div>
             </div>
 
@@ -288,10 +288,10 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAuthModal, onNavigate, isO
           
           <div className="text-center md:text-left space-y-1">
             <div>
-              © {new Date().getFullYear()} <strong>Foco em Dados</strong> · Titular & Desenvolvedor: <strong>Luciano Tavares Silva</strong> · focoemdados.com.br. Todos os direitos reservados.
+              © {new Date().getFullYear()} <strong>Foco em Dados</strong> · focoemdados.com.br. Todos os direitos reservados.
             </div>
-            <div className="text-[10px] text-slate-600 font-mono">
-              Portais do Ecossistema: focoemdados.com.br · fococompleto.com.br · soscuidadores.com
+            <div className="text-[10px] text-slate-500 font-mono">
+              Inteligência de Dados, Prospecção B2B e Automação de Vendas 24/7.
             </div>
           </div>
 

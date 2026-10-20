@@ -155,7 +155,7 @@ export const Header: React.FC<HeaderProps> = ({
                 title="Acessar o Painel Executivo Foco em Dados"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Painel do Titular</span>
+                <span>Dashboard</span>
               </button>
             ) : (
               <button
@@ -232,7 +232,7 @@ export const Header: React.FC<HeaderProps> = ({
               }}
               className="w-full py-2.5 rounded-xl bg-cyan-400 text-slate-950 font-black text-xs uppercase"
             >
-              {isOwner ? 'Acessar Painel do Titular' : 'Entrar na Plataforma'}
+              {isOwner ? 'Acessar Dashboard' : 'Entrar na Plataforma'}
             </button>
 
             <button

@@ -133,12 +133,13 @@ export const ProspectingScreen: React.FC<ProspectingScreenProps> = ({
   };
 
   const handleWhatsApp = (lead: ProspectLead) => {
-    if (onOpenWhatsAppWithMessage) {
-      onOpenWhatsAppWithMessage(lead.customPitch);
-    } else {
-      const clean = lead.whatsappDirect.replace(/\D/g, '');
-      window.open(`https://wa.me/${clean}?text=${encodeURIComponent(lead.customPitch)}`, '_blank');
+    const rawPhone = lead.phone || lead.whatsappDirect || '';
+    let cleanPhone = rawPhone.replace(/\D/g, '');
+    if (cleanPhone.length >= 10 && cleanPhone.length <= 11 && !cleanPhone.startsWith('55')) {
+      cleanPhone = `55${cleanPhone}`;
     }
+    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(lead.customPitch)}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 
   const handleExportCsv = () => {
@@ -474,14 +475,16 @@ export const ProspectingScreen: React.FC<ProspectingScreenProps> = ({
                   {copiedPitchId === lead.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedPitchId === lead.id ? 'Copiado!' : 'Copiar Pitch'}</span>
                 </button>
-                <button
-                  onClick={() => handleWhatsApp(lead)}
+                <a
+                  href={`https://wa.me/${(lead.phone || lead.whatsappDirect || '').replace(/\D/g, '').replace(/^(?:55)?(\d{10,11})$/, '55$1')}?text=${encodeURIComponent(lead.customPitch)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="py-2 px-3.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-mono font-bold inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                  title="Enviar mensagem no WhatsApp"
+                  title={`Enviar mensagem no WhatsApp (${lead.phone})`}
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>WhatsApp</span>
-                </button>
+                </a>
               </div>
 
             </div>

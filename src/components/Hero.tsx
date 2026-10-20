@@ -65,7 +65,7 @@ export const Hero: React.FC<HeroProps> = ({
 
             {/* Descriptive Subtitle */}
             <p className="text-slate-200 text-sm sm:text-base lg:text-lg leading-relaxed max-w-2xl mx-auto lg:mx-0 font-normal drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] bg-[#0d0f10]/40 lg:bg-transparent backdrop-blur-[2px] p-2 rounded-xl lg:p-0">
-              Plataforma de inteligência analítica de dados, prospecção B2B ativa de alta precisão e automação no piloto automático desenvolvida por Luciano Tavares Silva para acelerar suas vendas.
+              Plataforma de inteligência analítica de dados, prospecção B2B ativa de alta precisão e automação no piloto automático para acelerar o crescimento e o faturamento da sua empresa.
             </p>
 
             {/* Quick Benefits Checklist */}
@@ -115,67 +115,64 @@ export const Hero: React.FC<HeroProps> = ({
               </button>
             </div>
 
-            {/* Small Compact Owner Badge */}
-            <div className="pt-2 flex items-center justify-center lg:justify-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-teal-400 to-amber-400 p-0.5 shadow-md shrink-0">
-                <div className="w-full h-full bg-[#0d0f10] rounded-[10px] flex items-center justify-center text-cyan-400 font-black text-sm">
-                  ⚡
-                </div>
-              </div>
-              <div className="text-left text-xs">
-                <div className="font-bold text-white">Luciano Tavares Silva</div>
-                <div className="text-cyan-400/90 font-mono text-[11px]">Titular & Desenvolvedor de Software</div>
-              </div>
-            </div>
-
           </div>
 
-          {/* Right Column: High Quality Laptop / Device Mockup Showcase */}
+          {/* Right Column: Clean High-Tech Platform & Live Intelligence Showcase */}
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto max-w-md lg:max-w-none">
               
-              {/* Laptop Screen Frame */}
-              <div className="rounded-2xl overflow-hidden border border-white/15 bg-[#161819] shadow-2xl p-2 group hover:border-cyan-500/50 transition-all">
-                {/* Browser Header Bar */}
-                <div className="flex items-center gap-1.5 px-3 py-2 bg-[#0a0b0c] rounded-t-xl border-b border-white/10">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/80"></div>
-                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></div>
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></div>
-                  <div className="ml-2 text-[10px] font-mono text-slate-400 truncate bg-white/5 px-3 py-0.5 rounded-full w-full max-w-[200px]">
-                    fococompleto.com.br
+              {/* Clean Cyber Dashboard Frame */}
+              <div className="rounded-3xl overflow-hidden border border-cyan-500/30 bg-[#121517]/95 shadow-2xl p-6 backdrop-blur-xl space-y-5 hover:border-cyan-400 transition-all">
+                
+                {/* Header Bar */}
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></div>
+                    <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                      Ecossistema Ativo · Foco em Dados
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold">
+                    ONLINE 24/7
+                  </span>
+                </div>
+
+                {/* Live Core Metrics */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3.5 rounded-2xl bg-[#090b0d] border border-white/10 space-y-1">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">Leads Mapeados</div>
+                    <div className="text-xl font-extrabold text-cyan-400 font-sans">12.845</div>
+                    <div className="text-[9px] text-slate-400 font-mono">Raio de 15km ativo</div>
+                  </div>
+                  <div className="p-3.5 rounded-2xl bg-[#090b0d] border border-white/10 space-y-1">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">Sem Presença Web</div>
+                    <div className="text-xl font-extrabold text-amber-400 font-sans">8.420</div>
+                    <div className="text-[9px] text-amber-400 font-mono">Oportunidades em aberto</div>
                   </div>
                 </div>
 
-                {/* Main Preview Image */}
-                <div className="relative aspect-[16/10] overflow-hidden rounded-b-xl bg-slate-950">
-                  <img 
-                    src="/src/assets/images/luciano_laptop_hero.jpg" 
-                    alt="Desenvolvimento de Websites Profissionais" 
-                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0d0f10] via-transparent to-transparent opacity-60"></div>
-                  
-                  {/* Floating Metric Badge */}
-                  <div className="absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-[#0f1112]/90 backdrop-blur-md border border-white/10 flex items-center justify-between text-xs">
-                    <div>
-                      <div className="text-[10px] text-cyan-400 font-mono uppercase">Performance & Velocidade</div>
-                      <div className="font-bold text-white">Pontuação 98+ no Google Lighthouse</div>
-                    </div>
-                    <div className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 font-mono font-bold text-xs border border-emerald-500/30">
-                      100% OK
-                    </div>
+                {/* Interactive Feature List */}
+                <div className="space-y-2.5 pt-1 text-xs">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5">
+                    <span className="text-slate-300 font-medium">⚡ Resposta WhatsApp Bot</span>
+                    <span className="text-emerald-400 font-mono font-bold">&lt; 3 segundos</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5">
+                    <span className="text-slate-300 font-medium">🌐 Carregamento dos Sites</span>
+                    <span className="text-cyan-400 font-mono font-bold">&lt; 1 segundo</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5">
+                    <span className="text-slate-300 font-medium">💳 Pagamento Integrado</span>
+                    <span className="text-purple-300 font-mono font-bold">Stripe 100% Seguro</span>
                   </div>
                 </div>
-              </div>
 
-              {/* Floating Floating WhatsApp Badge */}
-              <div className="absolute -bottom-5 -left-5 p-3.5 rounded-2xl bg-emerald-500 text-slate-950 font-bold text-xs shadow-2xl flex items-center gap-2 border border-emerald-300/40 hidden sm:flex">
-                <MessageSquare className="w-5 h-5 fill-slate-950" />
-                <div>
-                  <div className="text-[10px] uppercase font-mono tracking-wider opacity-80">Automação 24h</div>
-                  <div className="text-xs font-extrabold">Atendimento Instantâneo</div>
+                {/* Subtitle Guarantee */}
+                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                  <span>Prospecção & Automação B2B</span>
+                  <span className="text-cyan-400 font-bold">focoemdados.com.br</span>
                 </div>
+
               </div>
 
             </div>

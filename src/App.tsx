@@ -13,7 +13,7 @@ import { TechStack } from './components/TechStack';
 import { FaqSection } from './components/FaqSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
-import { FloatingWhatsApp } from './components/FloatingWhatsApp';
+import { IntegratedSiteChatbot } from './components/IntegratedSiteChatbot';
 import { BackToTop } from './components/BackToTop';
 import { AuthModal } from './components/AuthModal';
 import { LoginPage } from './components/LoginPage';
@@ -233,8 +233,14 @@ export default function App() {
         isOwner={isOwner} 
       />
 
-      {/* Floating WhatsApp Action Button */}
-      <FloatingWhatsApp onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+      {/* Integrated AI Assistant Chatbot capable of answering any question about the site */}
+      <IntegratedSiteChatbot 
+        onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} 
+        onNavigateToPlans={() => {
+          const el = document.getElementById('servicos-precos');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }}
+      />
 
       {/* Floating Back to Top Button */}
       <BackToTop />

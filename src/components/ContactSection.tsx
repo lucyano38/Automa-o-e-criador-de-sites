@@ -120,7 +120,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenWhatsAppWi
                   <ArrowRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-1 transition-transform" />
                 </a>
 
-                {/* Email Titular */}
+                {/* Email Suporte */}
                 <a
                   href="mailto:lucyano.pci@gmail.com"
                   className="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-all text-left group"
@@ -130,7 +130,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenWhatsAppWi
                       <Mail className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-white">E-mail do Titular</div>
+                      <div className="text-xs font-bold text-white">E-mail de Suporte</div>
                       <div className="text-xs text-amber-300 font-mono">lucyano.pci@gmail.com</div>
                     </div>
                   </div>
@@ -148,19 +148,15 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenWhatsAppWi
                   </div>
                 </div>
 
-                {/* Portais Sob Comando */}
+                {/* Portais do Ecossistema */}
                 <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
                   <div className="text-xs font-bold text-emerald-400 font-mono uppercase tracking-wider">
-                    Portais Sob Meu Comando:
+                    Portais Oficiais:
                   </div>
                   <div className="space-y-1 text-xs text-slate-300 font-mono">
                     <div className="flex items-center justify-between">
-                      <span>• fococompleto.com.br</span>
-                      <a href="https://fococompleto.com.br" target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">Principal</a>
-                    </div>
-                    <div className="flex items-center justify-between">
                       <span>• focoemdados.com.br</span>
-                      <a href="https://focoemdados.com.br" target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline">Visitar</a>
+                      <a href="https://focoemdados.com.br" target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline">Principal</a>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>• soscuidadores.com</span>
