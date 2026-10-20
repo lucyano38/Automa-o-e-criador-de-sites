@@ -82,25 +82,36 @@ export const IntegratedSiteChatbot: React.FC<IntegratedSiteChatbotProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: query,
-          conversationHistory: messages.map(m => ({ sender: m.sender, text: m.text }))
+          conversationHistory: messages
+            .filter(m => m.id !== 'welcome-1')
+            .map(m => ({ sender: m.sender, text: m.text }))
         })
       });
 
       const data = await res.json();
+      const replyText = data?.reply || (
+        'O **Foco em Dados** (focoemdados.com.br) oferece soluções completas de Presença Digital e Automação B2B:\n\n' +
+        '• **Landing Page de Alta Conversão**: R$ 497,00 (ou até 12x via Stripe)\n' +
+        '• **Website Institucional**: R$ 790,00\n' +
+        '• **Automação de WhatsApp 24h**: R$ 590,00 (taxa única de setup)\n' +
+        '• **Gestão de Redes Sociais**: R$ 397,00/mês\n\n' +
+        'Você pode contratar com segurança pelo Stripe ou tirar dúvidas específicas diretamente aqui no chat!'
+      );
+
       const aiReply: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
-        text: data.reply || 'Tive uma breve oscilação na resposta. Pode enviar novamente ou solicitar um atendimento humano imediato!',
+        text: replyText,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
       setMessages(prev => [...prev, aiReply]);
     } catch (err) {
-      console.error(err);
+      console.error('Chat error:', err);
       const fallbackReply: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
-        text: 'Nossos serviços possuem valores promocionais de lançamento com checkout 100% integrado via **Stripe**:\n\n• **Landing Page de Alta Conversão**: R$ 497,00 (ou até 12x)\n• **Website Institucional**: R$ 790,00\n• **Automação WhatsApp 24h**: R$ 590,00 (taxa única, sem mensalidades)\n• **Gestão de Redes Sociais**: R$ 397,00/mês\n\nVocê pode pagar via Cartão de Crédito ou PIX com segurança total!',
+        text: 'O **Foco em Dados** (focoemdados.com.br) desenvolve Websites e Landing Pages ultrarrápidas, Automação de WhatsApp 24h e Gestão de Redes Sociais com preços promocionais de entrada e pagamento 100% seguro em até 12x ou PIX via **Stripe**!',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, fallbackReply]);

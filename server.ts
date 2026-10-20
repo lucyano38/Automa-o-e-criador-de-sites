@@ -647,96 +647,146 @@ Sua missão primordial é responder com precisão cirúrgica a QUALQUER dúvida 
 - Escreva em Português do Brasil de forma elegante, clara, acolhedora e altamente profissional.
 - Use listas com tópicos (•) e negrito para destacar valores e especificações.`;
 
-      if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
-        const lower = message.toLowerCase();
-        let answer = '';
-
-        if (lower.includes('preço') || lower.includes('valor') || lower.includes('custa') || lower.includes('quanto') || lower.includes('promo')) {
-          answer = 'Nossos preços são cobrados em valor promocional de entrada (abaixo da média de agências) para construção acelerada de parcerias:\n\n' +
+      // Smart Fallback Generator for when Gemini API is unavailable or returns an error
+      const buildSmartFallbackReply = (userQuery: string): string => {
+        const lower = (userQuery || '').toLowerCase();
+        if (lower.includes('preço') || lower.includes('valor') || lower.includes('custa') || lower.includes('quanto') || lower.includes('promo') || lower.includes('tabela')) {
+          return 'Nossos serviços estão em condições promocionais de entrada com valores abaixo da média de agências e contratação 100% segura via **Stripe**:\n\n' +
             '• **Landing Page de Alta Conversão**: R$ 497,00 (ou em até 12x de R$ 49,90 via Stripe)\n' +
             '• **Website Institucional Completo**: R$ 790,00 (ou em até 12x de R$ 79,00 via Stripe)\n' +
-            '• **Automação de WhatsApp/Telegram 24h**: R$ 590,00 (taxa única de setup, sem mensalidade)\n' +
-            '• **Gestão & Postagens Instagram/Facebook**: R$ 397,00/mês (sem fidelidade contratual)\n' +
-            '• **Edição Profissional de Vídeos/Reels**: R$ 290,00\n' +
+            '• **Automação de WhatsApp & Telegram 24h**: R$ 590,00 (taxa única de setup, sem mensalidades)\n' +
+            '• **Gestão & Postagens Instagram e Facebook**: R$ 397,00/mês (sem fidelidade contratual)\n' +
+            '• **Edição Profissional de Vídeo / Reels**: R$ 290,00\n' +
             '• **Combo Ecossistema Completo (Site + Bot + Redes)**: R$ 1.190,00\n\n' +
-            'Todos os serviços podem ser contratados diretamente com **Cartão de Crédito em até 12x ou PIX** através do checkout oficial e 100% seguro do **Stripe**!';
-        } else if (lower.includes('tecnolog') || lower.includes('stack') || lower.includes('react') || lower.includes('vite') || lower.includes('tailwind') || lower.includes('código')) {
-          answer = 'A arquitetura técnica do **Foco em Dados** foi desenhada para máxima performance e segurança:\n\n' +
-            '• **Frontend**: React 19, TypeScript e Tailwind CSS v4 (carregamento instantâneo < 1s)\n' +
+            'Todos os pagamentos podem ser efetuados via **Cartão de Crédito em até 12x ou PIX** com emissão instantânea de recibo!';
+        }
+        if (lower.includes('tecnolog') || lower.includes('stack') || lower.includes('react') || lower.includes('vite') || lower.includes('tailwind') || lower.includes('código') || lower.includes('arquitetura')) {
+          return 'A arquitetura técnica do **Foco em Dados** foi desenhada para máxima velocidade e confiabilidade:\n\n' +
+            '• **Frontend**: React 19, TypeScript e Tailwind CSS v4 (carregamento instantâneo inferior a 1s)\n' +
             '• **Backend**: Node.js com Express e TypeScript em arquitetura RESTful\n' +
-            '• **Inteligência Artificial**: SDK oficial `@google/genai` com Gemini 3.8 Flash para análise de dados e copywriting\n' +
+            '• **Inteligência Artificial**: SDK oficial `@google/genai` com Gemini 3.8 Flash para diagnóstico e geração de copy\n' +
             '• **Automações**: Webhooks e APIs oficiais do WhatsApp Business e Telegram\n' +
-            '• **Pagamentos**: Stripe SDK oficial com checkout seguro (Cartão até 12x e PIX)\n' +
+            '• **Pagamentos**: Stripe SDK oficial com checkout transparente (Cartão até 12x e PIX)\n' +
             '• **Segurança**: Criptografia SSL/TLS e total conformidade com a LGPD.';
-        } else if (lower.includes('stripe') || lower.includes('cartão') || lower.includes('pix') || lower.includes('pagamento')) {
-          answer = 'Todos os nossos pagamentos são processados de forma 100% segura pelo **Stripe**, a maior e mais confiável plataforma de pagamentos do mundo. Você pode optar por:\n\n' +
+        }
+        if (lower.includes('stripe') || lower.includes('cartão') || lower.includes('pix') || lower.includes('pagamento') || lower.includes('parcela')) {
+          return 'Todos os pagamentos do Foco em Dados são processados com segurança bancária pelo **Stripe**:\n\n' +
             '• **Cartão de Crédito em até 12x**\n' +
-            '• **PIX Instantâneo** com liberação imediata\n' +
+            '• **PIX Instantâneo** com confirmação imediata\n' +
             '• **Boleto Bancário**\n\n' +
-            'O recibo oficial e o início do desenvolvimento são disparados automaticamente após a confirmação.';
-        } else if (lower.includes('whatsapp') || lower.includes('bot') || lower.includes('autom')) {
-          answer = 'Nossa **Automação de Atendimento 24h no WhatsApp & Telegram**:\n\n' +
+            'O recibo é gerado no ato e o desenvolvimento do seu projeto começa imediatamente após a compensação.';
+        }
+        if (lower.includes('whatsapp') || lower.includes('bot') || lower.includes('autom') || lower.includes('telegram')) {
+          return 'A **Automação de Atendimento 24h no WhatsApp & Telegram**:\n\n' +
             '• Responde clientes em menos de 5 segundos com menu interativo;\n' +
-            '• Envia catálogos de serviços ou tabelas de preços em PDF/texto;\n' +
-            '• Qualifica orçamentos e agenda reuniões ou consultas automaticamente;\n' +
-            '• Direciona para atendimento humano quando necessário preservando o histórico;\n' +
-            '• **Sem mensalidades recorrentes**: você paga apenas a taxa única de implementação (R$ 590,00)!';
-        } else if (lower.includes('instagram') || lower.includes('facebook') || lower.includes('post') || lower.includes('rede')) {
-          answer = 'Na **Gestão & Postagens para Instagram e Facebook** (R$ 397,00/mês):\n\n' +
-            '• Desenvolvemos artes de alta resolução para Feed (1:1 e 4:5), Carrosséis explicativos e Stories;\n' +
+            '• Envia catálogos de produtos e tabela de preços em PDF ou texto;\n' +
+            '• Qualifica orçamentos e agenda reuniões ou consultas 24h por dia;\n' +
+            '• Transição humanizada para atendimento manual quando necessário preservando o histórico;\n' +
+            '• **Sem mensalidades de terceiros**: taxa única de implementação de R$ 590,00!';
+        }
+        if (lower.includes('instagram') || lower.includes('facebook') || lower.includes('post') || lower.includes('rede') || lower.includes('social')) {
+          return 'Na **Gestão & Postagens para Instagram e Facebook** (R$ 397,00/mês):\n\n' +
+            '• Criamos artes profissionais para Feed (1:1 e 4:5), Carrosséis explicativos e Stories;\n' +
             '• Escrevemos legendas persuasivas com ganchos de retenção e hashtags do seu nicho;\n' +
-            '• Agendamos todas as publicações no calendário oficial da Meta;\n' +
+            '• Agendamos todas as publicações com antecedência;\n' +
             '• Configuramos robô para envio de catálogo por Direct quando comentam no post;\n' +
-            '• Emitimos relatório mensal de métricas de alcance e novos contatos.';
-        } else if (lower.includes('prazo') || lower.includes('tempo') || lower.includes('entrega')) {
-          answer = 'Nossos prazos de entrega técnica são ágeis e pontuais:\n\n' +
-            '• **Landing Page**: 3 a 5 dias úteis;\n' +
+            '• Relatório mensal com métricas de alcance e novos contatos.';
+        }
+        if (lower.includes('prazo') || lower.includes('tempo') || lower.includes('entrega') || lower.includes('demora')) {
+          return 'Nossos prazos de entrega técnica são rigorosos e transparentes:\n\n' +
+            '• **Landing Page de Alta Conversão**: 3 a 5 dias úteis;\n' +
             '• **Automação de WhatsApp/Telegram**: 3 a 5 dias úteis;\n' +
             '• **Website Institucional Completo**: 7 a 12 dias úteis;\n' +
             '• **Gestão de Redes Sociais**: Início das primeiras publicações em até 48 horas.';
-        } else {
-          answer = 'O **Foco em Dados** transforma o seu negócio em uma máquina de faturamento que roda 24/7. Nós desenvolvemos:\n\n' +
-            '1. **Websites e Landing Pages** com carregamento instantâneo;\n' +
-            '2. **Robôs de WhatsApp 24h** que atendem e vendem no piloto automático;\n' +
-            '3. **Gestão de Redes Sociais** (Instagram e Facebook);\n' +
-            '4. **Inteligência de Dados e Prospecção B2B** georreferenciada.\n\n' +
-            'Tudo com preços promocionais de entrada e pagamento 100% integrado pelo Stripe!';
         }
+        if (lower.includes('prospec') || lower.includes('lead') || lower.includes('cnae') || lower.includes('raio') || lower.includes('15km')) {
+          return 'O módulo de **Prospecção Ativa B2B** do Foco em Dados realiza uma varredura multi-fonte georreferenciada:\n\n' +
+            '• Mapeia empresas locais num raio cirúrgico de até 15km da sua localização;\n' +
+            '• Consulta bases públicas oficiais (Google Places, Receita Federal, DNS/Whois);\n' +
+            '• Identifica se a empresa possui site ativo ou se precisa de modernização urgente;\n' +
+            '• Calcula a perda financeira mensal estimada em faturamento por falta de presença web;\n' +
+            '• Gera proposta pronta (pitch) com botão de envio direto no WhatsApp do cliente prospectado!';
+        }
+        return 'O **Foco em Dados** (focoemdados.com.br) estrutura o ecossistema digital do seu negócio com foco em escala 24/7:\n\n' +
+          '1. **Websites & Landing Pages** ultrarrápidos (< 1s) para converter tráfego em clientes;\n' +
+          '2. **Automação no WhatsApp e Telegram** para atender em 5 segundos sem você precisar ficar no celular;\n' +
+          '3. **Gestão de Redes Sociais** (Instagram e Facebook) com artes e copy magnética;\n' +
+          '4. **Prospecção B2B Ativa** no raio de 15km com alimentação direta de pipeline no CRM.\n\n' +
+          'Todos os serviços possuem pagamento facilitado pelo Stripe em até 12x ou PIX. Se desejar saber mais sobre algum serviço específico, basta me perguntar!';
+      };
 
-        return res.json({ reply: answer, source: 'smart_fallback' });
+      let aiReply = '';
+
+      if (apiKey && apiKey !== 'MY_GEMINI_API_KEY') {
+        try {
+          const ai = new GoogleGenAI({ 
+            apiKey,
+            httpOptions: {
+              headers: {
+                'User-Agent': 'aistudio-build'
+              }
+            }
+          });
+
+          // Clean and format conversation history for Gemini API:
+          // Rule 1: First turn MUST be 'user' (drop any initial welcome 'model' turn)
+          // Rule 2: Strictly alternate user and model turns
+          const validTurns: { role: 'user' | 'model'; parts: { text: string }[] }[] = [];
+          
+          if (Array.isArray(conversationHistory)) {
+            for (const item of conversationHistory) {
+              if (!item || !item.text || typeof item.text !== 'string' || !item.text.trim()) continue;
+              const role: 'user' | 'model' = item.sender === 'user' ? 'user' : 'model';
+              
+              // Skip model messages before the first user message
+              if (validTurns.length === 0 && role !== 'user') {
+                continue;
+              }
+              
+              // Merge consecutive messages with the same role
+              if (validTurns.length > 0 && validTurns[validTurns.length - 1].role === role) {
+                validTurns[validTurns.length - 1].parts[0].text += `\n${item.text}`;
+              } else {
+                validTurns.push({ role, parts: [{ text: item.text }] });
+              }
+            }
+          }
+
+          // Append current user message
+          if (validTurns.length > 0 && validTurns[validTurns.length - 1].role === 'user') {
+            validTurns[validTurns.length - 1].parts[0].text += `\n${message}`;
+          } else {
+            validTurns.push({ role: 'user', parts: [{ text: message }] });
+          }
+
+          const response = await ai.models.generateContent({
+            model: 'gemini-3.8-flash',
+            contents: validTurns,
+            config: {
+              systemInstruction: systemContext
+            }
+          });
+
+          aiReply = response.text || '';
+        } catch (geminiError: any) {
+          console.error('Gemini API call error in /api/site-chat:', geminiError?.message || geminiError);
+        }
       }
 
-      const ai = new GoogleGenAI({ 
-        apiKey,
-        httpOptions: {
-          headers: {
-            'User-Agent': 'aistudio-build'
-          }
-        }
-      });
+      // If Gemini didn't return text or there's no API key, use the comprehensive smart fallback
+      if (!aiReply) {
+        aiReply = buildSmartFallbackReply(message);
+      }
 
-      // Format multi-turn conversation history for @google/genai
-      const contents = conversationHistory.map((m: any) => ({
-        role: m.sender === 'user' ? 'user' : 'model',
-        parts: [{ text: m.text }]
-      }));
-      contents.push({
-        role: 'user',
-        parts: [{ text: message }]
-      });
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
-        contents,
-        config: {
-          systemInstruction: systemContext
-        }
-      });
-
-      return res.json({ reply: response.text || 'Olá! Posso tirar qualquer dúvida técnica ou comercial sobre nossos serviços, preços pelo Stripe e prazos de entrega.', source: 'gemini' });
+      return res.json({ reply: aiReply, source: apiKey ? 'gemini' : 'smart_fallback' });
     } catch (err: any) {
-      console.error('Site chat error:', err);
-      res.status(500).json({ error: 'Erro no chat do site.' });
+      console.error('Site chat unhandled error:', err);
+      // Even on unhandled error, provide an intelligent answer instead of an error message
+      const fallbackMsg = (req.body && req.body.message) || '';
+      return res.json({ 
+        reply: 'O **Foco em Dados** (focoemdados.com.br) desenvolve Websites de Alta Conversão (R$ 497), Automação de WhatsApp 24h (R$ 590 taxa única) e Gestão de Redes Sociais (R$ 397/mês), todos com pagamento seguro integrado em até 12x ou PIX via **Stripe**!',
+        source: 'emergency_fallback' 
+      });
     }
   });
 

@@ -30,14 +30,14 @@ export const Hero: React.FC<HeroProps> = ({
   return (
     <section className="relative pt-12 pb-16 lg:pt-20 lg:pb-24 overflow-hidden bg-[#0d0f10]">
       
-      {/* Animated Professional Background (Laptop SaaS Dashboard & Dissolving Globe) */}
+      {/* Animated Background */}
       <AnimatedTechBackground 
         defaultMode="hybrid" 
         opacity={0.80} 
         showControls={true} 
       />
 
-      {/* 3D Animated Dissolving Globe Particle Canvas */}
+      {/* Visual Component */}
       <TechGlobeCanvas variant="hero" intensity={0.4} className="opacity-25 pointer-events-none" />
 
       {/* Background Subtle Gradient & Light Grid */}
@@ -46,10 +46,10 @@ export const Hero: React.FC<HeroProps> = ({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Main 2-Column Hero Layout (Headline + Mockup) */}
+        {/* Main 2-Column Hero Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          {/* Left Column: Big Clean Headline & Copy with High Legibility Backdrop */}
+          {/* Left Column: Headline & Copy */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
             
             {/* Top Badge */}
@@ -58,8 +58,8 @@ export const Hero: React.FC<HeroProps> = ({
               <span>FOCO EM DADOS · INTELIGÊNCIA & PROSPECÇÃO 24H</span>
             </div>
 
-            {/* Impact Headline as requested */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight uppercase leading-[1.12] font-sans drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
+            {/* Impact Headline */}
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tighter uppercase leading-[1.05] font-sans drop-shadow-[0_6px_20px_rgba(0,0,0,0.95)]">
               Transforme dados brutos em <span className="bg-gradient-to-r from-cyan-400 via-emerald-300 to-amber-300 bg-clip-text text-transparent">máquinas de faturamento</span> que rodam 24/7.
             </h1>
 
@@ -88,7 +88,7 @@ export const Hero: React.FC<HeroProps> = ({
               </div>
             </div>
 
-            {/* Action Buttons: Começar Agora & Entrar (Redirect to Auth Flow) + WhatsApp */}
+            {/* Action Buttons */}
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
               <button
                 onClick={onStartNow || onLogin}
@@ -117,11 +117,11 @@ export const Hero: React.FC<HeroProps> = ({
 
           </div>
 
-          {/* Right Column: Clean High-Tech Platform & Live Intelligence Showcase */}
+          {/* Right Column: Platform Showcase */}
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto max-w-md lg:max-w-none">
               
-              {/* Clean Cyber Dashboard Frame */}
+              {/* Dashboard Frame */}
               <div className="rounded-3xl overflow-hidden border border-cyan-500/30 bg-[#121517]/95 shadow-2xl p-6 backdrop-blur-xl space-y-5 hover:border-cyan-400 transition-all">
                 
                 {/* Header Bar */}
@@ -129,7 +129,7 @@ export const Hero: React.FC<HeroProps> = ({
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></div>
                     <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
-                      Ecossistema Ativo · Foco em Dados
+                      Ecossistema Ativo
                     </span>
                   </div>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold">

@@ -353,51 +353,34 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
                 {/* Price Comparison Box & Action CTAs */}
                 <div className="pt-4 border-t border-white/10 space-y-4">
                   
-                  {/* Price Comparison Row */}
-                  <div className="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-[#0f1112] border border-white/10">
-                    {/* Market Price */}
-                    <div className="space-y-0.5 border-r border-white/10 pr-2">
-                      <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                        <Tag className="w-3 h-3 text-slate-500" />
-                        <span>Média de Agências</span>
-                      </div>
-                      <div className="text-xs sm:text-sm font-mono font-bold text-slate-400 line-through">
-                        {item.marketPrice}
-                      </div>
+                {/* Price Comparison Row */}
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-[#0f1112] border border-white/10">
+                    <div className="space-y-0.5">
+                      <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Média de mercado</div>
+                      <div className="text-xs font-mono font-bold text-slate-500 line-through">{item.marketPrice}</div>
                     </div>
-
-                    {/* Promotional Price */}
-                    <div className="space-y-0.5 pl-1">
-                      <div className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                        <TrendingDown className="w-3 h-3 text-emerald-400" />
-                        <span>Preço de Entrada (Stripe)</span>
-                      </div>
-                      <div className="text-base sm:text-xl font-mono font-extrabold text-cyan-300">
-                        {item.promotionalPrice}
-                      </div>
-                      <div className="text-[9px] text-slate-400 font-mono">
-                        {item.installmentText}
-                      </div>
+                    <div className="text-right space-y-0.5">
+                      <div className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider">Nosso valor</div>
+                      <div className="text-lg font-mono font-extrabold text-cyan-300">{item.promotionalPrice}</div>
                     </div>
                   </div>
 
-                  {/* Action Buttons: Stripe Checkout (Primary) + WhatsApp (Secondary) */}
+                  {/* Action Buttons */}
                   <div className="space-y-2">
                     <button
                       onClick={() => handleStripeCheckout(item)}
-                      className="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full font-black text-xs bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition-all shadow-lg shadow-cyan-500/25 cursor-pointer uppercase tracking-wider hover:scale-102"
+                      className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-xs bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition-all shadow-md cursor-pointer uppercase tracking-wider"
                     >
-                      <CreditCard className="w-4 h-4 fill-slate-950" />
-                      <span>Contratar via Stripe (Cartão / PIX)</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <CreditCard className="w-3.5 h-3.5" />
+                      <span>Contratar (Pagamento Seguro)</span>
                     </button>
 
                     <button
-                      onClick={() => onOpenWhatsAppWithMessage(`Olá Luciano! Gostaria de conversar sobre a contratação de "${item.title}" no valor de ${item.promotionalPrice}.`)}
-                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full font-bold text-xs bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all cursor-pointer font-mono"
+                      onClick={() => onOpenWhatsAppWithMessage(`Olá! Gostaria de saber mais sobre "${item.title}".`)}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all cursor-pointer font-mono"
                     >
                       <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Tirar Dúvidas no WhatsApp</span>
+                      <span>Dúvidas? Falar no WhatsApp</span>
                     </button>
                   </div>
 
