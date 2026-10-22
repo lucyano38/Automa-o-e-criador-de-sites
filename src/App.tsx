@@ -5,6 +5,8 @@ import { Hero } from './components/Hero';
 import { AboutOwnerSection } from './components/AboutOwnerSection';
 import { ServicePricingBlocks } from './components/ServicePricingBlocks';
 import { PortfolioSection } from './components/PortfolioSection';
+import { ShowcaseExamplesSection } from './components/ShowcaseExamplesSection';
+import { MockupShowcase } from './components/MockupShowcase';
 import { InsightsSection } from './components/InsightsSection';
 import { RoiCalculator } from './components/RoiCalculator';
 import { AiDiagnostic } from './components/AiDiagnostic';
@@ -166,6 +168,12 @@ export default function App() {
 
               {/* Portfolio & Case Studies Showcase */}
               <PortfolioSection onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+
+              {/* Showcase Examples for Prospect Clients */}
+              <ShowcaseExamplesSection onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+
+              {/* Concrete Professional Mockup Showcase */}
+              <MockupShowcase onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
 
               {/* Story & Biography of the Owner (Luciano Tavares Silva) */}
               <AboutOwnerSection onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />

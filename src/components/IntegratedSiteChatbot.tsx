@@ -305,7 +305,7 @@ export const IntegratedSiteChatbot: React.FC<IntegratedSiteChatbotProps> = ({
       {/* Floating Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="group relative flex items-center gap-3 p-3.5 sm:px-5 sm:py-3.5 rounded-full bg-gradient-to-r from-cyan-500 via-teal-400 to-emerald-400 text-slate-950 font-extrabold text-xs shadow-2xl shadow-cyan-500/40 hover:scale-105 transition-all cursor-pointer uppercase tracking-wider font-sans"
+        className="group relative flex items-center gap-3 p-3.5 sm:px-5 sm:py-3.5 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-xs shadow-2xl shadow-cyan-500/40 hover:scale-105 transition-all cursor-pointer uppercase tracking-wider font-sans"
         title="Assistente IA Oficial · Responde qualquer dúvida"
       >
         <div className="relative">

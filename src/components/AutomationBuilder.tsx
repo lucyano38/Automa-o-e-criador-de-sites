@@ -121,6 +121,30 @@ export const AutomationBuilder: React.FC<AutomationBuilderProps> = ({ onOpenWhat
               </div>
             </div>
 
+            {/* Step 1.5: Configure AI Auto-Response (New) */}
+            <div className="glass-card rounded-2xl p-5 space-y-3">
+              <span className="text-xs font-mono font-semibold text-cyan-400 uppercase tracking-wider block">
+                1.5. Configurar Resposta IA Automática
+              </span>
+              <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800">
+                <div className="flex items-center gap-2 mb-2 text-xs text-slate-300">
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Personalização automática com nome do cliente</span>
+                </div>
+                <textarea
+                  placeholder="Olá {{cliente_nome}}, recebemos seu contato! Como posso te ajudar hoje?"
+                  className="w-full h-24 p-3 bg-slate-900 rounded-lg text-xs text-slate-200 border border-slate-700 focus:border-cyan-500 transition-all resize-none"
+                />
+                <div className="mt-2 flex items-center justify-between text-[10px] text-slate-500">
+                  <span>Use {{cliente_nome}} para variável</span>
+                  <label className="flex items-center gap-1 cursor-pointer">
+                    <input type="checkbox" className="accent-cyan-500" defaultChecked />
+                    Ativar IA
+                  </label>
+                </div>
+              </div>
+            </div>
+
             {/* Step 2: Add Action Nodes */}
             <div className="glass-card rounded-2xl p-5 space-y-3">
               <span className="text-xs font-mono font-semibold text-teal-400 uppercase tracking-wider block">

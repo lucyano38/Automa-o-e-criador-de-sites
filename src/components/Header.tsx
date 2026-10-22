@@ -178,10 +178,10 @@ export const Header: React.FC<HeaderProps> = ({
             {/* WhatsApp Direct Action */}
             <button
               onClick={onOpenWhatsApp}
-              className="p-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 transition-all cursor-pointer"
+              className="p-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/40 transition-all cursor-pointer"
               title="Falar no WhatsApp"
             >
-              <MessageSquare className="w-4 h-4 fill-emerald-400" />
+              <MessageSquare className="w-4 h-4 fill-cyan-400" />
             </button>
           </div>
 
@@ -240,7 +240,7 @@ export const Header: React.FC<HeaderProps> = ({
                 onOpenWhatsApp();
                 setMobileMenuOpen(false);
               }}
-              className="w-full py-2.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold text-xs"
+              className="w-full py-2.5 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold text-xs"
             >
               Falar no WhatsApp
             </button>
