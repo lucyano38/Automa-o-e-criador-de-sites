@@ -56,11 +56,11 @@ export const Hero: React.FC<HeroProps> = ({
             </motion.div>
 
             <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white tracking-tighter uppercase leading-[0.9] font-sans drop-shadow-[0_10px_40px_rgba(0,0,0,0.8)]">
-              Transforme dados brutos em <span className="bg-gradient-to-r from-cyan-300 via-teal-300 to-blue-400 bg-clip-text text-transparent">máquinas de faturamento</span> que rodam 24/7.
+              Escale seu faturamento no piloto automático: a automação inteligente que dispensa processos manuais.
             </h1>
 
             <p className="text-slate-400 text-lg lg:text-xl leading-relaxed max-w-2xl mx-auto font-light">
-              Plataforma de inteligência analítica de precisão e automação no piloto automático para escalar seu faturamento sem depender de processos manuais.
+              Plataforma de inteligência analítica que organiza seu CRM e automatiza sua prospecção.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
