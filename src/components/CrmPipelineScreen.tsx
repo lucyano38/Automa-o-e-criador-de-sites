@@ -39,6 +39,7 @@ export interface CrmDeal {
   stage: CrmStage;
   servico: string;
   dataCriacao: string;
+  ultimaInteracao: string;
   observacoes: string;
 }
 
@@ -55,6 +56,7 @@ const INITIAL_DEALS: CrmDeal[] = [
     stage: 'Novo Lead',
     servico: 'Website de Conversão + Bot WhatsApp',
     dataCriacao: 'Ontem',
+    ultimaInteracao: 'Ontem',
     observacoes: 'Detectado sem site no Google Maps. Alta urgência.'
   },
   {
@@ -69,6 +71,7 @@ const INITIAL_DEALS: CrmDeal[] = [
     stage: 'Contato Iniciado',
     servico: 'Cardápio Digital + Postagens Instagram',
     dataCriacao: '14/04/2024',
+    ultimaInteracao: 'Hoje',
     observacoes: 'Primeiro contato realizado via WhatsApp. Pediu demonstração.'
   },
   {
@@ -83,6 +86,7 @@ const INITIAL_DEALS: CrmDeal[] = [
     stage: 'Proposta Enviada',
     servico: 'Portal Jurídico + CRM Integrado',
     dataCriacao: '12/04/2024',
+    ultimaInteracao: 'Há 2 dias',
     observacoes: 'Proposta de R$ 4.200 enviada por PDF e WhatsApp.'
   },
   {
@@ -97,6 +101,7 @@ const INITIAL_DEALS: CrmDeal[] = [
     stage: 'Negociação',
     servico: 'Gestão Instagram + Bot de Agendamento',
     dataCriacao: '10/04/2024',
+    ultimaInteracao: 'Hoje',
     observacoes: 'Alinhando formas de pagamento em 3 parcelas.'
   },
   {
@@ -111,6 +116,7 @@ const INITIAL_DEALS: CrmDeal[] = [
     stage: 'Fechado',
     servico: 'Ecossistema Completo + Telegram Bot',
     dataCriacao: '05/04/2024',
+    ultimaInteracao: 'Há 1 semana',
     observacoes: 'Contrato ativo e integrado em produção!'
   },
   {
@@ -125,6 +131,7 @@ const INITIAL_DEALS: CrmDeal[] = [
     stage: 'Perdido',
     servico: 'Website Institucional',
     dataCriacao: '01/04/2024',
+    ultimaInteracao: 'Há 2 semanas',
     observacoes: 'Optou por adiar investimentos para o próximo trimestre.'
   }
 ];
@@ -144,7 +151,9 @@ export const CrmPipelineScreen: React.FC = () => {
       const saved = localStorage.getItem('foco_crm_deals_v1');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed.map((d: any) => ({ ...d, ultimaInteracao: d.ultimaInteracao || 'Nunca' }));
+        }
       }
     } catch {
       // fallback
@@ -153,6 +162,7 @@ export const CrmPipelineScreen: React.FC = () => {
   });
 
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [stageFilter, setStageFilter] = useState<CrmStage | 'Todos'>('Todos');
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const [newDeal, setNewDeal] = useState<Partial<CrmDeal>>({
     empresa: '',
@@ -164,6 +174,7 @@ export const CrmPipelineScreen: React.FC = () => {
     valor: 2500,
     stage: 'Novo Lead',
     servico: 'Website de Conversão',
+    ultimaInteracao: 'Hoje',
     observacoes: ''
   });
 
@@ -174,18 +185,24 @@ export const CrmPipelineScreen: React.FC = () => {
   };
 
   const filteredDeals = useMemo(() => {
-    if (!searchTerm.trim()) return deals;
-    const q = searchTerm.toLowerCase();
-    return deals.filter(d => 
-      d.empresa.toLowerCase().includes(q) ||
-      d.contatoNome.toLowerCase().includes(q) ||
-      d.servico.toLowerCase().includes(q) ||
-      d.nicho.toLowerCase().includes(q)
-    );
-  }, [deals, searchTerm]);
+    let result = deals;
+    if (stageFilter !== 'Todos') {
+      result = result.filter(d => d.stage === stageFilter);
+    }
+    if (searchTerm.trim()) {
+      const q = searchTerm.toLowerCase();
+      result = result.filter(d => 
+        d.empresa.toLowerCase().includes(q) ||
+        d.contatoNome.toLowerCase().includes(q) ||
+        d.servico.toLowerCase().includes(q) ||
+        d.nicho.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [deals, searchTerm, stageFilter]);
 
   const moveDeal = (id: string, newStage: CrmStage) => {
-    const updated = deals.map(d => d.id === id ? { ...d, stage: newStage } : d);
+    const updated = deals.map(d => d.id === id ? { ...d, stage: newStage, ultimaInteracao: 'Hoje' } : d);
     updateDeals(updated);
   };
 
@@ -205,6 +222,7 @@ export const CrmPipelineScreen: React.FC = () => {
       stage: (newDeal.stage as CrmStage) || 'Novo Lead',
       servico: newDeal.servico || 'Website de Conversão',
       dataCriacao: 'Hoje',
+      ultimaInteracao: 'Hoje',
       observacoes: newDeal.observacoes || ''
     };
 
@@ -220,6 +238,7 @@ export const CrmPipelineScreen: React.FC = () => {
       valor: 2500,
       stage: 'Novo Lead',
       servico: 'Website de Conversão',
+      ultimaInteracao: 'Hoje',
       observacoes: ''
     });
   };
@@ -309,13 +328,25 @@ export const CrmPipelineScreen: React.FC = () => {
           />
         </div>
 
-        <div className="text-xs font-mono text-slate-400">
-          Exibindo {filteredDeals.length} de {deals.length} propostas no funil
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Filter className="w-4 h-4 text-slate-400" />
+          <select
+            value={stageFilter}
+            onChange={(e) => setStageFilter(e.target.value as CrmStage | 'Todos')}
+            className="w-full sm:w-40 px-3 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-xs text-white focus:outline-none focus:border-cyan-400"
+          >
+            <option value="Todos">Todos os Estágios</option>
+            {COLUMNS.map(c => <option key={c.stage} value={c.stage}>{c.stage}</option>)}
+          </select>
+        </div>
+
+        <div className="text-xs font-mono text-slate-400 shrink-0">
+          {filteredDeals.length} exibidos
         </div>
       </div>
 
       {/* 6 Kanban Columns Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 items-start">
+      <div className="crm-pipeline-container flex flex-row md:grid md:grid-cols-6 gap-4 overflow-x-auto md:overflow-visible pb-4 items-start">
         {COLUMNS.map((col) => {
           const colDeals = filteredDeals.filter(d => d.stage === col.stage);
           const colTotal = colDeals.reduce((sum, item) => sum + item.valor, 0);
@@ -323,7 +354,7 @@ export const CrmPipelineScreen: React.FC = () => {
           return (
             <div 
               key={col.stage}
-              className={`rounded-2xl bg-[#101214] border ${col.color} p-4 space-y-3 min-h-[500px] flex flex-col justify-between`}
+              className={`rounded-2xl bg-[#101214] border ${col.color} p-4 space-y-3 min-h-[500px] flex flex-col justify-between flex-shrink-0 min-w-[300px] overflow-hidden`}
             >
               {/* Column Header */}
               <div className="space-y-1 pb-2 border-b border-white/10">
@@ -363,6 +394,10 @@ export const CrmPipelineScreen: React.FC = () => {
 
                       <div className="text-[10px] font-mono text-slate-400">
                         {deal.contatoNome} · {deal.cidade}
+                      </div>
+
+                      <div className="text-[10px] font-mono text-cyan-500">
+                        Última interação: {deal.ultimaInteracao}
                       </div>
 
                       <div className="text-[11px] text-cyan-300 font-medium">

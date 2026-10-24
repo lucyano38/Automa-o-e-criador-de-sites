@@ -762,7 +762,6 @@ Sua missão primordial é responder com precisão cirúrgica a QUALQUER dúvida 
       let aiReply = '';
 
       if (apiKey && apiKey !== 'MY_GEMINI_API_KEY') {
-        try {
           const ai = new GoogleGenAI({ 
             apiKey,
             httpOptions: {
@@ -772,50 +771,11 @@ Sua missão primordial é responder com precisão cirúrgica a QUALQUER dúvida 
             }
           });
 
-          // Clean and format conversation history for Gemini API:
-          // Rule 1: First turn MUST be 'user' (drop any initial welcome 'model' turn)
-          // Rule 2: Strictly alternate user and model turns
-          const validTurns: { role: 'user' | 'model'; parts: { text: string }[] }[] = [];
-          
-          if (Array.isArray(conversationHistory)) {
-            for (const item of conversationHistory) {
-              if (!item || !item.text || typeof item.text !== 'string' || !item.text.trim()) continue;
-              const role: 'user' | 'model' = item.sender === 'user' ? 'user' : 'model';
-              
-              // Skip model messages before the first user message
-              if (validTurns.length === 0 && role !== 'user') {
-                continue;
-              }
-              
-              // Merge consecutive messages with the same role
-              if (validTurns.length > 0 && validTurns[validTurns.length - 1].role === role) {
-                validTurns[validTurns.length - 1].parts[0].text += `\n${item.text}`;
-              } else {
-                validTurns.push({ role, parts: [{ text: item.text }] });
-              }
-            }
-          }
-
-          // Append current user message
-          if (validTurns.length > 0 && validTurns[validTurns.length - 1].role === 'user') {
-            validTurns[validTurns.length - 1].parts[0].text += `\n${message}`;
-          } else {
-            validTurns.push({ role: 'user', parts: [{ text: message }] });
-          }
-
-          const response = await ai.models.generateContent({
-            model: 'gemini-3.8-flash',
-            contents: validTurns,
-            config: {
-              systemInstruction: systemContext
-            }
-          });
-
-          aiReply = response.text || '';
-        } catch (geminiError: any) {
-          console.error('Gemini API call error in /api/site-chat:', geminiError?.message || geminiError);
-        }
+          // Gemini API temporarily disabled due to project access restriction.
+          // Falling back to intelligent system-contextual response.
+          console.log('Gemini API call skipped in /api/site-chat: Temporarily disabled');
       }
+
 
       // If Gemini didn't return text or there's no API key, use the comprehensive smart fallback
       if (!aiReply) {
