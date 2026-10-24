@@ -22,7 +22,13 @@ interface AboutOwnerSectionProps {
 
 export const AboutOwnerSection: React.FC<AboutOwnerSectionProps> = ({ onOpenWhatsAppWithMessage }) => {
   return (
-    <section id="sobre" className="py-20 md:py-28 bg-[#101214] relative border-t border-white/10">
+    <motion.section 
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ duration: 1.0, ease: 'easeOut' }}
+      id="sobre" 
+      className="py-20 md:py-28 bg-[#101214] relative border-t border-white/10"
+    >
       {/* Background ambient glow */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -193,6 +199,6 @@ export const AboutOwnerSection: React.FC<AboutOwnerSectionProps> = ({ onOpenWhat
         </motion.div>
 
       </div>
-    </section>
+    </motion.section>
   );
 };

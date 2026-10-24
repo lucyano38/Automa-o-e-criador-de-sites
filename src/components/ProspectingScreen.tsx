@@ -133,11 +133,38 @@ export const ProspectingScreen: React.FC<ProspectingScreenProps> = ({
   };
 
   const handleWhatsApp = (lead: ProspectLead) => {
-    const rawPhone = lead.phone || lead.whatsappDirect || '';
-    let cleanPhone = rawPhone.replace(/\D/g, '');
-    if (cleanPhone.length >= 10 && cleanPhone.length <= 11 && !cleanPhone.startsWith('55')) {
-      cleanPhone = `55${cleanPhone}`;
+    // Prioritize whatsappDirect if available, otherwise fallback to phone
+    const targetPhone = lead.whatsappDirect || lead.phone || '';
+    if (!targetPhone) return;
+
+    // Clean to numeric only
+    let cleanPhone = targetPhone.replace(/\D/g, '');
+    
+    // Remove leading zero if present
+    if (cleanPhone.startsWith('0')) {
+      cleanPhone = cleanPhone.substring(1);
     }
+    
+    // Ensure it has country code 55 (if not already present)
+    if (!cleanPhone.startsWith('55')) {
+      // If DDD + 8 or 9 digits, add 55
+      if (cleanPhone.length === 10 || cleanPhone.length === 11) {
+        cleanPhone = `55${cleanPhone}`;
+      }
+    }
+    
+    // Fix for Brazilian mobile numbers missing the '9' if they have only 8 digits after DDD
+    // 55 + DDD (2) + firstDigit (1) + suffix (7) = 12 digits total, should be 13 (with 9)
+    if (cleanPhone.length === 12) {
+        const ddd = cleanPhone.substring(2, 4);
+        const firstDigit = cleanPhone.substring(4, 5);
+        
+        // Check if it's a mobile prefix (6,7,8,9)
+        if (['6', '7', '8', '9'].includes(firstDigit)) {
+            cleanPhone = cleanPhone.substring(0, 4) + '9' + cleanPhone.substring(4);
+        }
+    }
+    
     const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(lead.customPitch)}`;
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
@@ -434,23 +461,28 @@ export const ProspectingScreen: React.FC<ProspectingScreenProps> = ({
           {filteredLeads.map((lead) => (
             <div 
               key={lead.id}
-              className="p-5 rounded-2xl bg-[#0e1011] border border-white/10 hover:border-cyan-500/40 transition-all space-y-4 flex flex-col justify-between"
+              className="p-5 rounded-2xl bg-[#0e1011] border border-white/10 hover:border-cyan-500/40 transition-all space-y-4 flex flex-col justify-between break-words overflow-hidden"
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
                     {lead.calculatedDistanceKm} km de distância
                   </span>
-                  {lead.hasWebsite ? (
-                    <span className="text-[10px] font-mono text-emerald-400">Com Site</span>
-                  ) : (
-                    <span className="text-[10px] font-mono text-red-400 font-bold bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/30">
-                      Sem Site
+                  <div className="flex gap-1 whitespace-nowrap">
+                    {lead.hasWebsite ? (
+                      <span className="text-[10px] font-mono text-emerald-400">Com Site</span>
+                    ) : (
+                      <span className="text-[10px] font-mono text-red-400 font-bold bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/30">
+                        Sem Site
+                      </span>
+                    )}
+                    <span className="text-[10px] font-mono text-amber-400 font-bold bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/30">
+                      Design
                     </span>
-                  )}
+                  </div>
                 </div>
 
-                <h4 className="text-base font-bold text-white font-sans">{lead.tradeName}</h4>
+                <h4 className="text-base font-bold text-white font-sans truncate">{lead.tradeName}</h4>
                 <div className="text-xs text-slate-400 font-mono">
                   {lead.neighborhood}, {lead.city} · CNAE: {lead.cnae}
                 </div>
@@ -475,16 +507,14 @@ export const ProspectingScreen: React.FC<ProspectingScreenProps> = ({
                   {copiedPitchId === lead.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedPitchId === lead.id ? 'Copiado!' : 'Copiar Pitch'}</span>
                 </button>
-                <a
-                  href={`https://wa.me/${(lead.phone || lead.whatsappDirect || '').replace(/\D/g, '').replace(/^(?:55)?(\d{10,11})$/, '55$1')}?text=${encodeURIComponent(lead.customPitch)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => handleWhatsApp(lead)}
                   className="py-2 px-3.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-mono font-bold inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                   title={`Enviar mensagem no WhatsApp (${lead.phone})`}
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>WhatsApp</span>
-                </a>
+                </button>
               </div>
 
             </div>

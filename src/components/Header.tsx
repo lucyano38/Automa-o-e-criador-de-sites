@@ -59,7 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
     if (tabId === 'cases') {
       setActiveTab('solucoes');
       setTimeout(() => {
-        const targetEl = document.getElementById('portfolio-section');
+        const targetEl = document.getElementById('portfolio');
         if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth' });
       }, 100);
       return;

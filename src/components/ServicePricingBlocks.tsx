@@ -22,6 +22,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
+import { Skeleton } from './Skeleton';
 
 interface ServicePricingBlocksProps {
   onOpenWhatsAppWithMessage: (message: string) => void;
@@ -51,6 +52,7 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
   const [isProcessingStripe, setIsProcessingStripe] = useState<boolean>(false);
   const [customerEmail, setCustomerEmail] = useState<string>('');
   const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const categories = [
     { id: 'todos', label: 'Todos os Serviços' },
@@ -243,10 +245,15 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
   };
 
   return (
-    <section id="servicos-precos" className="py-16 md:py-24 bg-[#0d0f10] relative border-t border-white/10">
+    <motion.section 
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ duration: 1.0, ease: 'easeOut' }}
+      id="servicos-precos" 
+      className="py-16 md:py-24 bg-[#0d0f10] relative border-t border-white/10"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -266,7 +273,6 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
           </p>
         </motion.div>
 
-        {/* Category Filter Pills */}
         <div className="flex flex-wrap items-center justify-center gap-2 mb-12">
           {categories.map((cat) => (
             <button
@@ -283,115 +289,113 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
           ))}
         </div>
 
-        {/* Offerings Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {filteredOfferings.map((item, index) => {
-            const IconComponent = item.icon;
-            return (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.4, delay: index * 0.08, ease: 'easeOut' }}
-                className={`relative rounded-3xl p-7 sm:p-8 bg-[#15181a] border ${item.accentColor} transition-all duration-300 shadow-2xl flex flex-col justify-between group`}
-              >
-      {/* Popular Ribbon Tag */}
-                {item.popular && (
-                  <div className="absolute -top-3 right-6 px-3.5 py-1 rounded-full bg-cyan-400 text-slate-950 font-mono font-extrabold text-[10px] uppercase tracking-wider shadow-md flex items-center gap-1">
-                    <Zap className="w-3 h-3 fill-slate-950" />
-                    <span>Destaque / Mais Solicitado</span>
-                  </div>
-                )}
-
-                <div>
-                  {/* Top Header: Badge & Title */}
-                  <div className="flex items-start justify-between gap-3 mb-5">
-                    <div className="space-y-1.5 flex-1">
-                      <span className={`inline-block px-3 py-1 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider border ${item.badgeBg}`}>
-                        {item.badge}
-                      </span>
-                      <h3 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight pt-1 uppercase font-sans">
-                        {item.title}
-                      </h3>
+          {isLoading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="relative rounded-3xl p-7 sm:p-8 bg-[#15181a] border border-slate-800 h-[500px]">
+                <Skeleton className="h-10 w-3/4 mb-4" />
+                <Skeleton className="h-4 w-full mb-6" />
+                <Skeleton className="h-40 w-full mb-6" />
+                <Skeleton className="h-12 w-full" />
+              </div>
+            ))
+          ) : (
+            filteredOfferings.map((item, index) => {
+              const IconComponent = item.icon;
+              return (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.4, delay: index * 0.08, ease: 'easeOut' }}
+                  className={`relative rounded-3xl p-7 sm:p-8 bg-[#15181a] border ${item.accentColor} transition-all duration-300 shadow-2xl flex flex-col justify-between group`}
+                >
+                  {item.popular && (
+                    <div className="absolute -top-3 right-6 px-3.5 py-1 rounded-full bg-cyan-400 text-slate-950 font-mono font-extrabold text-[10px] uppercase tracking-wider shadow-md flex items-center gap-1">
+                      <Zap className="w-3 h-3 fill-slate-950" />
+                      <span>Destaque / Mais Solicitado</span>
                     </div>
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 border border-white/10 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform">
-                      <IconComponent className="w-7 h-7 text-cyan-400" />
-                    </div>
-                  </div>
+                  )}
 
-                  {/* Description */}
-                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6">
-                    {item.description}
-                  </p>
-
-                  {/* Deliverables Checklist */}
-                  <div className="space-y-3 py-4 border-t border-white/10 mb-4">
-                    <span className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-widest block">
-                      O Que Está Incluso:
-                    </span>
-                    {item.deliverables.map((del, idx) => (
-                      <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-200">
-                        <div className="w-4 h-4 rounded-full bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center mt-0.5 shrink-0">
-                          <Check className="w-2.5 h-2.5 text-cyan-400" />
-                        </div>
-                        <span className="leading-snug">{del}</span>
+                  <div>
+                    <div className="flex items-start justify-between gap-3 mb-5">
+                      <div className="space-y-1.5 flex-1">
+                        <span className={`inline-block px-3 py-1 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider border ${item.badgeBg}`}>
+                          {item.badge}
+                        </span>
+                        <h3 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight pt-1 uppercase font-sans">
+                          {item.title}
+                        </h3>
                       </div>
-                    ))}
-                  </div>
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 border border-white/10 flex items-center justify-center shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                        <IconComponent className="w-7 h-7 text-cyan-400" />
+                      </div>
+                    </div>
 
-                  {/* Technologies Badges */}
-                  <div className="pt-2 pb-4 flex flex-wrap gap-1.5">
-                    {item.technologies.map((tech, tIdx) => (
-                      <span key={tIdx} className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-slate-400">
-                        {tech}
+                    <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6">
+                      {item.description}
+                    </p>
+
+                    <div className="space-y-3 py-4 border-t border-white/10 mb-4">
+                      <span className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-widest block">
+                        O Que Está Incluso:
                       </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Price Comparison Box & Action CTAs */}
-                <div className="pt-4 border-t border-white/10 space-y-4">
-                  
-                {/* Price Comparison Row */}
-                  <div className="flex items-center justify-between p-4 rounded-2xl bg-[#0f1112] border border-white/10">
-                    <div className="space-y-0.5">
-                      <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Média de mercado</div>
-                      <div className="text-xs font-mono font-bold text-slate-500 line-through">{item.marketPrice}</div>
+                      {item.deliverables.map((del, idx) => (
+                        <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-200">
+                          <div className="w-4 h-4 rounded-full bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center mt-0.5 shrink-0">
+                            <Check className="w-2.5 h-2.5 text-cyan-400" />
+                          </div>
+                          <span className="leading-snug">{del}</span>
+                        </div>
+                      ))}
                     </div>
-                    <div className="text-right space-y-0.5">
-                      <div className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider">Nosso valor</div>
-                      <div className="text-lg font-mono font-extrabold text-cyan-300">{item.promotionalPrice}</div>
+
+                    <div className="pt-2 pb-4 flex flex-wrap gap-1.5">
+                      {item.technologies.map((tech, tIdx) => (
+                        <span key={tIdx} className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-slate-400">
+                          {tech}
+                        </span>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => handleStripeCheckout(item)}
-                      className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-xs bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition-all shadow-md cursor-pointer uppercase tracking-wider"
-                    >
-                      <CreditCard className="w-3.5 h-3.5" />
-                      <span>Contratar (Pagamento Seguro)</span>
-                    </button>
+                  <div className="pt-4 border-t border-white/10 space-y-4">
+                    <div className="flex items-center justify-between p-4 rounded-2xl bg-[#0f1112] border border-white/10">
+                      <div className="space-y-0.5">
+                        <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Média de mercado</div>
+                        <div className="text-xs font-mono font-bold text-slate-500 line-through">{item.marketPrice}</div>
+                      </div>
+                      <div className="text-right space-y-0.5">
+                        <div className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider">Nosso valor</div>
+                        <div className="text-lg font-mono font-extrabold text-cyan-300">{item.promotionalPrice}</div>
+                      </div>
+                    </div>
 
-                    <button
-                      onClick={() => onOpenWhatsAppWithMessage(`Olá! Gostaria de saber mais sobre "${item.title}".`)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all cursor-pointer font-mono"
-                    >
-                      <MessageSquare className="w-3.5 h-3.5 text-cyan-400" />
-                      <span>Dúvidas? Falar no WhatsApp</span>
-                    </button>
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => handleStripeCheckout(item)}
+                        className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-xs bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition-all shadow-md cursor-pointer uppercase tracking-wider"
+                      >
+                        <CreditCard className="w-3.5 h-3.5" />
+                        <span>Contratar (Pagamento Seguro)</span>
+                      </button>
+
+                      <button
+                        onClick={() => onOpenWhatsAppWithMessage(`Olá! Gostaria de saber mais sobre "${item.title}".`)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-all cursor-pointer font-mono"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>Dúvidas? Falar no WhatsApp</span>
+                      </button>
+                    </div>
                   </div>
-
-                </div>
-
-              </motion.div>
-            );
-          })}
+                </motion.div>
+              );
+            })
+          )}
         </div>
 
-        {/* Combo Promocional */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -447,15 +451,11 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
             </button>
           </div>
         </motion.div>
-
       </div>
 
-      {/* Stripe Checkout Modal */}
       {selectedCheckoutItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
           <div className="relative w-full max-w-lg rounded-3xl bg-[#121517] border border-cyan-500/40 p-6 sm:p-8 space-y-6 shadow-2xl text-slate-200">
-            
-            {/* Header */}
             <div className="flex items-center justify-between pb-4 border-b border-white/10">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 font-bold">
@@ -470,7 +470,6 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
                   </p>
                 </div>
               </div>
-
               <button
                 onClick={() => setSelectedCheckoutItem(null)}
                 className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white cursor-pointer"
@@ -501,7 +500,6 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
               </div>
             ) : (
               <div className="space-y-5">
-                {/* Product Summary */}
                 <div className="p-4 rounded-2xl bg-[#090b0d] border border-white/10 flex items-center justify-between">
                   <div>
                     <span className="text-[10px] font-mono text-slate-400 uppercase">Serviço Selecionado:</span>
@@ -513,8 +511,6 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
                     <span className="text-lg font-extrabold text-cyan-300 font-mono">{selectedCheckoutItem.promotionalPrice}</span>
                   </div>
                 </div>
-
-                {/* Customer Email */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-mono text-slate-300 flex items-center justify-between">
                     <span>E-mail para envio do recibo e nota:</span>
@@ -529,8 +525,6 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
                     className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/15 text-white text-xs font-mono focus:outline-none focus:border-cyan-400"
                   />
                 </div>
-
-                {/* Payment Methods Badges */}
                 <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-2 text-xs">
                   <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block">
                     Formas de Pagamento Disponíveis:
@@ -548,14 +542,10 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
                     </span>
                   </div>
                 </div>
-
-                {/* Guarantee Note */}
                 <div className="text-[11px] text-slate-400 font-mono flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>Garantia incondicional de 7 dias com entrega técnica direta por Luciano Tavares Silva.</span>
                 </div>
-
-                {/* Submit Action */}
                 <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-3">
                   <button
                     type="button"
@@ -565,7 +555,6 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>Dúvidas? Falar no WhatsApp</span>
                   </button>
-
                   <button
                     onClick={handleSimulateCardPayment}
                     disabled={isProcessingStripe}
@@ -581,11 +570,9 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
                 </div>
               </div>
             )}
-
           </div>
         </div>
       )}
-
-    </section>
+    </motion.section>
   );
 };

@@ -164,34 +164,54 @@ export default function App() {
               />
 
               {/* High-Converting Services & Transparent Pricing Blocks */}
-              <ServicePricingBlocks onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+              <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <ServicePricingBlocks onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+              </motion.div>
 
               {/* Portfolio & Case Studies Showcase */}
-              <PortfolioSection onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+              <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <PortfolioSection onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+              </motion.div>
 
               {/* Showcase Examples for Prospect Clients */}
-              <ShowcaseExamplesSection onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+              <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <ShowcaseExamplesSection onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+              </motion.div>
 
               {/* Concrete Professional Mockup Showcase */}
-              <MockupShowcase onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+              <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <MockupShowcase onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+              </motion.div>
 
               {/* Story & Biography of the Owner (Luciano Tavares Silva) */}
-              <AboutOwnerSection onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+              <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <AboutOwnerSection onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+              </motion.div>
 
               {/* Interactive ROI Calculator */}
-              <RoiCalculator onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+              <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <RoiCalculator onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+              </motion.div>
 
               {/* Client Testimonials */}
-              <TestimonialsSection />
+              <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <TestimonialsSection />
+              </motion.div>
 
               {/* Modern Tech Stack */}
-              <TechStack />
+              <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <TechStack />
+              </motion.div>
 
               {/* Frequently Asked Questions */}
-              <FaqSection />
+              <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <FaqSection />
+              </motion.div>
 
               {/* Direct Contact Form & WhatsApp CTA */}
-              <ContactSection onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+              <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
+                <ContactSection onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+              </motion.div>
             </motion.div>
           )}
 

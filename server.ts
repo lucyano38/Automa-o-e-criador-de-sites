@@ -4,6 +4,15 @@ import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import Stripe from 'stripe';
+import { initializeApp } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import firebaseConfig from './firebase-applet-config.json' with { type: 'json' };
+
+// Initialize Firebase Admin
+initializeApp({
+  projectId: firebaseConfig.projectId
+});
+const db = getFirestore();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,6 +20,38 @@ const __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
   const PORT = 3000;
+
+  // Webhook needs raw body
+  app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!sig || !endpointSecret) return res.status(400).send('Webhook Error');
+
+    try {
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
+      const event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+
+      if (event.type === 'checkout.session.completed') {
+        const session = event.data.object as any;
+        console.log('Pagamento confirmado:', session.id);
+        const userId = session.client_reference_id;
+        
+        if (userId) {
+          await db.collection('subscriptions').doc(session.id).set({
+            userId: userId,
+            stripeCustomerId: session.customer,
+            status: 'active',
+            plan: session.metadata?.plan || 'basic'
+          });
+          console.log(`Subscription updated for user ${userId}`);
+        }
+      }
+      res.json({ received: true });
+    } catch (err) {
+      res.status(400).send(`Webhook Error: ${err}`);
+    }
+  });
 
   app.use(express.json());
 
@@ -543,6 +584,7 @@ Retorne APENAS um objeto JSON válido (sem marcação de bloco de código) com o
           success_url: `${req.headers.origin || 'http://localhost:3000'}/?checkout=success&service=${serviceId}`,
           cancel_url: `${req.headers.origin || 'http://localhost:3000'}/?checkout=cancel`,
           customer_email: customerEmail || undefined,
+          client_reference_id: req.body.userId || undefined,
         });
 
         return res.json({ id: session.id, url: session.url, mode: 'live_stripe' });
@@ -583,9 +625,11 @@ Sua missão primordial é responder com precisão cirúrgica a QUALQUER dúvida 
 
 === DIRETRIZ FUNDAMENTAL DE ATENDIMENTO ===
 - RESPONDA DIRETAMENTE À DÚVIDA DO CLIENTE! Você não é um mero redirecionador de cliques.
-- Tire dúvidas sobre código, arquitetura, integrações, stack, prazos e preços com profundidade.
-- Nunca responda simplesmente "fale no WhatsApp". O visitante veio para obter respostas imediatas aqui no chat.
-- Ao final de uma resposta completa e elucidativa, forneça as opções práticas: contratar diretamente com segurança via Stripe (em até 12x ou PIX) ou falar com um especialista no WhatsApp se desejar um escopo customizado.
+- Se a pergunta for sobre serviços, preços ou tecnologias, use os detalhes do nosso catálogo abaixo com precisão técnica.
+- Se o cliente perguntar algo sobre o Foco em Dados, cite as propostas de valor (dados, faturamento, 24/7) de forma natural.
+- Seja honesto: se não souber a resposta, peça para falar com Luciano no WhatsApp em vez de inventar ou dar respostas genéricas.
+- Ao final de toda resposta, ofereça o próximo passo lógico: contratar via Stripe (site) ou falar no WhatsApp (customização).
+- Mantenha um tom profissional, técnico e orientado a resultados.
 
 === IDENTIDADE INSTITUCIONAL ===
 - Marca: Foco em Dados (focoemdados.com.br)

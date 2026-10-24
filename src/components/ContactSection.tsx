@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import { 
   MessageSquare, 
   Mail, 
@@ -34,7 +35,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenWhatsAppWi
   };
 
   return (
-    <section id="contato" className="py-20 bg-slate-950 relative border-t border-slate-900">
+    <motion.section 
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ duration: 1.0, ease: 'easeOut' }}
+      id="contato" 
+      className="py-20 bg-slate-950 relative border-t border-slate-900"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
@@ -308,6 +315,6 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ onOpenWhatsAppWi
         </div>
 
       </div>
-    </section>
+    </motion.section>
   );
 };

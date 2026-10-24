@@ -136,7 +136,7 @@ export const AutomationBuilder: React.FC<AutomationBuilderProps> = ({ onOpenWhat
                   className="w-full h-24 p-3 bg-slate-900 rounded-lg text-xs text-slate-200 border border-slate-700 focus:border-cyan-500 transition-all resize-none"
                 />
                 <div className="mt-2 flex items-center justify-between text-[10px] text-slate-500">
-                  <span>Use {{cliente_nome}} para variável</span>
+                  <span>Use {'{cliente_nome}'} para variável</span>
                   <label className="flex items-center gap-1 cursor-pointer">
                     <input type="checkbox" className="accent-cyan-500" defaultChecked />
                     Ativar IA
