@@ -23,6 +23,7 @@ import {
 import { CNAE_NICHES, ITUPEVA_PROSPECT_LEADS, generateDynamicProspects } from '../data/prospectingData';
 import { ProspectLead, GeoLocationPoint } from '../types';
 import { geocodeLocation } from '../lib/geoService';
+import { formatWhatsAppLink } from '../lib/phone';
 
 interface ProspectingScreenProps {
   onOpenWhatsAppWithMessage?: (msg: string) => void;
@@ -137,35 +138,7 @@ export const ProspectingScreen: React.FC<ProspectingScreenProps> = ({
     const targetPhone = lead.whatsappDirect || lead.phone || '';
     if (!targetPhone) return;
 
-    // Clean to numeric only
-    let cleanPhone = targetPhone.replace(/\D/g, '');
-    
-    // Remove leading zero if present
-    if (cleanPhone.startsWith('0')) {
-      cleanPhone = cleanPhone.substring(1);
-    }
-    
-    // Ensure it has country code 55 (if not already present)
-    if (!cleanPhone.startsWith('55')) {
-      // If DDD + 8 or 9 digits, add 55
-      if (cleanPhone.length === 10 || cleanPhone.length === 11) {
-        cleanPhone = `55${cleanPhone}`;
-      }
-    }
-    
-    // Fix for Brazilian mobile numbers missing the '9' if they have only 8 digits after DDD
-    // 55 + DDD (2) + firstDigit (1) + suffix (7) = 12 digits total, should be 13 (with 9)
-    if (cleanPhone.length === 12) {
-        const ddd = cleanPhone.substring(2, 4);
-        const firstDigit = cleanPhone.substring(4, 5);
-        
-        // Check if it's a mobile prefix (6,7,8,9)
-        if (['6', '7', '8', '9'].includes(firstDigit)) {
-            cleanPhone = cleanPhone.substring(0, 4) + '9' + cleanPhone.substring(4);
-        }
-    }
-    
-    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(lead.customPitch)}`;
+    const whatsappUrl = formatWhatsAppLink(targetPhone, lead.customPitch);
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 
