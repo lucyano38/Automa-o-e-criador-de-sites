@@ -10,7 +10,9 @@ import {
   ShieldCheck, 
   Menu, 
   X,
-  ExternalLink
+  ExternalLink,
+  Layout,
+  ShoppingBag
 } from 'lucide-react';
 import { useFirebase, OWNER_EMAIL } from '../contexts/FirebaseContext';
 
@@ -30,6 +32,20 @@ export const PrivateNavbar: React.FC<PrivateNavbarProps> = ({ currentPath, onNav
       subtitle: 'Pipeline & Fontes',
       icon: BarChart2,
       badge: 'BI'
+    },
+    {
+      id: '/site-builder',
+      label: 'Construtor de Sites',
+      subtitle: 'IA & Afiliados',
+      icon: Layout,
+      badge: 'NOVO'
+    },
+    {
+      id: '/vitrine',
+      label: 'Kit Produtividade',
+      subtitle: 'Setup & Shopee',
+      icon: ShoppingBag,
+      badge: 'SHOPEE'
     },
     {
       id: '/prospecting',

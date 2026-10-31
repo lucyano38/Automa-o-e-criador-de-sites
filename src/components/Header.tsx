@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, MessageSquare, Linkedin, Instagram, Lock, ShieldCheck, ArrowRight, User, LogIn } from 'lucide-react';
+import { Menu, X, MessageSquare, ShieldCheck, ArrowRight, LogIn } from 'lucide-react';
 
 interface HeaderProps {
   activeTab: string;
@@ -26,6 +26,28 @@ export const Header: React.FC<HeaderProps> = ({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Close drawer on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
+
+  // Close drawer when screen resizes to desktop breakpoint (>= 1024px)
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024 && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [mobileMenuOpen]);
 
   const navTabs = [
     { id: 'solucoes', label: 'INÍCIO' },
@@ -91,45 +113,46 @@ export const Header: React.FC<HeaderProps> = ({
       id="main-header"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-[#0b0d0f]/95 backdrop-blur-md border-b border-cyan-500/20 py-3 shadow-xl'
-          : 'bg-[#0d0f10]/90 backdrop-blur-sm py-4 border-b border-white/5'
+          ? 'bg-[#0b0d0f]/95 backdrop-blur-md border-b border-cyan-500/20 py-2.5 sm:py-3 shadow-xl'
+          : 'bg-[#0d0f10]/90 backdrop-blur-sm py-2.5 sm:py-3.5 border-b border-white/5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-3 sm:gap-4">
           
-          {/* Brand Logo - Foco em Dados */}
+          {/* Brand Logo & Title - Dedicated breathing room, never squished or truncated */}
           <button
             onClick={() => {
               setActiveTab('solucoes');
+              setMobileMenuOpen(false);
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className="group flex items-center gap-3 text-left focus:outline-none cursor-pointer"
+            className="group flex items-center gap-2.5 sm:gap-3 text-left focus:outline-none cursor-pointer shrink-0"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-teal-400 to-emerald-400 p-0.5 shadow-md shadow-cyan-500/20 group-hover:scale-105 transition-all">
-              <div className="w-full h-full bg-[#0d0f10] rounded-[10px] flex items-center justify-center text-cyan-400 font-black text-lg">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-cyan-500 via-teal-400 to-emerald-400 p-0.5 shadow-md shadow-cyan-500/20 group-hover:scale-105 transition-all shrink-0">
+              <div className="w-full h-full bg-[#0d0f10] rounded-[9px] flex items-center justify-center text-cyan-400 font-black text-sm sm:text-base">
                 ⚡
               </div>
             </div>
-            <div>
-              <div className="font-extrabold text-white text-lg tracking-tight group-hover:text-cyan-400 transition-colors uppercase font-sans">
+            <div className="flex flex-col min-w-0">
+              <span className="font-extrabold text-white text-base sm:text-lg tracking-tight group-hover:text-cyan-400 transition-colors uppercase font-sans whitespace-nowrap leading-none">
                 Foco em Dados
-              </div>
-              <p className="text-[10px] text-cyan-400 font-mono tracking-widest uppercase font-semibold">
-                focoemdados.com.br · Inteligência B2B
-              </p>
+              </span>
+              <span className="hidden sm:inline-block text-[10px] sm:text-[11px] text-cyan-400 font-mono tracking-wider uppercase font-semibold whitespace-nowrap mt-1 leading-none">
+                Sites &amp; Automação Inteligente
+              </span>
             </div>
           </button>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-6">
+          {/* Desktop Nav Links (Visible exclusively on Large screens >= 1024px) */}
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-7">
             {navTabs.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => handleNavClick(tab.id)}
-                  className={`text-xs font-bold tracking-wider transition-all relative py-1 cursor-pointer font-sans ${
+                  className={`text-xs font-bold tracking-wider transition-all relative py-1 cursor-pointer font-sans whitespace-nowrap ${
                     isActive
                       ? 'text-white font-extrabold'
                       : 'text-slate-300 hover:text-white'
@@ -137,17 +160,16 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <span>{tab.label}</span>
                   {isActive && (
-                    <span className="absolute bottom-0 left-0 w-full h-[2.5px] bg-cyan-400 rounded-full animate-fade-in"></span>
+                    <span className="absolute bottom-0 left-0 w-full h-[2.5px] bg-cyan-400 rounded-full"></span>
                   )}
                 </button>
               );
             })}
           </nav>
 
-          {/* Right Actions: Entrar / Dashboard + WhatsApp */}
-          <div className="hidden md:flex items-center gap-3">
-            
-            {/* Login / Ecossistema Action Button */}
+          {/* Desktop Right Actions (Visible exclusively on Large screens >= 1024px) */}
+          <div className="hidden lg:flex items-center gap-3 shrink-0">
+            {/* Login / Dashboard Action */}
             {isOwner ? (
               <button
                 onClick={() => onNavigate('/dashboard')}
@@ -170,7 +192,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Começar Agora Button */}
             <button
               onClick={() => onNavigate(isOwner ? '/dashboard' : '/login')}
-              className="px-4 py-2 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-md shadow-cyan-500/20 cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-md shadow-cyan-500/20 cursor-pointer whitespace-nowrap"
             >
               Começar Agora
             </button>
@@ -185,54 +207,102 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
 
-          {/* Mobile Menu Toggle */}
-          <div className="flex items-center gap-2 lg:hidden">
+          {/* Mobile & Tablet Controls (Visible on all screens < 1024px: phones and tablets) */}
+          <div className="flex lg:hidden items-center gap-2 sm:gap-2.5 shrink-0">
+            {/* Direct quick action for mobile & tablet */}
+            {isOwner ? (
+              <button
+                onClick={() => onNavigate('/dashboard')}
+                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 text-xs font-mono font-bold transition-all min-h-[44px] cursor-pointer"
+                title="Acessar Dashboard"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="hidden xs:inline">Painel</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => onNavigate('/login')}
+                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold text-xs whitespace-nowrap transition-colors min-h-[44px] cursor-pointer shadow-sm shadow-cyan-500/20"
+                title="Entrar na Plataforma"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Entrar</span>
+              </button>
+            )}
+
+            {/* Direct WhatsApp icon on tablets (sm and up) */}
             <button
-              onClick={() => onNavigate(isOwner ? '/dashboard' : '/login')}
-              className="px-3 py-1.5 rounded-xl bg-cyan-400 text-slate-950 font-bold text-xs"
+              onClick={onOpenWhatsApp}
+              className="hidden sm:flex items-center justify-center min-w-[44px] min-h-[44px] p-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-400 border border-cyan-500/30 transition-all cursor-pointer"
+              title="Falar no WhatsApp"
+              aria-label="Falar no WhatsApp"
             >
-              Entrar
+              <MessageSquare className="w-4 h-4 fill-cyan-400" />
             </button>
 
+            {/* Responsive Hamburger Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-xl bg-white/5 text-slate-300 border border-white/10 hover:text-white focus:outline-none cursor-pointer"
-              aria-label="Toggle menu"
+              className={`flex items-center justify-center min-w-[44px] min-h-[44px] p-2.5 rounded-xl border transition-all cursor-pointer focus:outline-none ${
+                mobileMenuOpen
+                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-md shadow-cyan-500/20'
+                  : 'bg-white/5 text-slate-200 hover:text-white border-white/10 hover:border-cyan-500/30'
+              }`}
+              aria-label={mobileMenuOpen ? 'Fechar menu de navegação' : 'Abrir menu de navegação'}
+              aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? (
+                <X className="w-5 h-5 text-cyan-400" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
             </button>
           </div>
 
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Responsive Drawer for Mobile and Tablet Devices (< 1024px) */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#0b0d0f]/98 border-b border-white/10 px-4 pt-3 pb-6 mt-3 space-y-2 backdrop-blur-xl">
+        <div 
+          id="mobile-tablet-drawer"
+          className="lg:hidden bg-[#0a0c0e]/98 border-b border-cyan-500/20 px-4 sm:px-6 pt-3 pb-6 mt-2.5 space-y-3 backdrop-blur-2xl shadow-2xl animate-fade-in"
+        >
+          {/* Navigation Links with comfortable 44px+ touch targets */}
           <div className="flex flex-col space-y-1">
-            {navTabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  handleNavClick(tab.id);
-                  setMobileMenuOpen(false);
-                }}
-                className="text-left py-2 px-3 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 font-semibold text-xs tracking-wider"
-              >
-                {tab.label}
-              </button>
-            ))}
+            {navTabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    handleNavClick(tab.id);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`flex items-center justify-between w-full min-h-[44px] px-3.5 py-2.5 rounded-xl font-sans text-xs tracking-wider uppercase font-bold transition-all text-left cursor-pointer ${
+                    isActive
+                      ? 'bg-cyan-500/15 text-cyan-300 border-l-4 border-cyan-400 font-extrabold shadow-sm shadow-cyan-500/10'
+                      : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <ArrowRight className={`w-3.5 h-3.5 transition-transform ${isActive ? 'text-cyan-400 translate-x-1' : 'text-slate-600'}`} />
+                </button>
+              );
+            })}
           </div>
 
-          <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
+          {/* Action CTAs inside Drawer */}
+          <div className="pt-3 border-t border-white/10 flex flex-col gap-2.5">
             <button
               onClick={() => {
                 onNavigate(isOwner ? '/dashboard' : '/login');
                 setMobileMenuOpen(false);
               }}
-              className="w-full py-2.5 rounded-xl bg-cyan-400 text-slate-950 font-black text-xs uppercase"
+              className="w-full flex items-center justify-center gap-2 min-h-[46px] px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-teal-400 hover:from-cyan-300 hover:to-teal-300 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-md shadow-cyan-500/20 cursor-pointer"
             >
-              {isOwner ? 'Acessar Dashboard' : 'Entrar na Plataforma'}
+              <span>{isOwner ? 'Acessar Dashboard Executivo' : 'Começar Agora · Foco em Dados'}</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
 
             <button
@@ -240,10 +310,30 @@ export const Header: React.FC<HeaderProps> = ({
                 onOpenWhatsApp();
                 setMobileMenuOpen(false);
               }}
-              className="w-full py-2.5 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold text-xs"
+              className="w-full flex items-center justify-center gap-2 min-h-[46px] px-4 py-2.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 font-bold text-xs transition-all cursor-pointer shadow-sm shadow-cyan-500/10"
             >
-              Falar no WhatsApp
+              <MessageSquare className="w-4 h-4 fill-cyan-400" />
+              <span>Falar no WhatsApp Comercial</span>
             </button>
+
+            {!isOwner && (
+              <button
+                onClick={() => {
+                  onNavigate('/login');
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center justify-center gap-1.5 py-2 text-slate-400 hover:text-cyan-300 font-mono text-xs transition-colors cursor-pointer"
+              >
+                <LogIn className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Já tem cadastro? Acessar login</span>
+              </button>
+            )}
+
+            {/* Status indicator */}
+            <div className="pt-1 flex items-center justify-center gap-1.5 text-[11px] font-mono text-slate-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Sites Profissionais &amp; Automação B2B 24h</span>
+            </div>
           </div>
         </div>
       )}
@@ -251,3 +341,4 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+

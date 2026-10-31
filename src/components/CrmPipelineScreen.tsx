@@ -66,7 +66,7 @@ const COLUMNS: { stage: CrmStage; color: string; badgeBg: string }[] = [
   { stage: 'Perdido', color: 'border-red-500/40 text-red-400', badgeBg: 'bg-red-500/10' },
 ];
 
-const SortableDealCard = ({ deal }: { deal: CrmDeal }) => {
+const SortableDealCard: React.FC<{ deal: CrmDeal }> = ({ deal }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: deal.id });
   return (
     <div ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} {...attributes} {...listeners} className="p-4 rounded-xl bg-[#14171a] border border-white/10 hover:border-cyan-500/40 transition-all space-y-2.5 shadow-md cursor-grab active:cursor-grabbing">

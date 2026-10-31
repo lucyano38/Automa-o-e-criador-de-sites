@@ -25,6 +25,9 @@ import { ProspectingScreen } from './components/ProspectingScreen';
 import { CrmPipelineScreen } from './components/CrmPipelineScreen';
 import { AiContentGeneratorScreen } from './components/AiContentGeneratorScreen';
 import { SpreadsheetDataAnalysisScreen } from './components/SpreadsheetDataAnalysisScreen';
+import { AiSiteBuilderScreen } from './components/AiSiteBuilderScreen';
+import { ProductivityShowcaseScreen } from './components/ProductivityShowcaseScreen';
+import { CheckoutSuccessModal } from './components/CheckoutSuccessModal';
 import { useFirebase } from './contexts/FirebaseContext';
 
 export default function App() {
@@ -38,8 +41,28 @@ export default function App() {
   const [redirectReason, setRedirectReason] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('solucoes');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [checkoutSuccessSession, setCheckoutSuccessSession] = useState<{ sessionId: string; serviceId?: string } | null>(null);
+  const [checkoutCancelledNotice, setCheckoutCancelledNotice] = useState<boolean>(false);
 
   const WHATSAPP_NUMBER = '5511994411307'; // Luciano Tavares Silva (11) 99441-1307
+
+  // Handle Stripe Checkout Redirect Query Params
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const checkoutStatus = urlParams.get('checkout_status') || urlParams.get('checkout');
+    const sessionId = urlParams.get('session_id');
+    const service = urlParams.get('service');
+
+    if (checkoutStatus === 'success' && sessionId) {
+      setCheckoutSuccessSession({ sessionId, serviceId: service || undefined });
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (checkoutStatus === 'cancelled' || checkoutStatus === 'cancel') {
+      setCheckoutCancelledNotice(true);
+      window.history.replaceState({}, '', window.location.pathname);
+      const timer = setTimeout(() => setCheckoutCancelledNotice(false), 8000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // Sync client router with browser History API (popstate and pushState)
   useEffect(() => {
@@ -68,7 +91,7 @@ export default function App() {
   };
 
   // Route Authentication Guard (Middleware)
-  const isPrivateRoute = ['/dashboard', '/prospecting', '/crm', '/content', '/data-analysis'].includes(currentPath);
+  const isPrivateRoute = ['/dashboard', '/prospecting', '/crm', '/content', '/data-analysis', '/site-builder', '/vitrine', '/produtividade'].includes(currentPath);
 
   useEffect(() => {
     if (isPrivateRoute && !isOwner) {
@@ -102,6 +125,20 @@ export default function App() {
             <ExecutionDashboard 
               onNavigateToCrm={() => navigate('/crm')}
               onNavigateToProspecting={() => navigate('/prospecting')}
+              onNavigateToSiteBuilder={() => navigate('/site-builder')}
+              onNavigateToVitrine={() => navigate('/vitrine')}
+              onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage}
+            />
+          )}
+
+          {currentPath === '/site-builder' && (
+            <AiSiteBuilderScreen 
+              onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage}
+            />
+          )}
+
+          {(currentPath === '/vitrine' || currentPath === '/produtividade') && (
+            <ProductivityShowcaseScreen 
               onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage}
             />
           )}
@@ -279,6 +316,29 @@ export default function App() {
         onClose={() => setIsAuthModalOpen(false)} 
         onSuccess={() => navigate('/dashboard')}
       />
+
+      {/* Stripe Checkout Verified Purchase Modal */}
+      {checkoutSuccessSession && (
+        <CheckoutSuccessModal
+          sessionId={checkoutSuccessSession.sessionId}
+          serviceId={checkoutSuccessSession.serviceId}
+          onClose={() => setCheckoutSuccessSession(null)}
+          onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage}
+        />
+      )}
+
+      {/* Stripe Cancelled Toast Notification */}
+      {checkoutCancelledNotice && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl bg-slate-900 border border-white/20 text-slate-200 text-xs font-mono shadow-2xl flex items-center gap-3 animate-fade-in">
+          <span>O checkout Stripe foi cancelado. Seus dados estão seguros e você pode retomar a qualquer momento.</span>
+          <button 
+            onClick={() => setCheckoutCancelledNotice(false)} 
+            className="text-cyan-400 font-bold hover:underline cursor-pointer"
+          >
+            OK
+          </button>
+        </div>
+      )}
 
     </div>
   );

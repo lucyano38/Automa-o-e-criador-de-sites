@@ -18,20 +18,26 @@ import {
   ExternalLink,
   ShieldCheck,
   Cpu,
-  BarChart2
+  BarChart2,
+  ShoppingBag
 } from 'lucide-react';
 import { ITUPEVA_PROSPECT_LEADS } from '../data/prospectingData';
 import { ProspectLead } from '../types';
+import { ShopeeAffiliates } from './ShopeeAffiliates';
 
 interface ExecutionDashboardProps {
   onNavigateToCrm?: () => void;
   onNavigateToProspecting?: () => void;
+  onNavigateToSiteBuilder?: () => void;
+  onNavigateToVitrine?: () => void;
   onOpenWhatsAppWithMessage?: (msg: string) => void;
 }
 
 export const ExecutionDashboard: React.FC<ExecutionDashboardProps> = ({
   onNavigateToCrm,
   onNavigateToProspecting,
+  onNavigateToSiteBuilder,
+  onNavigateToVitrine,
   onOpenWhatsAppWithMessage
 }) => {
   const [activeStep, setActiveStep] = useState<number>(1);
@@ -163,6 +169,26 @@ export const ExecutionDashboard: React.FC<ExecutionDashboardProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            {onNavigateToSiteBuilder && (
+              <button
+                onClick={onNavigateToSiteBuilder}
+                className="px-4 py-3 rounded-xl font-bold text-xs bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2 cursor-pointer uppercase tracking-wider"
+                title="Criar site com IA e monetizar com Afiliados"
+              >
+                <Sparkles className="w-4 h-4 text-slate-950" />
+                <span>Construtor de Sites IA</span>
+              </button>
+            )}
+            {onNavigateToVitrine && (
+              <button
+                onClick={onNavigateToVitrine}
+                className="px-4 py-3 rounded-xl font-bold text-xs bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 transition-all shadow-lg shadow-cyan-500/20 flex items-center gap-2 cursor-pointer uppercase tracking-wider"
+                title="Kit de Produtividade & Setup recomendado (Shopee)"
+              >
+                <ShoppingBag className="w-4 h-4 text-slate-950" />
+                <span>Kit Produtividade (Shopee)</span>
+              </button>
+            )}
             <button
               onClick={onNavigateToProspecting}
               className="px-5 py-3 rounded-xl font-bold text-xs bg-cyan-400 hover:bg-cyan-300 text-slate-950 transition-all shadow-lg shadow-cyan-500/20 flex items-center gap-2 cursor-pointer uppercase tracking-wider"
@@ -280,6 +306,9 @@ export const ExecutionDashboard: React.FC<ExecutionDashboardProps> = ({
           <div className="text-[10px] text-purple-400 font-mono">Copy persuasiva com WhatsApp</div>
         </div>
       </div>
+
+      {/* Vitrine de Produtividade & Afiliados Shopee */}
+      <ShopeeAffiliates />
 
       {/* Lista de Leads Qualificados (Qualified Leads Table) */}
       <div className="rounded-3xl bg-[#121517] border border-white/10 p-6 sm:p-8 space-y-6 shadow-2xl">
