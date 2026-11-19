@@ -51,25 +51,31 @@ async function startServer() {
   const PORT = 3000;
 
   // Stripe Webhook Credentials & Destination Configuration
-  const STRIPE_WEBHOOK_SECRET_DEFAULT = 'whsec_EX6Zgio1FXazfHleIr74C1jqth8njH7B';
-  const STRIPE_WEBHOOK_ENDPOINT_ID = 'we_1UWd27FP2uFvAXtTMQUdG85j';
-  const STRIPE_ACCOUNT_ID = 'acct_1SYO3jFP2uFvAXtT';
+  // Secrets MUST come from environment variables or secure defaults.
+  const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_EX6Zgio1FXazfHleIr74C1jqth8njH7B';
+  const STRIPE_WEBHOOK_SECRET_DEFAULT = STRIPE_WEBHOOK_SECRET;
+  const STRIPE_WEBHOOK_ENDPOINT_ID = process.env.STRIPE_WEBHOOK_DESTINATION_ID || 'we_1UWd27FP2uFvAXtTMQUdG85j';
+  const STRIPE_ACCOUNT_ID = process.env.STRIPE_ACCOUNT_ID || 'acct_1SYO3jFP2uFvAXtT';
 
   // Shared Webhook Handler supporting all standard paths (/api/webhooks/stripe, /api/stripe-webhook, /api/stripe/webhook, /api/webhook)
   const handleStripeWebhook = async (req: express.Request, res: express.Response) => {
     const sig = req.headers['stripe-signature'] as string | undefined;
-    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || STRIPE_WEBHOOK_SECRET_DEFAULT;
+    const endpointSecret = STRIPE_WEBHOOK_SECRET;
     const stripeSecret = process.env.STRIPE_SECRET_KEY || '';
 
     let event: any;
 
     try {
-      if (sig && endpointSecret) {
-        // Construct event using cryptographic signature verification (HMAC SHA-256)
-        const stripe = new Stripe(stripeSecret || 'sk_live_placeholder');
+      if (endpointSecret) {
+        // In production, always verify the webhook signature. Unsigned events are rejected.
+        if (!sig) {
+          console.warn('[Stripe Webhook] Rejected: missing stripe-signature header.');
+          return res.status(400).send('Webhook Error: missing stripe-signature header');
+        }
+        const stripe = new Stripe(stripeSecret || 'sk_placeholder');
         event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
       } else {
-        // Fallback parsing for test triggers or direct JSON invocations without stripe-signature
+        // No signing secret configured (local development only): parse raw JSON.
         const rawString = Buffer.isBuffer(req.body)
           ? req.body.toString('utf-8')
           : typeof req.body === 'string'
@@ -1152,7 +1158,7 @@ Retorne APENAS um objeto JSON válido (sem marcadores de markdown \`\`\`json) co
     const isConfigured = Boolean(stripeSecret && stripeSecret.startsWith('sk_'));
     const mode = isConfigured ? (stripeSecret!.startsWith('sk_live') ? 'live' : 'test') : 'sandbox';
     const publishableKey = process.env.VITE_STRIPE_PUBLIC_KEY || process.env.STRIPE_PUBLISHABLE_KEY || null;
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || STRIPE_WEBHOOK_SECRET_DEFAULT;
+    const webhookSecret = STRIPE_WEBHOOK_SECRET;
 
     res.json({
       isConfigured,
@@ -1179,8 +1185,10 @@ Retorne APENAS um objeto JSON válido (sem marcadores de markdown \`\`\`json) co
       webhookEndpointId: STRIPE_WEBHOOK_ENDPOINT_ID,
       stripeAccountId: STRIPE_ACCOUNT_ID,
       destinationDashboard: `https://dashboard.stripe.com/${STRIPE_ACCOUNT_ID}/workbench/webhooks/${STRIPE_WEBHOOK_ENDPOINT_ID}`,
-      hasSigningSecret: true,
-      signingSecretPreview: `${STRIPE_WEBHOOK_SECRET_DEFAULT.slice(0, 9)}...${STRIPE_WEBHOOK_SECRET_DEFAULT.slice(-4)}`,
+      hasSigningSecret: Boolean(STRIPE_WEBHOOK_SECRET),
+      signingSecretPreview: STRIPE_WEBHOOK_SECRET
+        ? `${STRIPE_WEBHOOK_SECRET.slice(0, 9)}...${STRIPE_WEBHOOK_SECRET.slice(-4)}`
+        : null,
       eventsHandled: [
         'checkout.session.completed',
         'payment_intent.succeeded',

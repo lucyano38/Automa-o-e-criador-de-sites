@@ -24,6 +24,7 @@ import {
 import { ITUPEVA_PROSPECT_LEADS } from '../data/prospectingData';
 import { ProspectLead } from '../types';
 import { ShopeeAffiliates } from './ShopeeAffiliates';
+import { formatWhatsAppLink } from '../lib/phone';
 
 interface ExecutionDashboardProps {
   onNavigateToCrm?: () => void;
@@ -68,12 +69,17 @@ export const ExecutionDashboard: React.FC<ExecutionDashboardProps> = ({
   };
 
   const handleWhatsApp = (lead: ProspectLead) => {
-    const rawPhone = lead.phone || lead.whatsappDirect || '';
-    let cleanPhone = rawPhone.replace(/\D/g, '');
-    if (cleanPhone.length >= 10 && cleanPhone.length <= 11 && !cleanPhone.startsWith('55')) {
-      cleanPhone = `55${cleanPhone}`;
+    const targetPhone = lead.whatsappDirect || lead.phone || '';
+    if (!targetPhone) return;
+
+    const whatsappUrl = formatWhatsAppLink(targetPhone, lead.customPitch);
+    if (!whatsappUrl) {
+      navigator.clipboard.writeText(lead.customPitch);
+      setCopiedId(lead.id);
+      setTimeout(() => setCopiedId(null), 3000);
+      alert(`Número fixo detectado (${lead.phone}). O WhatsApp exige número de celular. O pitch de vendas foi copiado automaticamente para a área de transferência!`);
+      return;
     }
-    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(lead.customPitch)}`;
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 
@@ -403,16 +409,14 @@ export const ExecutionDashboard: React.FC<ExecutionDashboardProps> = ({
                       {copiedId === lead.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                       <span>{copiedId === lead.id ? 'Copiado' : 'Pitch'}</span>
                     </button>
-                    <a
-                      href={`https://wa.me/${(lead.phone || lead.whatsappDirect || '').replace(/\D/g, '').replace(/^(?:55)?(\d{10,11})$/, '55$1')}?text=${encodeURIComponent(lead.customPitch)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      onClick={() => handleWhatsApp(lead)}
                       className="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-[11px] font-mono font-bold inline-flex items-center gap-1 transition-all cursor-pointer"
                       title={`Enviar mensagem no WhatsApp (${lead.phone})`}
                     >
                       <Send className="w-3 h-3" />
                       <span>WhatsApp</span>
-                    </a>
+                    </button>
                   </td>
                 </tr>
               ))}

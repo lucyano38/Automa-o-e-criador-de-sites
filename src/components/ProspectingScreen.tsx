@@ -139,6 +139,13 @@ export const ProspectingScreen: React.FC<ProspectingScreenProps> = ({
     if (!targetPhone) return;
 
     const whatsappUrl = formatWhatsAppLink(targetPhone, lead.customPitch);
+    if (!whatsappUrl) {
+      navigator.clipboard.writeText(lead.customPitch);
+      setCopiedPitchId(lead.id);
+      setTimeout(() => setCopiedPitchId(null), 3000);
+      alert(`Número fixo detectado (${lead.phone}). O WhatsApp exige número de celular. O pitch de vendas foi copiado automaticamente para a área de transferência!`);
+      return;
+    }
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 
