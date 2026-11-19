@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExternalLink, Sparkles, Check, Star, Zap, ShieldCheck } from 'lucide-react';
+import { ExternalLink, Sparkles, Check, Star, Zap, ShieldCheck, Tag } from 'lucide-react';
 
 export function ShopeeAffiliates() {
   const defaultAffiliateUrl = 'https://s.shopee.com.br/3qOJDFeali';
@@ -13,6 +13,7 @@ export function ShopeeAffiliates() {
       rating: 4.9,
       reviews: 1420,
       badge: 'MAIS VENDIDO',
+      category: 'Gadgets',
       affiliateUrl: defaultAffiliateUrl,
       images: [
         '/assets/aistudio/sg-11134301-7rdxp-mdbgafdnksu8e7_resize_w1920_nl_da083a10.webp',
@@ -28,6 +29,7 @@ export function ShopeeAffiliates() {
       rating: 4.8,
       reviews: 980,
       badge: 'ERGONOMIA',
+      category: 'Home Office',
       affiliateUrl: defaultAffiliateUrl,
       images: [
         'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80',
@@ -42,6 +44,7 @@ export function ShopeeAffiliates() {
       rating: 4.9,
       reviews: 830,
       badge: 'SAÚDE & FOCO',
+      category: 'Setup',
       affiliateUrl: defaultAffiliateUrl,
       images: [
         'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=800&q=80',
@@ -109,9 +112,15 @@ export function ShopeeAffiliates() {
                       loading="lazy"
                     />
 
-                    {/* Badge */}
-                    <div className="absolute top-2 left-2 bg-cyan-500 text-slate-950 font-extrabold text-[10px] px-2 py-0.5 rounded shadow">
-                      {product.badge}
+                    {/* Badge & Category Pill */}
+                    <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
+                      <span className="bg-cyan-500 text-slate-950 font-extrabold text-[10px] px-2 py-0.5 rounded shadow">
+                        {product.badge}
+                      </span>
+                      <span className="bg-slate-900/90 text-cyan-300 border border-cyan-500/30 font-mono text-[9px] px-2 py-0.5 rounded flex items-center gap-1 shadow">
+                        <Tag className="w-2.5 h-2.5" />
+                        {product.category}
+                      </span>
                     </div>
 
                     {/* Rating badge */}
