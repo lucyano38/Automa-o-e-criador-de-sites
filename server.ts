@@ -424,7 +424,7 @@ Retorne APENAS um JSON válido no seguinte formato:
 }`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+        model: 'gemini-4-hydrogen',
         contents: prompt,
         config: {
           responseMimeType: 'application/json'
@@ -530,7 +530,7 @@ Retorne APENAS um objeto JSON válido (sem markdown de código) com o seguinte e
 }`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+        model: 'gemini-4-hydrogen',
         contents: prompt,
         config: {
           responseMimeType: 'application/json'
@@ -617,7 +617,7 @@ Retorne APENAS um objeto JSON válido (sem tags markdown de código) com o segui
 }`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+        model: 'gemini-4-hydrogen',
         contents: prompt,
         config: { responseMimeType: 'application/json' }
       });
@@ -708,7 +708,7 @@ Retorne APENAS um objeto JSON válido (sem marcação de bloco de código) com o
 }`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+        model: 'gemini-4-hydrogen',
         contents: prompt,
         config: { responseMimeType: 'application/json' }
       });
@@ -993,7 +993,7 @@ Retorne APENAS um objeto JSON válido (sem marcadores de markdown \`\`\`json) co
       let responseText = '';
       try {
         const response = await ai.models.generateContent({
-          model: 'gemini-3.8-flash',
+          model: 'gemini-4-hydrogen',
           contents: prompt,
           config: { responseMimeType: 'application/json' }
         });
@@ -1547,149 +1547,286 @@ Retorne APENAS um objeto JSON válido (sem marcadores de markdown \`\`\`json) co
 
       const apiKey = process.env.GEMINI_API_KEY;
 
-      const systemContext = `Você é o Consultor e Assistente Oficial do ecossistema "Foco em Dados" (focoemdados.com.br).
-Sua missão primordial é responder com precisão cirúrgica a QUALQUER dúvida técnica ou comercial sobre o site, arquitetura de software, automações, estratégias de tráfego/prospecção e contratações.
+      const systemContext = `Você é o Consultor e Assistente Oficial do ecossistema "Foco em Dados" (focoemdados.com.br), sob comando de Luciano Tavares Silva.
+Sua missão primordial é responder de forma COMPLETA, detalhada e com precisão cirúrgica a QUALQUER dúvida técnica ou comercial sobre TODOS os serviços oferecidos, entregas, prazos, preços e contratações.
 
 === DIRETRIZ FUNDAMENTAL DE ATENDIMENTO ===
-- RESPONDA DIRETAMENTE À DÚVIDA DO CLIENTE! Você não é um mero redirecionador de cliques.
-- Se a pergunta for sobre serviços, preços ou tecnologias, use os detalhes do nosso catálogo abaixo com precisão técnica.
+- RESPONDA DIRETAMENTE E DE FORMA COMPLETA À DÚVIDA DO CLIENTE! Nunca omita serviços ou informações importantes.
+- Se o cliente perguntar sobre "serviços", "o que vocês fazem", "catálogo" ou "valores", liste TODOS os 6 serviços principais + o Combo Ecossistema Completo, explicando o que cada um inclui, prazos e valores exatos.
+- Sempre que mencionar ou responder sobre **Edição de Vídeo**, deixe absolutamente claro que o valor é **R$ 290,00 / mês (plano mensal que inclui a edição de até 5 vídeos por mês)**.
 - Se o cliente perguntar algo sobre o Foco em Dados, cite as propostas de valor (dados, faturamento, 24/7) de forma natural.
-- Seja honesto: se não souber a resposta, peça para falar com Luciano no WhatsApp em vez de inventar ou dar respostas genéricas.
-- Ao final de toda resposta, ofereça o próximo passo lógico: contratar via Stripe (site) ou falar no WhatsApp (customização).
+- Seja honesto: se não souber algo fora do escopo, peça para falar com Luciano no WhatsApp (11) 99441-1307 em vez de inventar.
+- Ao final de toda resposta, ofereça o próximo passo lógico: contratar via Stripe (direto no site) ou falar no WhatsApp (personalização).
 - Mantenha um tom profissional, técnico e orientado a resultados.
 
 === IDENTIDADE INSTITUCIONAL ===
-- Marca: Foco em Dados (focoemdados.com.br)
-- Proposta de Valor: Transformar dados brutos em máquinas de faturamento que rodam 24/7 através de inteligência analítica, prospecção B2B de alta precisão e automações no piloto automático.
+- Marca: Foco em Dados (focoemdados.com.br) — Luciano Tavares Silva
+- Proposta de Valor: Transformar dados brutos em máquinas de faturamento que rodam 24/7 através de websites de alta conversão, automações no piloto automático, criação de conteúdo/vídeos e inteligência analítica.
 - Portais oficiais ativos: focoemdados.com.br (Inteligência & Prospecção) e soscuidadores.com (Portal Nacional de Cuidadores).
 - Contatos de suporte: atendimento@focoemdados.com.br e lucyano.pci@gmail.com.
 - WhatsApp Direto: (11) 99441-1307.
 
-=== CATÁLOGO DE SERVIÇOS & PREÇOS (CONDIÇÕES PROMOCIONAIS DE ENTRADA) ===
+=== CATÁLOGO COMPLETO DE SERVIÇOS & PREÇOS (CONDIÇÕES PROMOCIONAIS DE ENTRADA) ===
 *Preços especiais de lançamento, cobrados abaixo do mercado para formação de portfólio e clientes parceiros, com pagamento 100% integrado via Stripe:*
 
 1. LANDING PAGE DE ALTA CONVERSÃO:
    - Preço de Mercado: R$ 1.500 a R$ 2.800
    - Preço Especial Foco em Dados: R$ 497,00 (ou em até 12x de R$ 49,90 via Stripe)
    - Prazo de Entrega: 3 a 5 dias úteis
-   - Diferenciais: Carregamento instantâneo (< 1s), layout exclusivo e responsivo para mobile, copywriting persuasivo, botão de WhatsApp flutuante pré-configurado, pixels instalados (Meta/Google Ads/Analytics) e certificado SSL.
+   - Diferenciais: Carregamento instantâneo (< 1s), layout exclusivo e 100% responsivo para mobile e desktop, copywriting persuasivo, botão de WhatsApp flutuante pré-configurado, pixels instalados (Meta Ads, Google Ads e Analytics), hospedagem veloz e certificado SSL.
 
 2. WEBSITE INSTITUCIONAL COMPLETO:
    - Preço de Mercado: R$ 2.400 a R$ 4.500
    - Preço Especial Foco em Dados: R$ 790,00 (ou em até 12x de R$ 79,00 via Stripe)
    - Prazo de Entrega: 7 a 12 dias úteis
-   - Diferenciais: Estrutura multi-páginas (Início, Quem Somos, Serviços, Portfólio, Localização, Contato), SEO local otimizado para ranqueamento regional no Google, formulário inteligente integrado ao WhatsApp/Telegram, painel de métricas.
+   - Diferenciais: Estrutura multi-páginas (Início, Quem Somos, Serviços, Portfólio, Localização, Contato), SEO local avançado para ranqueamento orgânico no Google, formulário inteligente integrado ao WhatsApp/Telegram e mapas interativos.
 
-3. AUTOMAÇÃO DE ATENDIMENTO 24H (WHATSAPP & TELEGRAM):
-   - Preço de Mercado: R$ 1.800 a R$ 3.800
-   - Preço Especial Foco em Dados: R$ 590,00 (taxa única de setup, SEM mensalidades abusivas de terceiros)
-   - Prazo de Entrega: 3 a 5 dias úteis
-   - Diferenciais: Resposta automática em menos de 5 segundos, envio de catálogo de produtos/serviços, qualificação inicial de leads, agendamento de reuniões/consultas 24/7 e transição fluida para atendimento humano.
-
-4. GESTÃO & POSTAGENS INSTAGRAM E FACEBOOK:
+3. POSTAGENS & GESTÃO INSTAGRAM E FACEBOOK:
    - Preço de Mercado: R$ 1.200 a R$ 2.500 / mês
-   - Preço Especial Foco em Dados: R$ 397,00 / mês (sem fidelidade contratual)
+   - Preço Especial Foco em Dados: R$ 397,00 / mês (sem fidelidade contratual abusiva)
    - Prazo: Início em até 48 horas
-   - Diferenciais: Criação de artes para Feed (1:1 e 4:5), Carrosséis explicativos e Stories, copywriting magnético para legendas com hashtags estratégicas, agendamento automatizado, bot de resposta em DM para comentários e relatório mensal de métricas.
+   - Diferenciais: Criação de artes profissionais para Feed (1:1 e 4:5), Carrosséis educativos e Stories, copywriting magnético para legendas com hashtags estratégicas, agendamento e postagem programada automática, robô de resposta em DM para envio de catálogo quando comentam e relatório mensal de métricas.
 
-5. EDIÇÃO PROFISSIONAL DE VÍDEO & REELS:
-   - Preço Especial Foco em Dados: R$ 290,00 (pacote inicial)
-   - Prazo: 2 a 4 dias úteis
-   - Diferenciais: Cortes rápidos sem silêncios (jump cuts), legendas dinâmicas palavra por palavra no estilo Hormozi / TikTok Pop, zooms de ênfase, formato 9:16 vertical e trilha sem royalties.
+4. AUTOMAÇÃO DE ATENDIMENTO 24H (WHATSAPP & TELEGRAM):
+   - Preço de Mercado: R$ 1.800 a R$ 3.800
+   - Preço Especial Foco em Dados: R$ 590,00 (taxa única de implementação, SEM mensalidades abusivas de terceiros)
+   - Prazo de Entrega: 3 a 5 dias úteis
+   - Diferenciais: Menu interativo com resposta automática em menos de 5 segundos, envio de catálogo de produtos/tabela de preços, qualificação inicial de leads, encaminhamento de notificações para Telegram/E-mail, agendamento automático de reuniões/consultas 24/7 e transição humanizada para atendimento manual preservando o histórico.
 
-6. COMBO ECOSSISTEMA COMPLETO (SUPER DESCONTO):
-   - Valor Promocional: R$ 1.190,00 (economiza mais de R$ 1.500)
-   - Inclui: Landing Page de Alta Conversão + Robô WhatsApp 24h + Gestão de Redes Sociais.
+5. EDIÇÃO PROFISSIONAL DE VÍDEO & REELS (PLANO MENSAL · ATÉ 5 VÍDEOS):
+   - Preço de Mercado: R$ 800 a R$ 1.800 / mês
+   - Preço Especial Foco em Dados: R$ 290,00 / mês — VALOR MENSAL PARA ATÉ 5 VÍDEOS POR MÊS
+   - Prazo de Entrega: 2 a 4 dias úteis por vídeo
+   - Diferenciais: Edição manual cuidadosa feita diretamente por Luciano Tavares Silva (Premiere Pro, CapCut Pro, DaVinci Resolve), corte preciso de pausas e silêncios (jump-cuts dinâmicos), legendas dinâmicas palavra por palavra no estilo Alex Hormozi / TikTok Pop, zooms de retenção a cada 3-5s, efeitos sonoros (swoosh/pop), trilha de fundo sem royalties e entrega em formato vertical 9:16 (Reels, Shorts e TikTok) pronta para publicação.
+
+6. ANÁLISE DE DADOS & DASHBOARDS VISUAIS (BI · ESPECIALIDADE FOCO EM DADOS):
+   - Preço de Mercado: R$ 1.900 a R$ 3.900
+   - Preço Especial Foco em Dados: R$ 690,00 (ou em até 12x no cartão via Stripe)
+   - Prazo de Entrega: 5 a 10 dias úteis
+   - Diferenciais: Dashboards visuais interativos em tempo real para acompanhamento de vendas, leads e KPIs, centralização de dados de múltiplos canais, alertas automatizados no Telegram/WhatsApp para variações de métricas, conexão com planilhas Google Sheets e bancos de dados SQL.
+
+7. COMBO ECOSSISTEMA COMPLETO (SUPER DESCONTO):
+   - Preço de Mercado: R$ 3.800,00
+   - Valor Promocional: R$ 1.190,00 (ou em até 12x via Stripe — economia de mais de R$ 2.600)
+   - Inclui: Landing Page de Alta Conversão + Robô de Atendimento WhatsApp 24h + Gestão e Postagens Instagram e Facebook.
+
+=== FERRAMENTAS ADICIONAIS DO ECOSSISTEMA ===
+- Prospecção Ativa B2B Georreferenciada (15km, Google Places + Receita Federal + auditoria de site/DNS + pitch pronto no WhatsApp).
+- Construtor de Sites por IA & CRM Pipeline integrado (área de membros).
 
 === PAGAMENTOS INTEGRADOS VIA STRIPE ===
 - Integração oficial com Stripe Checkout para segurança bancária máxima.
 - Formas aceitas: Cartão de Crédito em até 12x, PIX Instantâneo com confirmação em segundos e Boleto.
-- Recibo e nota emitidos automaticamente no ato da contratação.
+- Recibo e confirmação emitidos automaticamente no ato da contratação.
 
 === ARQUITETURA TÉCNICA (PARA DÚVIDAS TÉCNICAS) ===
 - Frontend: React 19, TypeScript, Tailwind CSS v4, Motion (animações de interface), Three.js (globo 3D interativo).
 - Backend: Node.js com Express e TypeScript, arquitetura RESTful.
-- IA: SDK oficial @google/genai com Gemini 3.8 Flash para geração de diagnósticos e conteúdo.
-- Banco de Dados & Sessão: Firebase Firestore e Firebase Auth com restrição de rotas privadas (/dashboard, /prospecting, /crm, /content, /data-analysis).
-- Prospecção Georreferenciada: Filtro de raio cirúrgico de 15km, varredura multi-fonte com Google Places, Receita Federal e auditoria DNS.
+- IA: SDK oficial @google/genai com Gemini 4 Hydrogen para atendimento, diagnósticos, roteiros e análise de dados.
+- Banco de Dados & Sessão: Firebase Firestore e Firebase Auth com restrição de rotas privadas (/dashboard, /prospecting, /crm, /content, /data-analysis, /site-builder, /vitrine).
 - Segurança: Criptografia SSL ponta a ponta, sem cookies intrusivos, 100% de conformidade com a LGPD.
 
 === DIRETRIZES DE FORMATAÇÃO ===
 - Escreva em Português do Brasil de forma elegante, clara, acolhedora e altamente profissional.
-- Use listas com tópicos (•) e negrito para destacar valores e especificações.`;
+- Use listas com tópicos (•) e **negrito** para destacar valores, limites (ex: até 5 vídeos/mês) e especificações.`;
 
       // Smart Fallback Generator for when Gemini API is unavailable or returns an error
       const buildSmartFallbackReply = (userQuery: string): string => {
-        const lower = (userQuery || '').toLowerCase();
-        if (lower.includes('preço') || lower.includes('valor') || lower.includes('custa') || lower.includes('quanto') || lower.includes('promo') || lower.includes('tabela')) {
-          return 'Nossos serviços estão em condições promocionais de entrada com valores abaixo da média de agências e contratação 100% segura via **Stripe**:\n\n' +
-            '• **Landing Page de Alta Conversão**: R$ 497,00 (ou em até 12x de R$ 49,90 via Stripe)\n' +
-            '• **Website Institucional Completo**: R$ 790,00 (ou em até 12x de R$ 79,00 via Stripe)\n' +
-            '• **Automação de WhatsApp & Telegram 24h**: R$ 590,00 (taxa única de setup, sem mensalidades)\n' +
-            '• **Gestão & Postagens Instagram e Facebook**: R$ 397,00/mês (sem fidelidade contratual)\n' +
-            '• **Edição Profissional de Vídeo / Reels**: R$ 290,00\n' +
-            '• **Combo Ecossistema Completo (Site + Bot + Redes)**: R$ 1.190,00\n\n' +
-            'Todos os pagamentos podem ser efetuados via **Cartão de Crédito em até 12x ou PIX** com emissão instantânea de recibo!';
+        const normalized = (userQuery || '')
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '');
+
+        if (
+          normalized.includes('video') ||
+          normalized.includes('edicao') ||
+          normalized.includes('editar') ||
+          normalized.includes('reels') ||
+          normalized.includes('tiktok') ||
+          normalized.includes('shorts') ||
+          normalized.includes('hormozi') ||
+          normalized.includes('legenda')
+        ) {
+          return 'Na **Edição Profissional de Vídeo & Reels** (**R$ 290,00/mês — plano mensal para até 5 vídeos por mês**):\n\n' +
+            '• **Volume Incluso**: O valor de **R$ 290,00 é mensal** e cobre a edição profissional de **até 5 vídeos por mês** (Reels, TikTok ou YouTube Shorts);\n' +
+            '• **Edição Manual Estratégica**: Realizada diretamente por Luciano Tavares Silva (Adobe Premiere Pro, CapCut Pro e DaVinci Resolve);\n' +
+            '• **Cortes Dinâmicos (Jump-Cuts)**: Remoção cirúrgica de pausas, respirações e silêncios mortos para retenção máxima;\n' +
+            '• **Legendas Estilo Hormozi / TikTok Pop**: Legendas dinâmicas palavra por palavra com destaque visual;\n' +
+            '• **Zooms & Sonorização**: Zooms de ênfase a cada 3 a 5 segundos, efeitos sonoros (swoosh/pop) e trilha de fundo sem royalties;\n' +
+            '• **Entrega Rápida**: Formato vertical 9:16 pronto para postar, com entrega em 2 a 4 dias úteis por vídeo.\n\n' +
+            'Você pode contratar o plano mensal agora mesmo via **Stripe** (Cartão ou PIX) ou tirar dúvidas no WhatsApp **(11) 99441-1307**!';
         }
-        if (lower.includes('tecnolog') || lower.includes('stack') || lower.includes('react') || lower.includes('vite') || lower.includes('tailwind') || lower.includes('código') || lower.includes('arquitetura')) {
+
+        if (
+          normalized.includes('dado') ||
+          normalized.includes('dashboard') ||
+          normalized.includes('painel') ||
+          normalized.includes('metrica') ||
+          normalized.includes('planilha') ||
+          normalized.includes('bi') ||
+          normalized.includes('kpi')
+        ) {
+          return 'Em **Análise de Dados & Dashboards Visuais (BI)** (**R$ 690,00** ou em até 12x no cartão via Stripe):\n\n' +
+            '• **Painéis em Tempo Real**: Acompanhamento visual de vendas, leads, faturamento e metas sem trabalho manual;\n' +
+            '• **Centralização Multicanal**: Unifica dados do seu site, WhatsApp, planilhas Google Sheets e bancos SQL em um único lugar;\n' +
+            '• **Alertas Automáticos**: Notificações no Telegram ou WhatsApp quando indicadores (KPIs) atingem metas ou variações importantes;\n' +
+            '• **Relatórios Gerenciais**: Insights claros de crescimento desenvolvidos com a especialidade **focoemdados.com.br**.\n\n' +
+            'Deseja contratar pelo **Stripe** ou personalizar um dashboard no WhatsApp **(11) 99441-1307**?';
+        }
+
+        if (
+          normalized.includes('combo') ||
+          normalized.includes('ecossistema')
+        ) {
+          return 'O **Combo Ecossistema Completo** reúne nossas 3 principais soluções com super desconto:\n\n' +
+            '• **Valor Promocional**: **R$ 1.190,00** (de R$ 3.800,00 — economia de mais de R$ 2.600,00, parcelável em até 12x via Stripe);\n' +
+            '• **Landing Page de Alta Conversão**: Design exclusivo, carregamento < 1s, pixels e botão WhatsApp;\n' +
+            '• **Automação de Atendimento 24h**: Robô no WhatsApp/Telegram respondendo e qualificando leads em 5 segundos;\n' +
+            '• **Gestão Instagram & Facebook**: Artes profissionais, carrosséis, legendas e agendamento automático.\n\n' +
+            'Você pode fechar diretamente no botão **Contratar Combo (Stripe)** aqui na página ou falar no WhatsApp **(11) 99441-1307**!';
+        }
+
+        if (
+          normalized.includes('landing') ||
+          normalized.includes('website') ||
+          normalized.includes('site') ||
+          normalized.includes('pagina')
+        ) {
+          return 'Oferecemos duas soluções principais de **Websites & Landing Pages** com carregamento ultrarrápido (< 1s):\n\n' +
+            '• **Landing Page de Alta Conversão — R$ 497,00** (ou até 12x de R$ 49,90 via Stripe · entrega em 3 a 5 dias úteis): Layout responsivo exclusivo, copywriting persuasivo, botão de WhatsApp flutuante, pixels (Meta/Google Ads/Analytics) e certificado SSL;\n' +
+            '• **Website Institucional Completo — R$ 790,00** (ou até 12x de R$ 79,00 via Stripe · entrega em 7 a 12 dias úteis): Múltiplas páginas (Início, Quem Somos, Serviços, Portfólio, Localização, Contato), SEO local para ranquear no Google, mapas interativos e formulário integrado ao WhatsApp/Telegram.\n\n' +
+            'Qual dos dois modelos faz mais sentido para o seu negócio? Você pode contratar direto via **Stripe** ou falar com Luciano no WhatsApp!';
+        }
+
+        if (
+          normalized.includes('preco') ||
+          normalized.includes('valor') ||
+          normalized.includes('custa') ||
+          normalized.includes('quanto') ||
+          normalized.includes('promo') ||
+          normalized.includes('tabela') ||
+          normalized.includes('investimento')
+        ) {
+          return 'Todos os nossos serviços estão em condições promocionais com contratação 100% segura via **Stripe** (Cartão até 12x, PIX ou Boleto):\n\n' +
+            '• **Landing Page de Alta Conversão**: **R$ 497,00** (ou até 12x de R$ 49,90)\n' +
+            '• **Website Institucional Completo**: **R$ 790,00** (ou até 12x de R$ 79,00)\n' +
+            '• **Postagens & Gestão Instagram e Facebook**: **R$ 397,00/mês** (sem fidelidade contratual)\n' +
+            '• **Automação de Atendimento 24h (WhatsApp & Telegram)**: **R$ 590,00** (taxa única de implementação, sem mensalidades)\n' +
+            '• **Edição Profissional de Vídeo & Reels**: **R$ 290,00/mês** (**plano mensal para até 5 vídeos por mês**)\n' +
+            '• **Análise de Dados & Dashboards Visuais (BI)**: **R$ 690,00** (ou até 12x)\n' +
+            '• **Combo Ecossistema Completo (Landing Page + Bot 24h + Redes Sociais)**: **R$ 1.190,00**\n\n' +
+            'Se quiser detalhes de qualquer um desses serviços ou contratar agora, basta me perguntar ou clicar em **Ver Preços (Stripe)**!';
+        }
+
+        if (
+          normalized.includes('tecnolog') ||
+          normalized.includes('stack') ||
+          normalized.includes('react') ||
+          normalized.includes('vite') ||
+          normalized.includes('tailwind') ||
+          normalized.includes('codigo') ||
+          normalized.includes('arquitetura')
+        ) {
           return 'A arquitetura técnica do **Foco em Dados** foi desenhada para máxima velocidade e confiabilidade:\n\n' +
-            '• **Frontend**: React 19, TypeScript e Tailwind CSS v4 (carregamento instantâneo inferior a 1s)\n' +
-            '• **Backend**: Node.js com Express e TypeScript em arquitetura RESTful\n' +
-            '• **Inteligência Artificial**: SDK oficial `@google/genai` com Gemini 3.8 Flash para diagnóstico e geração de copy\n' +
-            '• **Automações**: Webhooks e APIs oficiais do WhatsApp Business e Telegram\n' +
-            '• **Pagamentos**: Stripe SDK oficial com checkout transparente (Cartão até 12x e PIX)\n' +
-            '• **Segurança**: Criptografia SSL/TLS e total conformidade com a LGPD.';
+            '• **Frontend**: React 19, TypeScript e Tailwind CSS v4 (carregamento instantâneo inferior a 1s);\n' +
+            '• **Backend**: Node.js com Express e TypeScript em arquitetura RESTful;\n' +
+            '• **Inteligência Artificial**: SDK oficial `@google/genai` com Gemini 4 Hydrogen para atendimento, diagnósticos, roteiros e análise de dados;\n' +
+            '• **Edição de Vídeo**: Fluxo profissional em Adobe Premiere Pro, CapCut Pro e DaVinci Resolve;\n' +
+            '• **Automações**: Webhooks, N8N, WhatsApp Business API e Telegram Bot API;\n' +
+            '• **Pagamentos & Segurança**: Stripe Checkout oficial, Firebase Firestore/Auth, criptografia SSL/TLS e conformidade LGPD.';
         }
-        if (lower.includes('stripe') || lower.includes('cartão') || lower.includes('pix') || lower.includes('pagamento') || lower.includes('parcela')) {
-          return 'Todos os pagamentos do Foco em Dados são processados com segurança bancária pelo **Stripe**:\n\n' +
-            '• **Cartão de Crédito em até 12x**\n' +
-            '• **PIX Instantâneo** com confirmação imediata\n' +
-            '• **Boleto Bancário**\n\n' +
-            'O recibo é gerado no ato e o desenvolvimento do seu projeto começa imediatamente após a compensação.';
+
+        if (
+          normalized.includes('stripe') ||
+          normalized.includes('cartao') ||
+          normalized.includes('pix') ||
+          normalized.includes('pagamento') ||
+          normalized.includes('parcela') ||
+          normalized.includes('contratar')
+        ) {
+          return 'Todos os pagamentos do **Foco em Dados** são processados com segurança bancária oficial pelo **Stripe**:\n\n' +
+            '• **Cartão de Crédito em até 12x**;\n' +
+            '• **PIX Instantâneo** com confirmação em segundos;\n' +
+            '• **Boleto Bancário**.\n\n' +
+            'O recibo é gerado automaticamente no ato e o alinhamento técnico do seu projeto inicia imediatamente com Luciano Tavares Silva!';
         }
-        if (lower.includes('whatsapp') || lower.includes('bot') || lower.includes('autom') || lower.includes('telegram')) {
-          return 'A **Automação de Atendimento 24h no WhatsApp & Telegram**:\n\n' +
-            '• Responde clientes em menos de 5 segundos com menu interativo;\n' +
-            '• Envia catálogos de produtos e tabela de preços em PDF ou texto;\n' +
-            '• Qualifica orçamentos e agenda reuniões ou consultas 24h por dia;\n' +
-            '• Transição humanizada para atendimento manual quando necessário preservando o histórico;\n' +
-            '• **Sem mensalidades de terceiros**: taxa única de implementação de R$ 590,00!';
+
+        if (
+          normalized.includes('whatsapp') ||
+          normalized.includes('bot') ||
+          normalized.includes('autom') ||
+          normalized.includes('telegram')
+        ) {
+          return 'Na **Automação de Atendimento 24h (WhatsApp & Telegram)** (**R$ 590,00 — taxa única, sem mensalidades**):\n\n' +
+            '• **Resposta em < 5 segundos**: Menu interativo funcionando 24 horas por dia;\n' +
+            '• **Catálogo & Orçamentos**: Envia tabela de preços, catálogo em PDF e qualifica o perfil do cliente;\n' +
+            '• **Agendamento Automático**: Marca reuniões ou consultas e notifica sua equipe no Telegram/E-mail;\n' +
+            '• **Transição Humanizada**: Quando o cliente precisa falar com um humano, o histórico vai completo para você;\n' +
+            '• **Prazo de Entrega**: Implementação completa em 3 a 5 dias úteis.';
         }
-        if (lower.includes('instagram') || lower.includes('facebook') || lower.includes('post') || lower.includes('rede') || lower.includes('social')) {
-          return 'Na **Gestão & Postagens para Instagram e Facebook** (R$ 397,00/mês):\n\n' +
-            '• Criamos artes profissionais para Feed (1:1 e 4:5), Carrosséis explicativos e Stories;\n' +
-            '• Escrevemos legendas persuasivas com ganchos de retenção e hashtags do seu nicho;\n' +
-            '• Agendamos todas as publicações com antecedência;\n' +
-            '• Configuramos robô para envio de catálogo por Direct quando comentam no post;\n' +
-            '• Relatório mensal com métricas de alcance e novos contatos.';
+
+        if (
+          normalized.includes('instagram') ||
+          normalized.includes('facebook') ||
+          normalized.includes('post') ||
+          normalized.includes('rede') ||
+          normalized.includes('social')
+        ) {
+          return 'Na **Gestão & Postagens para Instagram e Facebook** (**R$ 397,00/mês**, sem fidelidade contratual):\n\n' +
+            '• **Criação Visual Completa**: Artes profissionais para Feed (1:1 e 4:5), Carrosséis educativos e Stories;\n' +
+            '• **Copywriting & Hashtags**: Legendas magnéticas com ganchos de retenção e chamadas para ação;\n' +
+            '• **Agendamento Automático**: Publicações programadas no Instagram e Facebook sem você precisar postar manualmente;\n' +
+            '• **Robô de Direct (DM)**: Envio automático de catálogo ou link quando alguém comenta no seu post;\n' +
+            '• **Relatório Mensal**: Métricas de alcance, engajamento e novos contatos (início em até 48h).';
         }
-        if (lower.includes('prazo') || lower.includes('tempo') || lower.includes('entrega') || lower.includes('demora')) {
+
+        if (
+          normalized.includes('prazo') ||
+          normalized.includes('tempo') ||
+          normalized.includes('entrega') ||
+          normalized.includes('demora')
+        ) {
           return 'Nossos prazos de entrega técnica são rigorosos e transparentes:\n\n' +
+            '• **Edição Profissional de Vídeos & Reels (até 5 vídeos/mês)**: 2 a 4 dias úteis por vídeo;\n' +
+            '• **Gestão de Instagram & Facebook**: Início das publicações em até 48 horas;\n' +
             '• **Landing Page de Alta Conversão**: 3 a 5 dias úteis;\n' +
-            '• **Automação de WhatsApp/Telegram**: 3 a 5 dias úteis;\n' +
-            '• **Website Institucional Completo**: 7 a 12 dias úteis;\n' +
-            '• **Gestão de Redes Sociais**: Início das primeiras publicações em até 48 horas.';
+            '• **Automação de WhatsApp/Telegram 24h**: 3 a 5 dias úteis;\n' +
+            '• **Análise de Dados & Dashboards (BI)**: 5 a 10 dias úteis;\n' +
+            '• **Website Institucional Completo**: 7 a 12 dias úteis.';
         }
-        if (lower.includes('prospec') || lower.includes('lead') || lower.includes('cnae') || lower.includes('raio') || lower.includes('15km')) {
+
+        if (
+          normalized.includes('prospec') ||
+          normalized.includes('lead') ||
+          normalized.includes('cnae') ||
+          normalized.includes('raio') ||
+          normalized.includes('15km')
+        ) {
           return 'O módulo de **Prospecção Ativa B2B** do Foco em Dados realiza uma varredura multi-fonte georreferenciada:\n\n' +
             '• Mapeia empresas locais num raio cirúrgico de até 15km da sua localização;\n' +
             '• Consulta bases públicas oficiais (Google Places, Receita Federal, DNS/Whois);\n' +
             '• Identifica se a empresa possui site ativo ou se precisa de modernização urgente;\n' +
             '• Calcula a perda financeira mensal estimada em faturamento por falta de presença web;\n' +
-            '• Gera proposta pronta (pitch) com botão de envio direto no WhatsApp do cliente prospectado!';
+            '• Gera proposta pronta (pitch) com botão de envio direto para celulares no WhatsApp!';
         }
-        return 'O **Foco em Dados** (focoemdados.com.br) estrutura o ecossistema digital do seu negócio com foco em escala 24/7:\n\n' +
-          '1. **Websites & Landing Pages** ultrarrápidos (< 1s) para converter tráfego em clientes;\n' +
-          '2. **Automação no WhatsApp e Telegram** para atender em 5 segundos sem você precisar ficar no celular;\n' +
-          '3. **Gestão de Redes Sociais** (Instagram e Facebook) com artes e copy magnética;\n' +
-          '4. **Prospecção B2B Ativa** no raio de 15km com alimentação direta de pipeline no CRM.\n\n' +
-          'Todos os serviços possuem pagamento facilitado pelo Stripe em até 12x ou PIX. Se desejar saber mais sobre algum serviço específico, basta me perguntar!';
+
+        return 'O **Foco em Dados** (focoemdados.com.br) oferece um catálogo completo para escalar a presença digital e as vendas do seu negócio:\n\n' +
+          '• **Landing Page de Alta Conversão**: **R$ 497,00** (design exclusivo, carregamento < 1s, WhatsApp e pixels);\n' +
+          '• **Website Institucional Completo**: **R$ 790,00** (multi-páginas, SEO local no Google e formulários integrados);\n' +
+          '• **Postagens & Gestão Instagram/Facebook**: **R$ 397,00/mês** (artes, carrosséis, copy, agendamento e robô de DM);\n' +
+          '• **Automação WhatsApp & Telegram 24h**: **R$ 590,00** (taxa única sem mensalidades, atendimento em 5s);\n' +
+          '• **Edição Profissional de Vídeos & Reels**: **R$ 290,00/mês** (**plano mensal para até 5 vídeos por mês**, cortes dinâmicos e legendas estilo Hormozi);\n' +
+          '• **Análise de Dados & Dashboards (BI)**: **R$ 690,00** (painéis em tempo real e alertas de KPIs);\n' +
+          '• **Combo Ecossistema Completo**: **R$ 1.190,00** (Landing Page + Bot WhatsApp 24h + Gestão de Redes).\n\n' +
+          'Todos os serviços possuem contratação segura via **Stripe** (em até 12x ou PIX) ou atendimento personalizado pelo WhatsApp **(11) 99441-1307**. Sobre qual serviço você quer mais detalhes?';
       };
 
       let aiReply = '';
+      let usedGemini = false;
 
       if (apiKey && apiKey !== 'MY_GEMINI_API_KEY') {
-          const ai = new GoogleGenAI({ 
+        try {
+          const ai = new GoogleGenAI({
             apiKey,
             httpOptions: {
               headers: {
@@ -1698,24 +1835,45 @@ Sua missão primordial é responder com precisão cirúrgica a QUALQUER dúvida 
             }
           });
 
-          // Gemini API temporarily disabled due to project access restriction.
-          // Falling back to intelligent system-contextual response.
-          console.log('Gemini API call skipped in /api/site-chat: Temporarily disabled');
-      }
+          const formattedHistory = Array.isArray(conversationHistory)
+            ? conversationHistory
+                .filter((m: any) => m && typeof m.text === 'string' && m.text.trim())
+                .slice(-8)
+                .map((m: any) => `${m.sender === 'user' ? 'Cliente' : 'Assistente'}: ${m.text}`)
+                .join('\n')
+            : '';
 
+          const fullPrompt = formattedHistory
+            ? `Histórico recente da conversa:\n${formattedHistory}\n\nNova pergunta do cliente: ${message}`
+            : message;
+
+          const response = await ai.models.generateContent({
+            model: 'gemini-4-hydrogen',
+            contents: fullPrompt,
+            config: {
+              systemInstruction: systemContext
+            }
+          });
+
+          if (response.text && response.text.trim()) {
+            aiReply = response.text.trim();
+            usedGemini = true;
+          }
+        } catch (geminiErr: any) {
+          console.warn('[Site Chat] Gemini API fallback triggered:', geminiErr?.message || geminiErr);
+        }
+      }
 
       // If Gemini didn't return text or there's no API key, use the comprehensive smart fallback
       if (!aiReply) {
         aiReply = buildSmartFallbackReply(message);
       }
 
-      return res.json({ reply: aiReply, source: apiKey ? 'gemini' : 'smart_fallback' });
+      return res.json({ reply: aiReply, source: usedGemini ? 'gemini' : 'smart_fallback' });
     } catch (err: any) {
       console.error('Site chat unhandled error:', err);
-      // Even on unhandled error, provide an intelligent answer instead of an error message
-      const fallbackMsg = (req.body && req.body.message) || '';
       return res.json({ 
-        reply: 'O **Foco em Dados** (focoemdados.com.br) desenvolve Websites de Alta Conversão (R$ 497), Automação de WhatsApp 24h (R$ 590 taxa única) e Gestão de Redes Sociais (R$ 397/mês), todos com pagamento seguro integrado em até 12x ou PIX via **Stripe**!',
+        reply: 'O **Foco em Dados** (focoemdados.com.br) oferece Websites e Landing Pages (a partir de R$ 497), Automação de WhatsApp 24h (R$ 590 taxa única), Gestão de Redes Sociais (R$ 397/mês), Edição Profissional de Vídeos (R$ 290/mês para até 5 vídeos) e Dashboards de BI (R$ 690), todos com pagamento seguro em até 12x ou PIX via **Stripe**!',
         source: 'emergency_fallback' 
       });
     }

@@ -28,17 +28,17 @@ const INITIAL_MESSAGES: ChatMessage[] = [
   {
     id: 'welcome-1',
     sender: 'ai',
-    text: 'Olá! Sou o Assistente Oficial do **Foco em Dados** (focoemdados.com.br). Posso responder a qualquer dúvida técnica ou comercial sobre nossos serviços de websites, automação de WhatsApp 24h, gestão de redes sociais, preços promocionais e pagamentos integrados via Stripe. Como posso te ajudar agora?',
+    text: 'Olá! Sou o Assistente Oficial do **Foco em Dados** (focoemdados.com.br). Posso responder qualquer dúvida sobre todos os nossos serviços: **Websites e Landing Pages**, **Automação de WhatsApp/Telegram 24h**, **Gestão de Instagram/Facebook**, **Edição Profissional de Vídeos (plano mensal para até 5 vídeos)**, **Dashboards & BI**, preços e pagamento via Stripe. Como posso te ajudar?',
     time: 'Agora'
   }
 ];
 
 const SUGGESTED_QUESTIONS = [
+  'Quais serviços vocês oferecem e valores?',
+  'Como funciona a edição de vídeo mensal?',
   'Quanto custa uma Landing Page ou Website?',
   'Como funciona a automação de WhatsApp 24h?',
-  'Quais as formas de pagamento via Stripe?',
-  'Qual a stack técnica utilizada?',
-  'Qual o prazo médio de entrega?'
+  'Quais as formas de pagamento via Stripe?'
 ];
 
 export const IntegratedSiteChatbot: React.FC<IntegratedSiteChatbotProps> = ({
@@ -92,9 +92,12 @@ export const IntegratedSiteChatbot: React.FC<IntegratedSiteChatbotProps> = ({
       const replyText = data?.reply || (
         'O **Foco em Dados** (focoemdados.com.br) oferece soluções completas de Presença Digital e Automação B2B:\n\n' +
         '• **Landing Page de Alta Conversão**: R$ 497,00 (ou até 12x via Stripe)\n' +
-        '• **Website Institucional**: R$ 790,00\n' +
-        '• **Automação de WhatsApp 24h**: R$ 590,00 (taxa única de setup)\n' +
-        '• **Gestão de Redes Sociais**: R$ 397,00/mês\n\n' +
+        '• **Website Institucional Completo**: R$ 790,00 (ou até 12x via Stripe)\n' +
+        '• **Automação de WhatsApp & Telegram 24h**: R$ 590,00 (taxa única de setup)\n' +
+        '• **Gestão & Postagens Instagram e Facebook**: R$ 397,00/mês\n' +
+        '• **Edição Profissional de Vídeo & Reels**: R$ 290,00/mês (plano mensal para até 5 vídeos)\n' +
+        '• **Análise de Dados & Dashboards (BI)**: R$ 690,00\n' +
+        '• **Combo Ecossistema Completo**: R$ 1.190,00\n\n' +
         'Você pode contratar com segurança pelo Stripe ou tirar dúvidas específicas diretamente aqui no chat!'
       );
 
@@ -111,7 +114,14 @@ export const IntegratedSiteChatbot: React.FC<IntegratedSiteChatbotProps> = ({
       const fallbackReply: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
-        text: 'O **Foco em Dados** (focoemdados.com.br) desenvolve Websites e Landing Pages ultrarrápidas, Automação de WhatsApp 24h e Gestão de Redes Sociais com preços promocionais de entrada e pagamento 100% seguro em até 12x ou PIX via **Stripe**!',
+        text: 'O **Foco em Dados** (focoemdados.com.br) oferece:\n\n' +
+          '• **Landing Page de Alta Conversão**: R$ 497,00\n' +
+          '• **Website Institucional Completo**: R$ 790,00\n' +
+          '• **Automação de WhatsApp 24h**: R$ 590,00 (taxa única)\n' +
+          '• **Gestão Instagram & Facebook**: R$ 397,00/mês\n' +
+          '• **Edição Profissional de Vídeos & Reels**: R$ 290,00/mês (para até 5 vídeos mensais)\n' +
+          '• **Análise de Dados & Dashboards (BI)**: R$ 690,00\n\n' +
+          'Todos os serviços contam com pagamento seguro em até 12x ou PIX via **Stripe**!',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, fallbackReply]);
@@ -124,8 +134,9 @@ export const IntegratedSiteChatbot: React.FC<IntegratedSiteChatbotProps> = ({
   const renderFormattedText = (rawText: string) => {
     const lines = rawText.split('\n');
     return lines.map((line, lIdx) => {
-      // Process bold markers **text**
-      const parts = line.split(/(\*\*.*?\*\*)/g);
+      const isBullet = line.trim().startsWith('•') || line.trim().startsWith('-');
+      const cleanLine = isBullet ? line.replace(/^[\s•-]+/, '').trim() : line;
+      const parts = cleanLine.split(/(\*\*.*?\*\*)/g);
       const formattedParts = parts.map((part, pIdx) => {
         if (part.startsWith('**') && part.endsWith('**')) {
           return <strong key={pIdx} className="text-white font-bold">{part.slice(2, -2)}</strong>;
@@ -133,13 +144,10 @@ export const IntegratedSiteChatbot: React.FC<IntegratedSiteChatbotProps> = ({
         return part;
       });
 
-      const isBullet = line.trim().startsWith('•') || line.trim().startsWith('-');
-      const cleanLine = isBullet ? line.replace(/^[\s•-]+/, '').trim() : line;
-
       if (isBullet) {
         return (
           <div key={lIdx} className="flex items-start gap-1.5 my-0.5 text-slate-200">
-            <span className="text-cyan-400 mt-1 select-none font-bold text-xs">•</span>
+            <span className="text-cyan-400 mt-0.5 select-none font-bold text-xs">•</span>
             <span className="flex-1">{formattedParts}</span>
           </div>
         );

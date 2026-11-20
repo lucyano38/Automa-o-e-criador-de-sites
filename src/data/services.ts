@@ -69,9 +69,10 @@ export const SERVICES_DATA: Service[] = [
     id: 'edicao-videos-reels-profissional',
     icon: 'Video',
     title: 'Edição Profissional de Vídeos & Reels',
-    subtitle: 'Edição Manual Estratégica Realizada por Luciano Tavares',
-    description: 'Transformação das suas gravações brutas em vídeos magnéticos com cortes precisos de pausas, legendas dinâmicas palavra por palavra, auto zoom e efeitos de retenção máxima para Reels, Shorts e TikTok.',
+    subtitle: 'Plano Mensal (R$ 290/mês) para Até 5 Vídeos · Edição por Luciano Tavares',
+    description: 'Plano mensal de R$ 290,00/mês com edição profissional para até 5 vídeos por mês. Transformação das suas gravações brutas em vídeos magnéticos com cortes precisos de pausas, legendas dinâmicas palavra por palavra, auto zoom e efeitos de retenção máxima para Reels, Shorts e TikTok.',
     deliverables: [
+      'Plano mensal para até 5 vídeos editados por mês (R$ 290,00/mês)',
       'Edição manual cuidadosa feita diretamente por Luciano Tavares',
       'Remoção cirúrgica de pausas, vícios de fala e silêncios mortos (jump-cuts)',
       'Legendas dinâmicas palavra por palavra no estilo Alex Hormozi (amarelo/verde/branco)',

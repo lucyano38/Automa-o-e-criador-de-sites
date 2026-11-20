@@ -187,22 +187,23 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
       id: 'edicao-videos-profissional',
       category: 'video',
       title: 'EDIÇÃO PROFISSIONAL DE VÍDEO & REELS',
-      badge: 'Edição Cuidadosa de Alta Retenção',
+      badge: 'Plano Mensal · Até 5 Vídeos/mês',
       icon: Video,
       accentColor: 'border-amber-500/30 hover:border-amber-400',
       badgeBg: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
-      description: 'Transforme gravações brutas em vídeos magnéticos com cortes precisos de silêncios, legendas dinâmicas palavra por palavra no estilo Hormozi e zooms de retenção máxima.',
+      description: 'Plano mensal para edição de até 5 vídeos por mês. Transforme gravações brutas em vídeos magnéticos com cortes precisos de silêncios, legendas dinâmicas palavra por palavra no estilo Hormozi e zooms de retenção máxima.',
       deliverables: [
+        'Plano mensal incluindo a edição de até 5 vídeos por mês (Reels, Shorts ou TikTok)',
         'Edição manual cuidadosa feita diretamente por Luciano Tavares Silva',
         'Corte preciso de pausas, respirações e silêncios (jump-cuts dinâmicos)',
         'Legendas dinâmicas palavra por palavra no estilo Hormozi / TikTok Pop',
         'Zooms dinâmicos, efeitos sonoros (swoosh/pop) e trilha de fundo sem royalties',
         'Entrega rápida em formato 9:16 (Reels/Shorts/TikTok) pronta para publicação'
       ],
-      technologies: ['Adobe Premiere Pro', 'CapCut Pro', 'DaVinci Resolve', 'Edição Manual'],
-      marketPrice: 'R$ 800 a R$ 1.800',
-      promotionalPrice: 'R$ 290,00',
-      installmentText: 'pacote inicial de vídeos promocional',
+      technologies: ['Adobe Premiere Pro', 'CapCut Pro', 'DaVinci Resolve', 'Até 5 Vídeos/mês'],
+      marketPrice: 'R$ 800 a R$ 1.800 / mês',
+      promotionalPrice: 'R$ 290,00 / mês',
+      installmentText: 'valor mensal para até 5 vídeos',
       priceInCents: 29000,
       popular: false
     },
@@ -601,6 +602,7 @@ export const ServicePricingBlocks: React.FC<ServicePricingBlocksProps> = ({ onOp
                       <div className="text-right space-y-0.5">
                         <div className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider">Nosso valor</div>
                         <div className="text-lg font-mono font-extrabold text-cyan-300">{item.promotionalPrice}</div>
+                        <div className="text-[10px] font-mono text-slate-400">{item.installmentText}</div>
                       </div>
                     </div>
 

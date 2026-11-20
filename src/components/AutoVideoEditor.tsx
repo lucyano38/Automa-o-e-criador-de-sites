@@ -765,7 +765,7 @@ export const AutoVideoEditor: React.FC<AutoVideoEditorProps> = ({
                     Quer Seus Vídeos Editados no Piloto Automático?
                   </h4>
                   <p className="text-slate-300 text-xs leading-relaxed">
-                    Produzimos e editamos pacotes completos de Reels, TikToks e VSLs prontos para postar e converter clientes todos os dias.
+                    Plano mensal por apenas <strong>R$ 290,00/mês</strong> com edição profissional para <strong>até 5 vídeos por mês</strong> (Reels, TikToks e Shorts) prontos para postar e converter clientes todos os dias.
                   </p>
                 </div>
 
@@ -790,11 +790,11 @@ export const AutoVideoEditor: React.FC<AutoVideoEditorProps> = ({
 
                 {/* Direct WhatsApp Call to Action */}
                 <button
-                  onClick={() => onOpenWhatsAppWithMessage(`Olá Luciano! Gostei da ferramenta de Edição Automática de Vídeos e quero solicitar um pacote mensal de edição de Reels/TikTok para o meu negócio.`)}
+                  onClick={() => onOpenWhatsAppWithMessage(`Olá Luciano! Gostei da ferramenta de Edição Automática de Vídeos e quero contratar o plano mensal de edição de vídeos (R$ 290,00/mês para até 5 vídeos).`)}
                   className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-full font-black text-xs bg-emerald-400 hover:bg-emerald-300 text-slate-950 transition-all shadow-xl shadow-emerald-500/20 cursor-pointer uppercase tracking-wider"
                 >
                   <MessageSquare className="w-4 h-4 fill-slate-950" />
-                  <span>Contratar Pacote de Vídeos com Luciano</span>
+                  <span>Contratar Plano Mensal (Até 5 Vídeos · R$ 290/mês)</span>
                 </button>
 
               </div>
