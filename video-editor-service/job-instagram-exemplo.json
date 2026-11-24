@@ -1,0 +1,55 @@
+{
+  "input": "storage/uploads/seu_video.mp4",
+  "output": {
+    "file": "storage/outputs/video-instagram.mp4",
+    "preset": "instagram_reels",
+    "fit": "blur"
+  },
+  "autoCut": {
+    "silence": true,
+    "noiseDb": -30,
+    "minDuration": 0.4
+  },
+  "topicBanners": {
+    "enabled": true,
+    "language": "pt",
+    "username": "@seu.perfil",
+    "position": "top",
+    "hook": true,
+    "highlights": true,
+    "cta": true,
+    "lowerThird": false,
+    "quotes": true,
+    "dividers": false,
+    "maxHighlights": 4,
+    "maxQuotes": 2
+  },
+  "captions": {
+    "enabled": true,
+    "fontSize": 64,
+    "color": "#FFFFFF",
+    "marginV": 120
+  },
+  "effects": {
+    "zoom": true,
+    "zoomMax": 1.06,
+    "color": true,
+    "grade": "cinematic",
+    "audioNormalize": true,
+    "sharpen": true,
+    "vignette": true,
+    "cinemaBar": true
+  },
+  "progressBar": {
+    "enabled": true,
+    "position": "bottom",
+    "color": "#fcb045"
+  },
+  "professionalBanner": {
+    "title": "COMO EDITAR VÍDEOS RÁPIDO",
+    "subtitle": "Dica que ninguém te conta!",
+    "username": "@seu.perfil",
+    "theme": "instagram_gradient",
+    "position": "top"
+  }
+}

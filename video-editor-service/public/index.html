@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de Vídeo Profissional para Instagram</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(22, 27, 46, 0.75);
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --ig-pink: #e1306c;
+      --ig-orange: #fd1d1d;
+      --ig-yellow: #f56040;
+      --ig-purple: #833ab4;
+      --ig-grad: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      --accent: #38bdf8;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 32px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-image: radial-gradient(circle at 20% 20%, rgba(225, 48, 108, 0.12) 0%, transparent 40%),
+                        radial-gradient(circle at 80% 80%, rgba(56, 189, 248, 0.1) 0%, transparent 40%);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 900;
+      background: var(--ig-grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-title span.badge {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: var(--ig-grad);
+      color: #fff;
+    }
+
+    /* Upload Zone */
+    .upload-zone {
+      border: 2px dashed rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 32px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: rgba(0,0,0,0.2);
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--ig-pink);
+      background: rgba(225, 48, 108, 0.05);
+    }
+
+    .upload-zone svg {
+      width: 48px;
+      height: 48px;
+      fill: var(--ig-pink);
+      margin-bottom: 12px;
+    }
+
+    /* Grid Layouts */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #cbd5e1;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus, select:focus {
+      border-color: var(--ig-pink);
+    }
+
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--ig-pink);
+      cursor: pointer;
+    }
+
+    /* Banner Live Preview */
+    .banner-preview-box {
+      margin-top: 16px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #000;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .banner-preview-box svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Action Button */
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      background: var(--ig-grad);
+      color: #fff;
+      font-size: 1.15rem;
+      font-weight: 800;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(225, 48, 108, 0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(225, 48, 108, 0.6);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Progress & Results */
+    .progress-box {
+      display: none;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .progress-bar-wrap {
+      width: 100%;
+      height: 12px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    .progress-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: var(--ig-grad);
+      transition: width 0.3s;
+    }
+
+    .result-box {
+      display: none;
+      margin-top: 24px;
+      text-align: center;
+    }
+
+    video {
+      width: 100%;
+      max-width: 380px;
+      border-radius: 12px;
+      margin-top: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+    }
+
+    .btn-download {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 12px 28px;
+      background: var(--success);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Editor de Vídeo Profissional</h1>
+    <p>Cortes automáticos de silêncio, banners estilizados e presets otimizados para Instagram</p>
+  </header>
+
+  <!-- 1. Upload do Vídeo -->
+  <div class="card">
+    <div class="card-title">
+      1. Selecione seu Vídeo
+    </div>
+    <div class="upload-zone" id="uploadZone">
+      <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+      <p id="uploadText">Arraste seu vídeo aqui ou clique para selecionar (.mp4, .mov, .webm)</p>
+      <input type="file" id="fileInput" accept="video/*" style="display: none;">
+    </div>
+    <div id="fileInfo" style="margin-top: 10px; font-size: 0.9rem; color: var(--accent); display: none;"></div>
+  </div>
+
+  <!-- 2. Formato Instagram -->
+  <div class="card">
+    <div class="card-title">
+      2. Formato & Enquadramento
+      <span class="badge">Instagram</span>
+    </div>
+    <div class="form-grid">
+      <div>
+        <label for="presetSelect">Formato de Postagem</label>
+        <select id="presetSelect">
+          <option value="instagram_reels">Instagram Reels / Stories (9:16 vertical)</option>
+          <option value="instagram_feed_portrait">Instagram Feed Retrato (4:5)</option>
+          <option value="instagram_feed_square">Instagram Feed Quadrado (1:1)</option>
+          <option value="horizontal_16_9">YouTube Horizontal (16:9)</option>
+        </select>
+      </div>
+      <div>
+        <label for="fitSelect">Enquadramento do Vídeo</label>
+        <select id="fitSelect">
+          <option value="blur">Fundo Desfocado Profissional (Blur)</option>
+          <option value="crop">Preencher Tela Inteira (Crop)</option>
+          <option value="pad">Manter Proporção com Barras Pretas (Pad)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Cortes Automáticos -->
+  <div class="card">
+    <div class="card-title">
+      3. Cortes Automáticos
+      <span class="badge">IA / Áudio</span>
+    </div>
+    <div class="toggle-group">
+      <input type="checkbox" id="autoSilence" checked>
+      <label for="autoSilence" style="margin: 0; cursor: pointer;">
+        Remover silêncios e pausas automaticamente (Jump Cut dinâmico para Reels)
+      </label>
+    </div>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px; margin-left: 32px;">
+      Elimina automaticamente momentos de hesitação e pausas sem fala, aumentando a retenção do público.
+    </p>
+
+    <div class="toggle-group" style="margin-top: 16px;">
+      <input type="checkbox" id="progressBar">
+      <label for="progressBar" style="margin: 0; cursor: pointer;">
+        Adicionar barra de progresso de visualização no rodapé (Prende a atenção)
+      </label>
+    </div>
+  </div>
+
+  <!-- 4. Banner Profissional -->
+  <div class="card">
+    <div class="card-title">
+      4. Banner Profissional de Alto Impacto
+    </div>
+    <div class="toggle-group" style="margin-bottom: 16px;">
+      <input type="checkbox" id="enableBanner" checked>
+      <label for="enableBanner" style="margin: 0; cursor: pointer;">Incluir banner de destaque no vídeo</label>
+    </div>
+
+    <div id="bannerFields">
+      <div class="form-grid">
+        <div>
+          <label for="bannerTitle">Título Principal (Headline chamativa)</label>
+          <input type="text" id="bannerTitle" value="3 DICAS QUE NINGUÉM TE CONTA" placeholder="Ex: COMO GANHAR TEMPO HOJE">
+        </div>
+        <div>
+          <label for="bannerSub">Subtítulo (Chamada para Ação)</label>
+          <input type="text" id="bannerSub" value="Assista até o final!" placeholder="Ex: Salve para não esquecer">
+        </div>
+      </div>
+
+      <div class="form-grid" style="margin-top: 14px;">
+        <div>
+          <label for="bannerUser">Seu @ do Instagram</label>
+          <input type="text" id="bannerUser" value="@lucyano.tavares" placeholder="@seu.perfil">
+        </div>
+        <div>
+          <label for="bannerTheme">Tema Visual do Banner</label>
+          <select id="bannerTheme">
+            <option value="instagram_gradient">Gradiente Oficial Instagram</option>
+            <option value="dark_neon">Dark Neon / Moderno</option>
+            <option value="gold_luxury">Ouro & Luxo (Preto e Dourado)</option>
+            <option value="youtube_punch">Atenção Máxima (Amarelo & Preto)</option>
+            <option value="clean_white">Clean Moderno (Branco)</option>
+          </select>
+        </div>
+        <div>
+          <label for="bannerPos">Posição no Vídeo</label>
+          <select id="bannerPos">
+            <option value="top">Topo Seguro (Recomendado para Reels)</option>
+            <option value="bottom">Rodapé Seguro (Acima da legenda)</option>
+            <option value="center">Centro da Tela</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <label>Pré-visualização do Banner:</label>
+        <div class="banner-preview-box" id="previewBox"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Banners por Assunto (IA) -->
+  <div class="card">
+    <div class="card-title">
+      5. Banners por Assunto (Transcrição IA)
+      <span class="badge">Novo</span>
+    </div>
+    <div class="toggle-group" style="margin-bottom: 10px;">
+      <input type="checkbox" id="smartBanners">
+      <label for="smartBanners" style="margin: 0; cursor: pointer;">
+        Criar um banner automático para cada assunto falado no vídeo
+      </label>
+    </div>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-left: 32px; margin-top: 0;">
+      O vídeo é transcrito e os assuntos são detectados por pausas e frases de transição.
+      Um banner com o tema do assunto aparece exatamente entre um tópico e outro.
+      O processamento adiciona alguns segundos e precisa de áudio falado.
+    </p>
+    <div id="smartFields" style="display: none; margin-top: 14px;">
+      <div class="form-grid">
+        <div>
+          <label for="smartUser">Seu @ (opcional)</label>
+          <input type="text" id="smartUser" value="@lucyano.tavares" placeholder="@seu.perfil">
+        </div>
+        <div>
+          <label for="smartPos">Posição dos banners de assunto</label>
+          <select id="smartPos">
+            <option value="top">Topo Seguro (Recomendado)</option>
+            <option value="bottom">Rodapé Seguro</option>
+            <option value="center">Centro da Tela</option>
+          </select>
+        </div>
+      </div>
+
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin: 16px 0 8px;">
+        Banners automáticos extras (criados a partir da fala):
+      </p>
+      <div class="form-grid">
+        <div class="toggle-group"><input type="checkbox" id="bannerHook" checked><label for="bannerHook" style="margin:0;cursor:pointer;">Gancho nos primeiros 3s</label></div>
+        <div class="toggle-group"><input type="checkbox" id="bannerHighlights" checked><label for="bannerHighlights" style="margin:0;cursor:pointer;">Destaques (números, dicas, perguntas)</label></div>
+        <div class="toggle-group"><input type="checkbox" id="bannerCta" checked><label for="bannerCta" style="margin:0;cursor:pointer;">Chamada final para salvar/compartilhar</label></div>
+        <div class="toggle-group"><input type="checkbox" id="bannerLower"><label for="bannerLower" style="margin:0;cursor:pointer;">Lower-third com seu @ no início</label></div>
+        <div class="toggle-group"><input type="checkbox" id="bannerQuotes" checked><label for="bannerQuotes" style="margin:0;cursor:pointer;">Frases de impacto do vídeo</label></div>
+        <div class="toggle-group"><input type="checkbox" id="bannerDividers"><label for="bannerDividers" style="margin:0;cursor:pointer;">Cartões entre assuntos</label></div>
+      </div>
+
+      <div class="form-grid" style="margin-top: 16px;">
+        <div class="toggle-group"><input type="checkbox" id="enableCaptions" checked><label for="enableCaptions" style="margin:0;cursor:pointer;">Legendas profissionais queimadas no vídeo</label></div>
+        <div class="toggle-group"><input type="checkbox" id="videoHasCaptions"><label for="videoHasCaptions" style="margin:0;cursor:pointer;">O vídeo já tem legenda — não adicionar outra</label></div>
+        <div>
+          <label for="captionSize">Tamanho das legendas</label>
+          <select id="captionSize">
+            <option value="48">Médio</option>
+            <option value="64" selected>Grande (Reels)</option>
+            <option value="80">Extra grande</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 14px;">
+        <div class="toggle-group">
+          <input type="checkbox" id="enableWebImages">
+          <label for="enableWebImages" style="margin:0;cursor:pointer;">Incluir imagens da internet no vídeo</label>
+        </div>
+        <div id="webImageFields" style="display: none; margin-top: 12px;">
+          <div class="toggle-group">
+            <input type="checkbox" id="webImageAuto" checked>
+            <label for="webImageAuto" style="margin:0;cursor:pointer;">Buscar imagens automaticamente sobre cada assunto falado</label>
+          </div>
+          <div style="margin-top: 10px;">
+            <label for="webImageUrls">Ou cole URLs de imagens (uma por linha)</label>
+            <textarea id="webImageUrls" rows="3" placeholder="https://exemplo.com/imagem.jpg" style="width:100%;padding:10px;border-radius:12px;background:#0c0e0f;border:1px solid rgba(255,255,255,0.15);color:#e2e8f0;font-size:12px;"></textarea>
+          </div>
+          <div class="form-grid" style="margin-top: 10px;">
+            <div>
+              <label for="webImagePos">Posição da imagem</label>
+              <select id="webImagePos">
+                <option value="center">Centro (Recomendado)</option>
+                <option value="bottom">Rodapé</option>
+                <option value="top">Topo</option>
+              </select>
+            </div>
+            <div>
+              <label for="webImageMax">Máximo de imagens</label>
+              <select id="webImageMax">
+                <option value="2">2</option>
+                <option value="4" selected>4</option>
+                <option value="6">6</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Efeitos Profissionais -->
+  <div class="card">
+    <div class="card-title">
+      6. Efeitos Profissionais
+      <span class="badge">Novo</span>
+    </div>
+    <div class="toggle-group">
+      <input type="checkbox" id="fxZoom" checked>
+      <label for="fxZoom" style="margin: 0; cursor: pointer;">Zoom cinematográfico lento</label>
+    </div>
+    <div class="toggle-group">
+      <input type="checkbox" id="fxColor" checked>
+      <label for="fxColor" style="margin: 0; cursor: pointer;">Correção de cor e contraste</label>
+    </div>
+    <div class="toggle-group">
+      <input type="checkbox" id="fxSharpen" checked>
+      <label for="fxSharpen" style="margin: 0; cursor: pointer;">Nitidez (sharpen suave)</label>
+    </div>
+    <div class="toggle-group">
+      <input type="checkbox" id="fxVignette" checked>
+      <label for="fxVignette" style="margin: 0; cursor: pointer;">Vignette (cantos escurecidos)</label>
+    </div>
+    <div class="toggle-group">
+      <input type="checkbox" id="fxCinema" checked>
+      <label for="fxCinema" style="margin: 0; cursor: pointer;">Barras cinematográficas</label>
+    </div>
+    <div class="toggle-group">
+      <input type="checkbox" id="fxAudio">
+      <label for="fxAudio" style="margin: 0; cursor: pointer;">Normalizar áudio (pode aumentar ruído; deixe desmarcado para manter o som original)</label>
+    </div>
+    <div class="form-grid" style="margin-top: 12px;">
+      <div>
+        <label for="fxGrade">Tonalidade de cor</label>
+        <select id="fxGrade">
+          <option value="natural">Natural</option>
+          <option value="cinematic" selected>Cinematográfica</option>
+          <option value="vibrant">Vibrante</option>
+          <option value="vintage">Vintage</option>
+          <option value="bw">Preto e branco</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Renderizar -->
+  <button class="btn-submit" id="btnRender" disabled>
+    Selecione um vídeo primeiro
+  </button>
+
+  <div class="progress-box" id="progressBox">
+    <h3 id="progressText">Processando vídeo...</h3>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBarFill"></div>
+    </div>
+    <p style="font-size: 0.85rem; color: var(--text-muted);">FFmpeg aplicando cortes e renderizando em alta definição.</p>
+  </div>
+
+  <div class="result-box" id="resultBox">
+    <h3 style="color: var(--success);">Vídeo Pronto para Publicar! 🎉</h3>
+    <video id="player" controls></video>
+    <div>
+      <a href="#" class="btn-download" id="downloadBtn" download="video-instagram.mp4">Baixar Vídeo Editado (.mp4)</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  let uploadedFileId = null;
+
+  // Token do assinante, repassado pelo site focoemdados.com.br na URL.
+  const editorToken = new URLSearchParams(window.location.search).get('token') || '';
+  const authHeaders = () => editorToken ? { 'x-foco-id-token': editorToken } : {};
+
+  const uploadZone = document.getElementById('uploadZone');
+  const fileInput = document.getElementById('fileInput');
+  const fileInfo = document.getElementById('fileInfo');
+  const uploadText = document.getElementById('uploadText');
+  const btnRender = document.getElementById('btnRender');
+  const previewBox = document.getElementById('previewBox');
+
+  // Banner Live Preview
+  function updatePreview() {
+    const title = document.getElementById('bannerTitle').value || 'SEU TÍTULO AQUI';
+    const sub = document.getElementById('bannerSub').value;
+    const user = document.getElementById('bannerUser').value;
+    const theme = document.getElementById('bannerTheme').value;
+
+    const colors = {
+      instagram_gradient: { s: '#833ab4', m: '#fd1d1d', e: '#fcb045', t: '#fff', a: '#ffe500' },
+      dark_neon: { s: '#0f172a', m: '#1e293b', e: '#0f172a', t: '#f8fafc', a: '#38bdf8' },
+      gold_luxury: { s: '#1a1813', m: '#2d2619', e: '#1a1813', t: '#ffffff', a: '#fbbf24' },
+      youtube_punch: { s: '#facc15', m: '#eab308', e: '#facc15', t: '#09090b', a: '#dc2626' },
+      clean_white: { s: '#ffffff', m: '#f8fafc', e: '#ffffff', t: '#0f172a', a: '#ef4444' }
+    }[theme] || { s: '#833ab4', m: '#fd1d1d', e: '#fcb045', t: '#fff', a: '#ffe500' };
+
+    const svg = `
+      <svg width="450" height="${sub ? 110 : 85}" viewBox="0 0 980 ${sub ? 240 : 190}" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="pBg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="${colors.s}" />
+            <stop offset="50%" stop-color="${colors.m}" />
+            <stop offset="100%" stop-color="${colors.e}" />
+          </linearGradient>
+        </defs>
+        <rect x="4" y="4" width="972" height="${sub ? 232 : 182}" rx="24" fill="url(#pBg)" stroke="rgba(255,255,255,0.4)" stroke-width="3" />
+        <rect x="150" y="12" width="680" height="4" rx="2" fill="${colors.a}" opacity="0.8" />
+        ${user ? `<text x="890" y="44" font-size="22" font-weight="700" fill="#fff" text-anchor="end">${user}</text>` : ''}
+        <text x="490" y="${sub ? 135 : 115}" font-size="${title.length > 28 ? 44 : 52}" font-weight="900" fill="${colors.t}" text-anchor="middle">${title.toUpperCase()}</text>
+        ${sub ? `<text x="490" y="195" font-size="28" font-weight="600" fill="${colors.a}" text-anchor="middle">${sub}</text>` : ''}
+      </svg>
+    `;
+    previewBox.innerHTML = svg;
+  }
+
+  ['bannerTitle', 'bannerSub', 'bannerUser', 'bannerTheme'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updatePreview);
+  });
+  updatePreview();
+
+  // Upload Handling
+  uploadZone.addEventListener('click', () => fileInput.click());
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) handleFile(fileInput.files[0]);
+  });
+
+  async function handleFile(file) {
+    uploadText.textContent = `Enviando: ${file.name}...`;
+    const ext = file.name.split('.').pop().toLowerCase();
+    try {
+      const res = await fetch(`/upload?ext=${ext}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: file
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Falha no upload');
+      uploadedFileId = data.id;
+      uploadText.textContent = `✅ Vídeo Carregado: ${file.name}`;
+      fileInfo.style.display = 'block';
+      fileInfo.textContent = `Tamanho: ${(file.size / (1024*1024)).toFixed(1)} MB | Pronto para editar`;
+      btnRender.disabled = false;
+      btnRender.textContent = 'Gerar Vídeo para Instagram 🚀';
+    } catch (err) {
+      alert('Erro ao enviar vídeo: ' + err.message);
+      uploadText.textContent = 'Arraste seu vídeo aqui ou clique para selecionar';
+    }
+  }
+
+  // Mostra/oculta os campos dos banners inteligentes
+  const smartToggle = document.getElementById('smartBanners');
+  if (smartToggle) {
+    smartToggle.addEventListener('change', () => {
+      document.getElementById('smartFields').style.display = smartToggle.checked ? 'block' : 'none';
+    });
+  }
+  const webImageToggle = document.getElementById('enableWebImages');
+  if (webImageToggle) {
+    webImageToggle.addEventListener('change', () => {
+      document.getElementById('webImageFields').style.display = webImageToggle.checked ? 'block' : 'none';
+    });
+  }
+
+  // Render Trigger
+  btnRender.addEventListener('click', async () => {
+    if (!uploadedFileId) return;
+
+    btnRender.disabled = true;
+    document.getElementById('progressBox').style.display = 'block';
+    document.getElementById('resultBox').style.display = 'none';
+
+    const spec = {
+      input: uploadedFileId,
+      output: {
+        preset: document.getElementById('presetSelect').value,
+        fit: document.getElementById('fitSelect').value
+      },
+      autoCut: {
+        silence: document.getElementById('autoSilence').checked
+      },
+      progressBar: {
+        enabled: document.getElementById('progressBar').checked,
+        position: 'bottom',
+        color: '#fcb045'
+      },
+      effects: {
+        zoom: document.getElementById('fxZoom').checked,
+        color: document.getElementById('fxColor').checked,
+        sharpen: document.getElementById('fxSharpen').checked,
+        vignette: document.getElementById('fxVignette').checked,
+        cinemaBar: document.getElementById('fxCinema').checked,
+        grade: document.getElementById('fxGrade').value,
+        audioNormalize: document.getElementById('fxAudio').checked
+      }
+    };
+
+    if (document.getElementById('smartBanners').checked) {
+      spec.topicBanners = {
+        enabled: true,
+        language: 'pt',
+        username: document.getElementById('smartUser').value,
+        position: document.getElementById('smartPos').value,
+        hook: document.getElementById('bannerHook').checked,
+        highlights: document.getElementById('bannerHighlights').checked,
+        cta: document.getElementById('bannerCta').checked,
+        lowerThird: document.getElementById('bannerLower').checked,
+        quotes: document.getElementById('bannerQuotes').checked,
+        dividers: document.getElementById('bannerDividers').checked,
+        maxHighlights: 4,
+        maxQuotes: 2
+      };
+      spec.captions = {
+        enabled: document.getElementById('enableCaptions').checked && !document.getElementById('videoHasCaptions').checked,
+        fontSize: Number(document.getElementById('captionSize').value),
+        color: '#FFFFFF',
+        marginV: 120
+      };
+      spec.webImages = {
+        enabled: document.getElementById('enableWebImages').checked,
+        auto: document.getElementById('webImageAuto').checked,
+        urls: document.getElementById('webImageUrls').value.split('\n').map(s => s.trim()).filter(Boolean),
+        position: document.getElementById('webImagePos').value,
+        maxImages: Number(document.getElementById('webImageMax').value)
+      };
+    }
+
+    if (document.getElementById('enableBanner').checked) {
+      spec.professionalBanner = {
+        title: document.getElementById('bannerTitle').value,
+        subtitle: document.getElementById('bannerSub').value,
+        username: document.getElementById('bannerUser').value,
+        theme: document.getElementById('bannerTheme').value,
+        position: document.getElementById('bannerPos').value
+      };
+    }
+
+    try {
+      const res = await fetch('/jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        body: JSON.stringify(spec)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Falha ao criar job');
+
+      pollJob(data.id);
+    } catch (err) {
+      alert('Erro: ' + err.message);
+      btnRender.disabled = false;
+      document.getElementById('progressBox').style.display = 'none';
+    }
+  });
+
+  async function pollJob(id) {
+    let failures = 0;
+    const startedAt = Date.now();
+    const timer = setInterval(async () => {
+      if (Date.now() - startedAt > 20 * 60 * 1000) {
+        clearInterval(timer);
+        document.getElementById('progressText').textContent = 'Processamento demorou demais. Tente novamente.';
+        btnRender.disabled = false;
+        return;
+      }
+      try {
+        const res = await fetch(`/jobs/${id}`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        failures = 0;
+        const p = data.progress || 0;
+        document.getElementById('progressBarFill').style.width = p + '%';
+        document.getElementById('progressText').textContent = `Processando: ${p}%`;
+
+        if (data.status === 'done') {
+          clearInterval(timer);
+          document.getElementById('progressBox').style.display = 'none';
+          document.getElementById('resultBox').style.display = 'block';
+          document.getElementById('player').src = data.url;
+          document.getElementById('downloadBtn').href = data.url;
+          btnRender.disabled = false;
+        } else if (data.status === 'error') {
+          clearInterval(timer);
+          alert('Erro no processamento: ' + data.error);
+          document.getElementById('progressBox').style.display = 'none';
+          btnRender.disabled = false;
+        }
+      } catch (e) {
+        failures++;
+        if (failures >= 5) {
+          clearInterval(timer);
+          document.getElementById('progressText').textContent = 'Servidor indisponível. Recarregue a página e tente novamente.';
+          btnRender.disabled = false;
+        }
+      }
+    }, 1000);
+  }
+</script>
+
+</body>
+</html>

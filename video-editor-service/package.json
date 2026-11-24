@@ -1,0 +1,16 @@
+{
+  "name": "video-editor-instagram",
+  "version": "0.3.0",
+  "description": "Editor profissional de vídeo para Instagram com cortes automáticos de silêncio e banners estilizados (FFmpeg + Node, sem dependências)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node cli.js --help",
+    "example": "node cli.js --example",
+    "clean": "node -e \"require('./cleanup').runCleanup(['./storage/uploads','./storage/outputs'],{forceAll:true}).then(()=>console.log('Limpeza concluída'))\""
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}

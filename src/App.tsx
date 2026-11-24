@@ -28,10 +28,11 @@ import { SpreadsheetDataAnalysisScreen } from './components/SpreadsheetDataAnaly
 import { AiSiteBuilderScreen } from './components/AiSiteBuilderScreen';
 import { ProductivityShowcaseScreen } from './components/ProductivityShowcaseScreen';
 import { CheckoutSuccessModal } from './components/CheckoutSuccessModal';
+import { VideoEditorPro } from './components/VideoEditorPro';
 import { useFirebase } from './contexts/FirebaseContext';
 
 export default function App() {
-  const { isOwner } = useFirebase();
+  const { isOwner, user } = useFirebase();
   
   // Client Route State
   const [currentPath, setCurrentPath] = useState<string>(() => {
@@ -111,6 +112,27 @@ export default function App() {
         onGoHome={() => navigate('/')} 
         redirectReason={redirectReason} 
       />
+    );
+  }
+
+  // View: Editor Pro (aba aditiva, acessivel a qualquer usuario autenticado)
+  if (currentPath === '/editor-pro') {
+    if (!user) {
+      return (
+        <LoginPage
+          onSuccessRedirect={() => navigate('/editor-pro')}
+          onGoHome={() => navigate('/')}
+          redirectReason="Entre com sua conta Google para acessar o Editor Pro."
+        />
+      );
+    }
+    return (
+      <div className="min-h-screen bg-[#0d0f10] text-slate-100 font-sans selection:bg-cyan-500/30 selection:text-cyan-300">
+        <PrivateNavbar currentPath={currentPath} onNavigate={navigate} />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
+          <VideoEditorPro />
+        </main>
+      </div>
     );
   }
 

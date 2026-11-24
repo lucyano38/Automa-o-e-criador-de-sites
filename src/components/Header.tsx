@@ -56,9 +56,17 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'sobre', label: 'SOBRE O TITULAR' },
     { id: 'faq', label: 'FAQ' },
     { id: 'contato', label: 'CONTATO' },
+    { id: 'editor-pro', label: 'EDITOR PRO' },
   ];
 
   const handleNavClick = (tabId: string) => {
+    // Rota aditiva do Editor Pro (nao altera o comportamento das abas antigas).
+    if (tabId === 'editor-pro') {
+      onNavigate('/editor-pro');
+      setMobileMenuOpen(false);
+      return;
+    }
+
     setActiveTab(tabId);
 
     if (tabId === 'contato') {

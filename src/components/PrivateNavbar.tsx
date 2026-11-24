@@ -12,7 +12,8 @@ import {
   X,
   ExternalLink,
   Layout,
-  ShoppingBag
+  ShoppingBag,
+  Film
 } from 'lucide-react';
 import { useFirebase, OWNER_EMAIL } from '../contexts/FirebaseContext';
 
@@ -74,6 +75,13 @@ export const PrivateNavbar: React.FC<PrivateNavbarProps> = ({ currentPath, onNav
       subtitle: 'Pergunte aos Dados',
       icon: FileSpreadsheet,
       badge: 'AI BI'
+    },
+    {
+      id: '/editor-pro',
+      label: 'Editor Pro de Vídeos',
+      subtitle: 'Cortes, banners e efeitos IA',
+      icon: Film,
+      badge: 'NOVO'
     }
   ];
 

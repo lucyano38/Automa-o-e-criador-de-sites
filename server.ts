@@ -6,6 +6,7 @@ import { GoogleGenAI } from '@google/genai';
 import Stripe from 'stripe';
 import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import { getAuth as getAdminAuth } from 'firebase-admin/auth';
 import firebaseConfig from './firebase-applet-config.json' with { type: 'json' };
 
 // Initialize Firebase Admin
@@ -48,7 +49,7 @@ const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   // Stripe Webhook Credentials & Destination Configuration
   // Secrets MUST come from environment variables or secure defaults.
@@ -144,6 +145,23 @@ async function startServer() {
             plan: serviceId,
             updatedAt: new Date().toISOString()
           });
+
+          // Editor Pro: libera o acesso e zera a cota mensal de 5 videos.
+          if (serviceId === 'editor-pro' || session.metadata?.plan === 'editor-pro') {
+            await safeDbSave('editorProAccess', userId, {
+              userId,
+              email: customerEmail,
+              plan: 'editor-pro',
+              status: 'active',
+              stripeCustomerId: session.customer || null,
+              stripeSubscriptionId: session.subscription || null,
+              currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+              monthKey: new Date().toISOString().slice(0, 7),
+              videosUsed: 0,
+              activatedAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            });
+          }
         }
 
         console.log(`[Stripe Webhook] Pedido ${orderId} automatizado com sucesso para ${customerEmail}!`);
@@ -200,6 +218,20 @@ async function startServer() {
           currentPeriodEnd: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
           updatedAt: new Date().toISOString()
         });
+
+        // Mantem o entitlement do Editor Pro sincronizado com a recorrencia.
+        const proUserId = sub.metadata?.userId || sub.metadata?.client_reference_id;
+        if (sub.metadata?.plan === 'editor-pro' && proUserId) {
+          await safeDbSave('editorProAccess', proUserId, {
+            userId: proUserId,
+            plan: 'editor-pro',
+            status: sub.status === 'active' || sub.status === 'trialing' ? 'active' : sub.status,
+            stripeSubscriptionId: sub.id,
+            stripeCustomerId: sub.customer,
+            currentPeriodEnd: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
+            updatedAt: new Date().toISOString()
+          });
+        }
         return res.json({ received: true, subscriptionId: sub.id, status: sub.status });
       }
 
@@ -210,6 +242,18 @@ async function startServer() {
           status: 'canceled',
           canceledAt: new Date().toISOString()
         });
+
+        const proUserId = sub.metadata?.userId || sub.metadata?.client_reference_id;
+        if (sub.metadata?.plan === 'editor-pro' && proUserId) {
+          await safeDbSave('editorProAccess', proUserId, {
+            userId: proUserId,
+            plan: 'editor-pro',
+            status: 'canceled',
+            stripeSubscriptionId: sub.id,
+            canceledAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          });
+        }
         return res.json({ received: true, subscriptionId: sub.id, status: 'canceled' });
       }
 
@@ -1877,6 +1921,147 @@ Sua missão primordial é responder de forma COMPLETA, detalhada e com precisão
         source: 'emergency_fallback' 
       });
     }
+  });
+
+  // ==========================================================================
+  // EDITOR PRO — aba de edicao de videos com assinatura de R$ 29,90/mes
+  // Bloco aditivo: nao altera nenhum endpoint existente.
+  // ==========================================================================
+  const EDITOR_PRO_OWNER_EMAIL = 'lucyano.pci@gmail.com';
+  const EDITOR_PRO_LIMIT = 5;
+
+  async function verifyEditorProToken(req: express.Request) {
+    const raw = req.headers.authorization || req.headers['x-foco-id-token'];
+    const token = typeof raw === 'string' ? raw.replace(/^Bearer\s+/i, '') : '';
+    if (!token) return null;
+    try {
+      return await getAdminAuth().verifyIdToken(token);
+    } catch (err: any) {
+      console.warn('[Editor Pro] Token invalido:', err?.message || err);
+      return null;
+    }
+  }
+
+  function currentMonthKey() {
+    return new Date().toISOString().slice(0, 7);
+  }
+
+  // Cria a assinatura recorrente (mode: subscription, R$ 29,90/mes).
+  app.post('/api/create-editor-pro-checkout', async (req, res) => {
+    try {
+      const { customerEmail, customerName, userId } = req.body;
+      const stripeSecret = process.env.STRIPE_SECRET_KEY;
+      const origin = req.headers.origin || process.env.APP_URL || 'http://localhost:3000';
+
+      if (!stripeSecret || !stripeSecret.startsWith('sk_')) {
+        return res.json({
+          mode: 'gateway_ready',
+          isStripeConfigured: false,
+          priceInCents: 2990,
+          priceFormatted: (29.9).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+          message: 'Ambiente Stripe pronto. Configure STRIPE_SECRET_KEY para ativar a assinatura do Editor Pro.'
+        });
+      }
+
+      const stripe = new Stripe(stripeSecret);
+      const session = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        line_items: [{
+          price_data: {
+            currency: 'brl',
+            recurring: { interval: 'month' },
+            product_data: {
+              name: 'Editor Pro - Foco em Dados',
+              description: 'Edicao automatica de ate 5 videos por mes (cortes, banners por assunto e efeitos).'
+            },
+            unit_amount: 2990
+          },
+          quantity: 1
+        }],
+        success_url: `${origin}/editor-pro?checkout_status=success&session_id={CHECKOUT_SESSION_ID}&service=editor-pro`,
+        cancel_url: `${origin}/editor-pro?checkout_status=cancelled&service=editor-pro`,
+        customer_email: customerEmail || undefined,
+        client_reference_id: userId || 'guest',
+        metadata: {
+          plan: 'editor-pro',
+          serviceId: 'editor-pro',
+          serviceTitle: 'Editor Pro - ate 5 videos/mes',
+          customerEmail: customerEmail || '',
+          customerName: customerName || '',
+          userId: userId || ''
+        }
+      });
+
+      if (userId && userId !== 'guest') {
+        await safeDbSave('editorProAccess', userId, {
+          userId,
+          email: customerEmail || '',
+          plan: 'editor-pro',
+          status: 'pending',
+          checkoutSessionId: session.id,
+          updatedAt: new Date().toISOString()
+        });
+      }
+
+      return res.json({ id: session.id, url: session.url, mode: 'live_stripe' });
+    } catch (err: any) {
+      console.error('[Editor Pro] Erro no checkout:', err);
+      return res.status(500).json({ error: 'Erro ao criar assinatura Editor Pro: ' + err.message });
+    }
+  });
+
+  // Consulta o entitlement e a cota do mes corrente.
+  app.get('/api/editor-pro/access', async (req, res) => {
+    const decoded = await verifyEditorProToken(req);
+    if (!decoded) return res.status(401).json({ error: 'Autenticacao necessaria' });
+
+    const uid = decoded.uid;
+    const isOwnerUser = (decoded.email || '').toLowerCase() === EDITOR_PRO_OWNER_EMAIL.toLowerCase();
+    const access = await safeDbGet('editorProAccess', uid);
+    const monthKey = currentMonthKey();
+    const periodValid = !access?.currentPeriodEnd || new Date(access.currentPeriodEnd).getTime() > Date.now();
+    const active = isOwnerUser || (access?.status === 'active' && periodValid);
+    const used = access?.monthKey === monthKey ? Number(access.videosUsed || 0) : 0;
+
+    return res.json({
+      active,
+      plan: 'editor-pro',
+      limit: EDITOR_PRO_LIMIT,
+      used,
+      remaining: active ? Math.max(0, EDITOR_PRO_LIMIT - used) : 0,
+      isOwner: isOwnerUser
+    });
+  });
+
+  // Consome 1 video do limite mensal. Chamado pelo servico de edicao antes de renderizar.
+  app.post('/api/editor-pro/consume', async (req, res) => {
+    const decoded = await verifyEditorProToken(req);
+    if (!decoded) return res.status(401).json({ error: 'Autenticacao necessaria', allowed: false });
+
+    const uid = decoded.uid;
+    const isOwnerUser = (decoded.email || '').toLowerCase() === EDITOR_PRO_OWNER_EMAIL.toLowerCase();
+    const access = await safeDbGet('editorProAccess', uid);
+    const periodValid = !access?.currentPeriodEnd || new Date(access.currentPeriodEnd).getTime() > Date.now();
+    const active = isOwnerUser || (access?.status === 'active' && periodValid);
+    if (!active) return res.status(403).json({ error: 'Assinatura Editor Pro inativa', allowed: false });
+
+    const monthKey = currentMonthKey();
+    const used = access?.monthKey === monthKey ? Number(access.videosUsed || 0) : 0;
+    if (used >= EDITOR_PRO_LIMIT) {
+      return res.status(403).json({ error: 'Limite de 5 videos atingido neste mes', allowed: false, remaining: 0 });
+    }
+
+    await safeDbSave('editorProAccess', uid, {
+      userId: uid,
+      email: decoded.email || '',
+      plan: 'editor-pro',
+      status: access?.status || 'active',
+      monthKey,
+      videosUsed: used + 1,
+      updatedAt: new Date().toISOString()
+    });
+
+    return res.json({ allowed: true, used: used + 1, remaining: Math.max(0, EDITOR_PRO_LIMIT - used - 1) });
   });
 
   // Vite middleware in dev mode
