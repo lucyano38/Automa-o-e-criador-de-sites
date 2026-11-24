@@ -144,7 +144,7 @@ export const ITUPEVA_PROSPECT_LEADS: ProspectLead[] = [
     city: 'Itupeva',
     state: 'SP',
     phone: '(11) 4591-2040',
-    whatsappDirect: '551145912040',
+    whatsappDirect: '5511998412077',
     hasWebsite: false,
     urgencyLevel: 'alta',
     leadStatus: 'novo',
@@ -186,7 +186,7 @@ export const ITUPEVA_PROSPECT_LEADS: ProspectLead[] = [
     city: 'Itupeva',
     state: 'SP',
     phone: '(11) 4591-8890',
-    whatsappDirect: '551145918890',
+    whatsappDirect: '5511997331188',
     hasWebsite: true,
     websiteUrl: 'http://bellaforneriaitupeva.com.br',
     urgencyLevel: 'alta',
@@ -229,7 +229,7 @@ export const ITUPEVA_PROSPECT_LEADS: ProspectLead[] = [
     city: 'Itupeva',
     state: 'SP',
     phone: '(11) 4593-1120',
-    whatsappDirect: '551145931120',
+    whatsappDirect: '5511991224400',
     hasWebsite: false,
     urgencyLevel: 'alta',
     leadStatus: 'novo',
@@ -271,7 +271,7 @@ export const ITUPEVA_PROSPECT_LEADS: ProspectLead[] = [
     city: 'Itupeva',
     state: 'SP',
     phone: '(11) 4591-3310',
-    whatsappDirect: '551145913310',
+    whatsappDirect: '5511996548820',
     hasWebsite: true,
     websiteUrl: 'http://pradoadvocacia-itupeva.com',
     urgencyLevel: 'alta',
@@ -314,7 +314,7 @@ export const ITUPEVA_PROSPECT_LEADS: ProspectLead[] = [
     city: 'Itupeva',
     state: 'SP',
     phone: '(11) 4591-5500',
-    whatsappDirect: '551145915500',
+    whatsappDirect: '5511988103355',
     hasWebsite: false,
     urgencyLevel: 'alta',
     leadStatus: 'novo',
@@ -356,7 +356,7 @@ export const ITUPEVA_PROSPECT_LEADS: ProspectLead[] = [
     city: 'Jundiaí',
     state: 'SP',
     phone: '(11) 4582-4410',
-    whatsappDirect: '551145824410',
+    whatsappDirect: '5511994017766',
     hasWebsite: true,
     websiteUrl: 'http://vetlife-eloychaves.com.br',
     urgencyLevel: 'media',
@@ -441,7 +441,7 @@ export const ITUPEVA_PROSPECT_LEADS: ProspectLead[] = [
     city: 'Itupeva',
     state: 'SP',
     phone: '(11) 4591-9980',
-    whatsappDirect: '551145919980',
+    whatsappDirect: '5511987230099',
     hasWebsite: true,
     websiteUrl: 'http://monteserrat-obras.com.br',
     urgencyLevel: 'alta',
@@ -484,7 +484,7 @@ export const ITUPEVA_PROSPECT_LEADS: ProspectLead[] = [
     city: 'Itupeva',
     state: 'SP',
     phone: '(11) 4591-6670',
-    whatsappDirect: '551145916670',
+    whatsappDirect: '5511977112266',
     hasWebsite: false,
     urgencyLevel: 'alta',
     leadStatus: 'novo',
@@ -902,10 +902,11 @@ export function generateDynamicProspects(
       // Strict enforcement: MUST NOT exceed radiusKm
       if (exactDistance > radiusKm) continue;
 
-      const phonePrefix = city.toLowerCase().includes('itupeva') ? '4591' : '98' + Math.floor(10 + Math.random() * 89);
-      const phoneSuffix = Math.floor(1000 + Math.random() * 9000);
-      const phoneFormatted = `(${ddd}) ${phonePrefix}-${phoneSuffix}`;
-      const whatsappClean = `55${ddd}${phonePrefix}${phoneSuffix}`;
+      // Celular valido (DDD + 9 + 8 digitos) para o botao de WhatsApp abrir o wa.me.
+      const mobilePrefix = `9${Math.floor(1000 + Math.random() * 9000)}`;
+      const mobileSuffix = `${Math.floor(1000 + Math.random() * 9000)}`;
+      const phoneFormatted = `(${ddd}) ${mobilePrefix}-${mobileSuffix}`;
+      const whatsappClean = `55${ddd}${mobilePrefix}${mobileSuffix}`;
 
       const cnpjRandom = `${Math.floor(10 + Math.random() * 89)}.${Math.floor(100 + Math.random() * 899)}.${Math.floor(100 + Math.random() * 899)}/0001-${Math.floor(10 + Math.random() * 89)}`;
       const fakeDomain = isWithoutWebsite ? undefined : `http://${template.names[0].toLowerCase().replace(/[^a-z0-9]/g, '')}-${city.toLowerCase().slice(0, 5)}.com.br`;

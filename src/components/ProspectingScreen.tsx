@@ -23,7 +23,7 @@ import {
 import { CNAE_NICHES, ITUPEVA_PROSPECT_LEADS, generateDynamicProspects } from '../data/prospectingData';
 import { ProspectLead, GeoLocationPoint } from '../types';
 import { geocodeLocation } from '../lib/geoService';
-import { formatWhatsAppLink } from '../lib/phone';
+import { buildWhatsAppSearchUrl, formatWhatsAppLink } from '../lib/phone';
 
 interface ProspectingScreenProps {
   onOpenWhatsAppWithMessage?: (msg: string) => void;
@@ -47,6 +47,7 @@ export const ProspectingScreen: React.FC<ProspectingScreenProps> = ({
   const [scanProgress, setScanProgress] = useState<number>(0);
   const [scanMessage, setScanMessage] = useState<string>('');
   const [copiedPitchId, setCopiedPitchId] = useState<string | null>(null);
+  const [whatsappNotice, setWhatsappNotice] = useState<string | null>(null);
   const [searchLeadQuery, setSearchLeadQuery] = useState<string>('');
 
   // Center Coordinates
@@ -136,17 +137,22 @@ export const ProspectingScreen: React.FC<ProspectingScreenProps> = ({
   const handleWhatsApp = (lead: ProspectLead) => {
     // Prioritize whatsappDirect if available, otherwise fallback to phone
     const targetPhone = lead.whatsappDirect || lead.phone || '';
-    if (!targetPhone) return;
+    const whatsappUrl = targetPhone ? formatWhatsAppLink(targetPhone, lead.customPitch) : null;
 
-    const whatsappUrl = formatWhatsAppLink(targetPhone, lead.customPitch);
-    if (!whatsappUrl) {
-      navigator.clipboard.writeText(lead.customPitch);
-      setCopiedPitchId(lead.id);
-      setTimeout(() => setCopiedPitchId(null), 3000);
-      alert(`Número fixo detectado (${lead.phone}). O WhatsApp exige número de celular. O pitch de vendas foi copiado automaticamente para a área de transferência!`);
+    if (whatsappUrl) {
+      setWhatsappNotice(null);
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
       return;
     }
-    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+
+    // Sem celular cadastrado: copia o pitch e abre uma busca pelo WhatsApp real da empresa.
+    navigator.clipboard.writeText(lead.customPitch);
+    setCopiedPitchId(lead.id);
+    setTimeout(() => setCopiedPitchId(null), 3000);
+    setWhatsappNotice(
+      `${lead.tradeName} não tem celular cadastrado. Copiamos o pitch e abrimos uma busca para encontrar o WhatsApp da empresa.`
+    );
+    window.open(buildWhatsAppSearchUrl(lead.tradeName, lead.city), '_blank', 'noopener,noreferrer');
   };
 
   const handleExportCsv = () => {
@@ -435,6 +441,20 @@ export const ProspectingScreen: React.FC<ProspectingScreenProps> = ({
             />
           </div>
         </div>
+
+        {whatsappNotice && (
+          <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs">
+            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
+            <span className="flex-1">{whatsappNotice}</span>
+            <button
+              onClick={() => setWhatsappNotice(null)}
+              className="text-amber-300 hover:text-white font-mono cursor-pointer"
+              aria-label="Fechar aviso"
+            >
+              ✕
+            </button>
+          </div>
+        )}
 
         {/* Lead Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

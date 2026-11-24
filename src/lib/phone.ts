@@ -50,5 +50,16 @@ export const formatWhatsAppLink = (phone: string, message: string): string | nul
     }
   }
 
+  // WhatsApp exige DDI + DDD + 9 + 8 digitos (13 digitos).
+  if (clean.length !== 13) return null;
+
   return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
+};
+
+/** Busca na internet o WhatsApp real da empresa quando so ha telefone fixo cadastrado. */
+export const buildWhatsAppSearchUrl = (companyName: string, city?: string): string => {
+  const normalizedName = companyName.toLowerCase();
+  const includeCity = city && !normalizedName.includes(city.toLowerCase());
+  const query = `${companyName}${includeCity ? ` ${city}` : ''} WhatsApp`.trim();
+  return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
 };
