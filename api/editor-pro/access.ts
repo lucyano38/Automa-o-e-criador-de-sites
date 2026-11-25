@@ -1,6 +1,7 @@
 import { verifyToken, safeDbGet, OWNER_EMAIL, EDITOR_PRO_LIMIT, isEditorProAccess, usedThisMonth, currentMonthKey } from '../_lib';
 
 export default async function handler(req: any, res: any) {
+  try {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Metodo nao permitido' });
   }
@@ -23,4 +24,8 @@ export default async function handler(req: any, res: any) {
     isOwner,
     monthKey: currentMonthKey()
   });
+  } catch (err: any) {
+    console.error('[Editor Pro access] Erro:', err);
+    return res.status(500).json({ error: 'Erro interno', detail: String(err?.message || err) });
+  }
 }
