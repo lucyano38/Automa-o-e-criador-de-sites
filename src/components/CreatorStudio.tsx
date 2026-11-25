@@ -5,6 +5,7 @@ import {
   Captions, WandSparkles, Sparkles, AlertCircle, CheckCircle2, Zap
 } from 'lucide-react';
 import { useFirebase } from '../contexts/FirebaseContext';
+import { BrowserEditor } from './BrowserEditor';
 
 type Lang = 'pt' | 'en' | 'es';
 type Theme = 'dark' | 'light';
@@ -207,6 +208,9 @@ export const CreatorStudio: React.FC = () => {
             </div>
           )}
 
+          <BrowserEditor />
+
+          <div className={`border-t pt-5 ${cx('border-white/10', 'border-slate-200')}`}>
           {checking ? (
             <div className={`p-10 text-center text-xs font-mono ${muted}`}>...</div>
           ) : !access?.active ? (
@@ -231,6 +235,7 @@ export const CreatorStudio: React.FC = () => {
               </div>
             </div>
           )}
+          </div>
         </div>
       </section>
 
