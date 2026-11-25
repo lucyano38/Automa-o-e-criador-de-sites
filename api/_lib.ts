@@ -1,11 +1,8 @@
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import { getAuth } from 'firebase-admin/auth';
-import Stripe from 'stripe';
-
 /**
  * Biblioteca compartilhada das funcoes serverless do Editor Pro.
  * Arquivos com "_" no inicio nao sao expostos como funcoes pela Vercel.
+ * Os imports do Firebase Admin e do Stripe sao feitos sob demanda para
+ * que um problema de credencial nao derrube o carregamento do modulo.
  */
 
 export const OWNER_EMAIL = 'lucyano.pci@gmail.com';
@@ -13,41 +10,51 @@ export const EDITOR_PRO_LIMIT = 5;
 
 const PROJECT_ID = process.env.FIREBASE_PROJECT_ID || 'appcuidador-23628';
 
-function initFirebaseAdmin() {
-  if (getApps().length) return;
-  const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (raw) {
-    try {
-      const sa = JSON.parse(raw);
-      initializeApp({ credential: cert(sa), projectId: sa.project_id || PROJECT_ID });
-      return;
-    } catch (err) {
-      console.error('[Editor Pro] FIREBASE_SERVICE_ACCOUNT invalida:', err);
+let authClient: any = null;
+let getFirestoreFn: any = null;
+let firestore: any = null;
+let stripeCtor: any = null;
+
+async function ensureFirebase() {
+  if (authClient) return;
+  const { initializeApp, cert, getApps } = await import('firebase-admin/app');
+  const { getAuth } = await import('firebase-admin/auth');
+  const { getFirestore } = await import('firebase-admin/firestore');
+
+  if (!getApps().length) {
+    const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
+    if (raw) {
+      try {
+        const sa = JSON.parse(raw);
+        initializeApp({ credential: cert(sa), projectId: sa.project_id || PROJECT_ID });
+      } catch (err: any) {
+        console.error('[Editor Pro] FIREBASE_SERVICE_ACCOUNT invalida:', err?.message || err);
+        initializeApp({ projectId: PROJECT_ID });
+      }
+    } else {
+      initializeApp({ projectId: PROJECT_ID });
     }
   }
-  // Sem service account, a verificacao de token ainda funciona (chaves publicas do Google).
-  initializeApp({ projectId: PROJECT_ID });
+
+  authClient = getAuth();
+  getFirestoreFn = getFirestore;
 }
 
-initFirebaseAdmin();
-
-// Firestore e inicializado sob demanda: se as credenciais nao estiverem
-// configuradas, a verificacao de token continua funcionando.
-let firestore: ReturnType<typeof getFirestore> | null = null;
-function getDb() {
-  if (!firestore) firestore = getFirestore();
-  return firestore;
-}
-export const adminAuth = getAuth();
-
-export function getStripe(): Stripe | null {
+export async function getStripeAsync(): Promise<any | null> {
   const key = process.env.STRIPE_SECRET_KEY;
-  return key && key.startsWith('sk_') ? new Stripe(key) : null;
+  if (!key || !key.startsWith('sk_')) return null;
+  if (!stripeCtor) {
+    const mod = await import('stripe');
+    stripeCtor = (mod as any).default || mod;
+  }
+  return new stripeCtor(key);
 }
 
 export async function safeDbSave(collection: string, docId: string, data: any) {
   try {
-    await getDb().collection(collection).doc(docId).set(data, { merge: true });
+    await ensureFirebase();
+    if (!firestore) firestore = getFirestoreFn();
+    await firestore.collection(collection).doc(docId).set(data, { merge: true });
   } catch (err: any) {
     console.warn(`[Editor Pro] Falha ao salvar ${collection}/${docId}:`, err?.message || err);
   }
@@ -55,7 +62,9 @@ export async function safeDbSave(collection: string, docId: string, data: any) {
 
 export async function safeDbGet(collection: string, docId: string): Promise<any | null> {
   try {
-    const doc = await getDb().collection(collection).doc(docId).get();
+    await ensureFirebase();
+    if (!firestore) firestore = getFirestoreFn();
+    const doc = await firestore.collection(collection).doc(docId).get();
     if (doc.exists) return doc.data();
   } catch (err: any) {
     console.warn(`[Editor Pro] Falha ao ler ${collection}/${docId}:`, err?.message || err);
@@ -68,7 +77,8 @@ export async function verifyToken(req: any) {
   const token = typeof raw === 'string' ? raw.replace(/^Bearer\s+/i, '') : '';
   if (!token) return null;
   try {
-    return await adminAuth.verifyIdToken(token);
+    await ensureFirebase();
+    return await authClient.verifyIdToken(token);
   } catch (err: any) {
     console.warn('[Editor Pro] Token invalido:', err?.message || err);
     return null;

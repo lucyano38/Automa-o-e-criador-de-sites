@@ -1,5 +1,4 @@
-import Stripe from 'stripe';
-import { getStripe, safeDbSave } from '../_lib';
+import { getStripeAsync, safeDbSave } from '../_lib';
 
 export const config = { api: { bodyParser: false } };
 
@@ -17,7 +16,7 @@ export default async function handler(req: any, res: any) {
   }
 
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
-  const stripe = getStripe();
+  const stripe = await getStripeAsync();
   if (!stripe || !secret) {
     console.error('[Webhook] STRIPE_SECRET_KEY ou STRIPE_WEBHOOK_SECRET nao configurado');
     return res.status(500).json({ error: 'Webhook do Stripe nao configurado' });
@@ -25,7 +24,7 @@ export default async function handler(req: any, res: any) {
 
   const raw = await readRaw(req);
   const sig = req.headers['stripe-signature'] as string | undefined;
-  let event: Stripe.Event;
+  let event: any;
   try {
     event = stripe.webhooks.constructEvent(raw, sig || '', secret);
   } catch (err: any) {

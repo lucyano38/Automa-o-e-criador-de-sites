@@ -1,4 +1,4 @@
-import { getStripe, safeDbSave } from './_lib';
+import { getStripeAsync, safeDbSave } from './_lib';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
@@ -6,7 +6,7 @@ export default async function handler(req: any, res: any) {
   }
 
   const { customerEmail, customerName, userId } = req.body || {};
-  const stripe = getStripe();
+  const stripe = await getStripeAsync();
   const origin = req.headers?.origin || process.env.APP_URL || 'https://focoemdados.com.br';
 
   if (!stripe) {

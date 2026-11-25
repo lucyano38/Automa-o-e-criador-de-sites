@@ -1,5 +1,6 @@
-import { adminAuth } from './_lib';
+import { verifyToken } from './_lib';
 
-export default function handler(req: any, res: any) {
-  res.status(200).json({ ok: true, hasAdminAuth: Boolean(adminAuth) });
+export default async function handler(req: any, res: any) {
+  const result = await verifyToken({ headers: {} });
+  res.status(200).json({ ok: true, noTokenRejected: result === null });
 }
