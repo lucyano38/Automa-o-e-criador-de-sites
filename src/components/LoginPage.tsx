@@ -16,12 +16,14 @@ interface LoginPageProps {
   onSuccessRedirect: () => void;
   onGoHome: () => void;
   redirectReason?: string | null;
+  hideDirectOwnerLogin?: boolean;
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ 
   onSuccessRedirect, 
   onGoHome,
-  redirectReason 
+  redirectReason,
+  hideDirectOwnerLogin = false
 }) => {
   const { signInWithGoogle, loginAsOwnerDirect, authError, clearAuthError } = useFirebase();
   const [emailInput, setEmailInput] = useState<string>(OWNER_EMAIL);
@@ -138,14 +140,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             <span>Entrar com Conta Google</span>
           </button>
 
-          <div className="flex items-center gap-3 text-xs text-slate-500 font-mono">
-            <div className="h-px bg-white/10 flex-1"></div>
-            <span>OU ACESSO DIRETO</span>
-            <div className="h-px bg-white/10 flex-1"></div>
-          </div>
+          {!hideDirectOwnerLogin && (
+            <div className="flex items-center gap-3 text-xs text-slate-500 font-mono">
+              <div className="h-px bg-white/10 flex-1"></div>
+              <span>OU ACESSO DIRETO</span>
+              <div className="h-px bg-white/10 flex-1"></div>
+            </div>
+          )}
         </div>
 
-        {/* Login Method 2: Direct Owner Email */}
+        {/* Login Method 2: Direct Owner Email (only for the internal ecosystem) */}
+        {!hideDirectOwnerLogin && (
         <form onSubmit={handleDirectOwnerLogin} className="space-y-3.5">
           <div className="space-y-1.5">
             <label className="text-[11px] font-mono text-slate-300 uppercase tracking-wider flex items-center justify-between">
@@ -175,6 +180,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
+        )}
 
         {/* Security Footer Note */}
         <div className="pt-2 border-t border-white/10 text-center space-y-1">

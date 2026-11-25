@@ -50,8 +50,13 @@ export const VideoEditorPro: React.FC = () => {
       const res = await fetch('/api/editor-pro/access', {
         headers: { Authorization: `Bearer ${idToken}` }
       });
+      if (!res.ok) {
+        if (res.status === 404) {
+          throw new Error('Servidor do Editor Pro indisponivel: a API do site ainda nao foi publicada. Avise o administrador.');
+        }
+        throw new Error('Nao foi possivel consultar sua assinatura. Tente novamente em instantes.');
+      }
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Nao foi possivel consultar sua assinatura.');
       setAccess(data);
     } catch (err: any) {
       setAuthError(err?.message || 'Erro ao consultar acesso.');

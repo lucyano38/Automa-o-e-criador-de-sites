@@ -123,6 +123,7 @@ export default function App() {
           onSuccessRedirect={() => navigate('/editor-pro')}
           onGoHome={() => navigate('/')}
           redirectReason="Entre com sua conta Google para acessar o Editor Pro."
+          hideDirectOwnerLogin
         />
       );
     }
