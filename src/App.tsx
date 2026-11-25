@@ -29,6 +29,7 @@ import { AiSiteBuilderScreen } from './components/AiSiteBuilderScreen';
 import { ProductivityShowcaseScreen } from './components/ProductivityShowcaseScreen';
 import { CheckoutSuccessModal } from './components/CheckoutSuccessModal';
 import { VideoEditorPro } from './components/VideoEditorPro';
+import { CreatorStudio } from './components/CreatorStudio';
 import { useFirebase } from './contexts/FirebaseContext';
 
 export default function App() {
@@ -131,7 +132,7 @@ export default function App() {
       <div className="min-h-screen bg-[#0d0f10] text-slate-100 font-sans selection:bg-cyan-500/30 selection:text-cyan-300">
         <PrivateNavbar currentPath={currentPath} onNavigate={navigate} />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
-          <VideoEditorPro />
+          <CreatorStudio />
         </main>
       </div>
     );
