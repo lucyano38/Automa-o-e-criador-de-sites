@@ -11,25 +11,33 @@ import Stripe from 'stripe';
 export const OWNER_EMAIL = 'lucyano.pci@gmail.com';
 export const EDITOR_PRO_LIMIT = 5;
 
+const PROJECT_ID = process.env.FIREBASE_PROJECT_ID || 'appcuidador-23628';
+
 function initFirebaseAdmin() {
   if (getApps().length) return;
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
   if (raw) {
     try {
       const sa = JSON.parse(raw);
-      initializeApp({ credential: cert(sa), projectId: sa.project_id });
+      initializeApp({ credential: cert(sa), projectId: sa.project_id || PROJECT_ID });
       return;
     } catch (err) {
       console.error('[Editor Pro] FIREBASE_SERVICE_ACCOUNT invalida:', err);
     }
   }
   // Sem service account, a verificacao de token ainda funciona (chaves publicas do Google).
-  initializeApp({ projectId: process.env.FIREBASE_PROJECT_ID });
+  initializeApp({ projectId: PROJECT_ID });
 }
 
 initFirebaseAdmin();
 
-export const db = getFirestore();
+// Firestore e inicializado sob demanda: se as credenciais nao estiverem
+// configuradas, a verificacao de token continua funcionando.
+let firestore: ReturnType<typeof getFirestore> | null = null;
+function getDb() {
+  if (!firestore) firestore = getFirestore();
+  return firestore;
+}
 export const adminAuth = getAuth();
 
 export function getStripe(): Stripe | null {
@@ -39,7 +47,7 @@ export function getStripe(): Stripe | null {
 
 export async function safeDbSave(collection: string, docId: string, data: any) {
   try {
-    await db.collection(collection).doc(docId).set(data, { merge: true });
+    await getDb().collection(collection).doc(docId).set(data, { merge: true });
   } catch (err: any) {
     console.warn(`[Editor Pro] Falha ao salvar ${collection}/${docId}:`, err?.message || err);
   }
@@ -47,7 +55,7 @@ export async function safeDbSave(collection: string, docId: string, data: any) {
 
 export async function safeDbGet(collection: string, docId: string): Promise<any | null> {
   try {
-    const doc = await db.collection(collection).doc(docId).get();
+    const doc = await getDb().collection(collection).doc(docId).get();
     if (doc.exists) return doc.data();
   } catch (err: any) {
     console.warn(`[Editor Pro] Falha ao ler ${collection}/${docId}:`, err?.message || err);
