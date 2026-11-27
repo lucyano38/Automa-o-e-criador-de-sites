@@ -1,6 +1,6 @@
 {
   "framework": "vite",
   "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/((?!api/|review-memory-foam-pillow\\.html).*)", "destination": "/index.html" }
   ]
 }
