@@ -1,6 +1,9 @@
 {
   "framework": "vite",
   "rewrites": [
-    { "source": "/((?!api/|review-memory-foam-pillow\\.html).*)", "destination": "/index.html" }
+    {
+      "source": "/((?!api/|review-memory-foam-pillow\\.html|review-woodworking-plans\\.html).*)",
+      "destination": "/index.html"
+    }
   ]
 }
