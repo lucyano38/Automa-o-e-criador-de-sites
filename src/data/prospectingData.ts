@@ -13,6 +13,16 @@ export const CNAE_NICHES: CnaeNicheOption[] = [
     recommendedPitchHint: 'Identificar se não tem site (construir do zero) ou se tem site antigo lento (modernizar e acelerar).',
   },
   {
+    id: 'todos',
+    name: 'Todos os Nichos & Empresas',
+    cnaeCode: 'MULTISSETORIAL',
+    cnaeDescription: 'Varredura ampla multissetorial em todos os comércios locais',
+    icon: '🌐',
+    category: 'Geral',
+    serviceToOffer: 'Criação de Presença Digital & Modernização Web',
+    recommendedPitchHint: 'Identificar se não tem site (construir do zero) ou se tem site antigo lento (modernizar e acelerar).',
+  },
+  {
     id: 'saude',
     name: 'Clínicas Médicas & Odontologia',
     cnaeCode: '8630-5/01',
