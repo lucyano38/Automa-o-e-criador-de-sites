@@ -30,6 +30,8 @@ import { ProductivityShowcaseScreen } from './components/ProductivityShowcaseScr
 import { CheckoutSuccessModal } from './components/CheckoutSuccessModal';
 import { VideoEditorPro } from './components/VideoEditorPro';
 import { CreatorStudio } from './components/CreatorStudio';
+import { PalletsPage } from './components/pallets/PalletsPage';
+import { PalletsTeaser } from './components/PalletsTeaser';
 import { useFirebase } from './contexts/FirebaseContext';
 
 export default function App() {
@@ -191,6 +193,24 @@ export default function App() {
   }
 
   // View: Public Visitor Landing Page (focoemdados.com.br)
+  // Public B2B pallets niche (/pallets)
+  if (currentPath === '/pallets') {
+    return (
+      <div className="min-h-screen bg-[#05070a] text-white">
+        <Header
+          activeTab="pallets"
+          setActiveTab={setActiveTab}
+          onOpenWhatsApp={() => handleOpenWhatsAppWithMessage()}
+          onNavigate={navigate}
+          isOwner={isOwner}
+          currentPath={currentPath}
+        />
+        <PalletsPage />
+        <Footer onNavigate={navigate} onOpenWhatsApp={() => handleOpenWhatsAppWithMessage()} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0d0f10] text-slate-100 font-sans selection:bg-cyan-500/30 selection:text-cyan-300">
       
@@ -227,6 +247,7 @@ export default function App() {
               {/* High-Converting Services & Transparent Pricing Blocks */}
               <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
                 <ServicePricingBlocks onOpenWhatsAppWithMessage={handleOpenWhatsAppWithMessage} />
+                <PalletsTeaser onNavigate={navigate} onOpenWhatsApp={() => handleOpenWhatsAppWithMessage()} />
               </motion.div>
 
               {/* Portfolio & Case Studies Showcase */}
