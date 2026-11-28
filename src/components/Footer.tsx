@@ -27,6 +27,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAuthModal, onNavigate, isO
   };
 
   const handleNavLink = (target: string) => {
+    if (target === 'pallets') { if (onNavigate) onNavigate('/pallets'); return; }
     if (target === 'home') {
       if (onNavigate) {
         onNavigate('/');
@@ -179,7 +180,8 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAuthModal, onNavigate, isO
                   Planos & Preços
                 </button>
               </li>
-            </ul>
+            <li><button onClick={() => handleNavLink('pallets')} className="hover:text-cyan-400 transition-colors cursor-pointer flex items-center gap-1.5"><span>Pallets B2B</span><span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-400">NOVO</span></button></li>
+</ul>
           </div>
 
           {/* Coluna 3 (Centro-Direita - 2 cols): Seção LEGAL */}
