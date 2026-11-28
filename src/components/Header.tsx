@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, MessageSquare, ShieldCheck, ArrowRight, LogIn } from 'lucide-react';
 
 interface HeaderProps {
+  currentPath?: string;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onOpenWhatsApp: () => void;
@@ -50,6 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
   }, [mobileMenuOpen]);
 
   const navTabs = [
+    { id: 'pallets', label: 'PALLETS' },
     { id: 'solucoes', label: 'INÍCIO' },
     { id: 'servicos', label: 'SERVIÇOS & PLANOS' },
     { id: 'cases', label: 'PORTFÓLIO' },
@@ -60,6 +62,7 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   const handleNavClick = (tabId: string) => {
+    if (tabId === 'pallets') { onNavigate('/pallets'); setMobileMenuOpen(false); return; }
     // Rota aditiva do Editor Pro (nao altera o comportamento das abas antigas).
     if (tabId === 'editor-pro') {
       onNavigate('/editor-pro');
