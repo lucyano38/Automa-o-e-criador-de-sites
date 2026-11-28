@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Areas privadas do ecossistema
+Disallow: /login
+Disallow: /dashboard
+Disallow: /prospecting
+Disallow: /crm
+Disallow: /content
+Disallow: /data-analysis
+Disallow: /site-builder
+Disallow: /vitrine
+Disallow: /produtividade
+Disallow: /editor-pro
+
+Sitemap: https://focoemdados.com.br/sitemap.xml
